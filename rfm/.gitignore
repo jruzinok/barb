@@ -1,0 +1,21 @@
+*.sw?
+.DS_Store
+.document
+.yardoc
+local_testing
+coverage
+*doc
+pkg
+*.gem
+*.bak
+*.md.html
+Gemfile.lock
+*.diff
+.bundle/***
+vendor/***
+# you can keep ruby-version in git repo, but don't include it in gem build.
+.ruby-version
+ruby-prof-*.html
+ruby-prof-*.txt
+# hide ruby-prof output images (used in html reports)
+/*.png

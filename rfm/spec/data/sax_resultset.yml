@@ -1,0 +1,40 @@
+#####  SAX PARSER CONFIGURATION  #####
+---
+elements:
+  fmresultset:
+    class: FmResultset
+    hide: true
+    elements:
+      datasource:
+        class: Datasource
+      metadata:
+        class: Metadata
+        elements:
+          field_definition:
+      resultset:
+        class: Resultset
+        individual_attributes: true
+        before_close: :attach_parent_objects
+        elements:
+          record:
+            class: Record
+            hide_attributes: true
+            elements:
+              field:
+                class: Field
+                hide: true
+                before_close: :build_record_data
+              relatedset:
+                class: RelatedSet
+                as_attribute: portals
+                delineate_with_hash: table
+                elements:
+                  record:
+                    class: Record
+                    hide_attributes: true
+                    elements:
+                      field:
+                        class: Field
+                        hide: true
+                        before_close: :build_record_data
+...
