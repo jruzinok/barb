@@ -15,7 +15,7 @@ def charge_credit_card()
 	
 	response = transaction.create_transaction(request)
 
-	if response != null
+	if response.transactionResponse != nil
 		if response.messages.resultCode == MessageTypeEnum::Ok
 			@responseKind = "OK"
 			@transactionID = response.transactionResponse.transId
@@ -27,8 +27,9 @@ def charge_credit_card()
 			@responseMessage = response.messages.messages[0].text
 			@responseError =  response.transactionResponse.errors.errors[0].errorText
 		end
+
 	else
-		@responseKind = "Error"
+		@responseKind = "Failure"
 		@responseMessage = "This payment failed to process"
 	end
 end
