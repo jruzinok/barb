@@ -1,5 +1,4 @@
 :host: "192.168.0.1"
-:database: "PTD16"
 :port: 80
 :ssl: false
 :account_name: "CreditCardProcessor"
