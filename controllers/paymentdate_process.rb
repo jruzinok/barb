@@ -15,19 +15,20 @@ def charge_credit_card()
 	
 	response = transaction.create_transaction(request)
 
-	if response.messages.resultCode == MessageTypeEnum::Ok
-		@responseKind = "OK"
-		@transactionID = response.transactionResponse.transId
-		@authorizationCode = response.transactionResponse.authCode
-		# puts "Successful charge (auth + capture) (authorization code: #{response.transactionResponse.authCode})"
+	if response != null
+		if response.messages.resultCode == MessageTypeEnum::Ok
+			@responseKind = "OK"
+			@transactionID = response.transactionResponse.transId
+			@authorizationCode = response.transactionResponse.authCode
+		else
+			@responseKind = "Error"
+			@transactionID = response.transactionResponse.transId
+			@responseCode =  response.transactionResponse.errors.errors[0].errorCode
+			@responseMessage = response.messages.messages[0].text
+			@responseError =  response.transactionResponse.errors.errors[0].errorText
+		end
 	else
 		@responseKind = "Error"
-		@transactionID = response.transactionResponse.transId
-		@responseCode =  response.transactionResponse.errors.errors[0].errorCode
-		@responseMessage = response.messages.messages[0].text
-		@responseError =  response.transactionResponse.errors.errors[0].errorText
-		# raise "Failed to charge card."
+		@responseMessage = "This payment failed to process"
 	end
-	
-	# return response
 end
