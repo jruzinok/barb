@@ -4,19 +4,32 @@ require 'bigdecimal'
 # 	@record = PaymentDate.find params[:id]
 # end
 
-def find_by_batch (batch)
-	@paymentdates = PaymentDate.find(:_kF_PaymentBatch => batch)
+def find_by_batch
+	if @database == "PTD"
+		@paymentdates = PTDPaymentDate.find(:_kF_PaymentBatch => @batch)
+	elsif @database == "BC"
+		@paymentdates = BCPaymentDate.find(:_kF_PaymentBatch => @batch)
+	end
 end
 
 def find_by_status_and_date
-	@paymentdates = PaymentDate.find(:zzF_Status => @status, :Date => @date)
+	if @database == "PTD"
+		@paymentdates = PTDPaymentDate.find(:zzF_Status => @status, :Date => @date)
+	elsif @database == "BC"
+		@paymentdates = BCPaymentDate.find(:zzF_Status => @status, :Date => @date)
+	end
 end
 
-def process (batch)
-	# @date = "3/28/2016"
-	# @status = "Scheduled"
-	# find_by_status_and_date
-	find_by_batch (batch)
+def process
+	find_by_batch
+
+	# This outputs the batch id. It's used to display acts as the header or beginning of the process
+	puts "\n\n\n\n\n"
+	puts "\n----------------------------------------"
+	puts "\n[DATABASE] #{@database}"
+	puts "\n[BATCH] #{@batch})"
+	puts "\n[TIMESTAMP] #{Time.now.utc.iso8601}"
+	puts "\n----------------------------------------"
 
 	@paymentdates.each do |pd|
 		@paymentdate = pd
@@ -30,7 +43,8 @@ def process (batch)
 end
 
 def load
-	rel = "T54_PaymentDate | PAYMENTFORM::"
+	@serial = @paymentdate[:_Serial]
+	rel = "T54_PaymentDate | PAYMENTMETHOD::"
 	@cardname = @paymentdate["#{rel}zzC_Name_Full"]
 	@cardnumber = @paymentdate["#{rel}CreditCard_Number"]
 	@carddate = @paymentdate["#{rel}MMYY"]
@@ -41,8 +55,10 @@ end
 def report
 	if @responseKind == "OK"
 		puts "[Success] CardNumber: #{@cardnumber} Authorization: #{@authorizationCode})"
-	else
+	elsif @responseKind == "Error"
 		puts "[Error] CardNumber: #{@cardnumber} Error: #{@responseCode} #{@responseError} #{@responseMessage})"
+	elsif @responseKind == "Failure"
+		puts "[Failure] PaymentDate Serial: #{@serial} Error: #{@responseMessage})"
 	end
 end
 
@@ -51,10 +67,12 @@ def update
 		@paymentdate[:zzF_Status] = "Approved"
 		@paymentdate[:zzPP_Transaction] = @transactionID
 		@paymentdate[:zzPP_Authorization_Code] = @authorizationCode
-	else
+	elsif @responseKind == "Error"
 		@paymentdate[:zzF_Status] = "Declined"
 		@paymentdate[:zzPP_Response_Code] = @responseCode
 		@paymentdate[:zzPP_Response_Error] = @responseError
+		@paymentdate[:zzPP_Response_Message] = @responseMessage
+	elsif @responseKind == "Failure"
 		@paymentdate[:zzPP_Response_Message] = @responseMessage
 	end
 

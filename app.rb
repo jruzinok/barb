@@ -14,9 +14,10 @@ require_relative 'controllers/paymentdate_process.rb'
 
 class CreditCard < Sinatra::Application
 
-	get '/process/:batch' do
+	get '/process/:database/:batch' do
+		@database = params[:database]
 		@batch = params[:batch]
-		process (@batch)
+		process
 	end
 
 	# FUTURE DEVELOPMENT
