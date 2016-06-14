@@ -4,6 +4,7 @@ require 'rfm'
 require 'authorizenet'
 # require 'rack-flash'
 require 'sinatra'
+require 'openssl'
 
 # This loads the Ruby 2 FileMaker server configuration settings.
 config = YAML.load_file(File.dirname(__FILE__) + "/config/rfm.yml")
