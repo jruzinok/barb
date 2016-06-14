@@ -42,7 +42,7 @@ def process
 	end
 
 	# This final step calls the Payment Processor Tool script in the Payment Processor application file.
-	@step5 = PPPaymentDate.find({:_kF_PaymentBatch => @batch}, :post_script => ["Payment Processor Tool", "Initiate from Ruby"])
+	@step5 = BCPaymentDate.find({:_kF_PaymentBatch => @batch}, :post_script => ["PaymentProcessorCallBack", "#{@batch}¶Initiate from Ruby"])
 end
 
 def load
