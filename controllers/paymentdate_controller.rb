@@ -43,13 +43,14 @@ def process
 end
 
 def load
-	@serial = @paymentdate[:_Serial]
+	@serial = @paymentdate["_Serial"]
 	rel = "T54_PaymentDate | PAYMENTMETHOD::"
 	@cardname = @paymentdate["#{rel}zzC_Name_Full"]
 	@cardnumber = @paymentdate["#{rel}CreditCard_Number"]
 	@carddate = @paymentdate["#{rel}MMYY"]
 	@cardcvv = @paymentdate["#{rel}CVV"]
-	@amount = @paymentdate[:Amount].to_f
+	@amount = @paymentdate["Amount"].to_f
+	@bc = @paymentdate["T54_LINK::zzC_BC_Location_ABBR"]
 end
 
 def report
