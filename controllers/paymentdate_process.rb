@@ -10,7 +10,18 @@ def charge_credit_card()
 	request.transactionRequest = TransactionRequestType.new()
 	request.transactionRequest.amount = @amount
 	request.transactionRequest.payment = PaymentType.new
-	request.transactionRequest.payment.creditCard = CreditCardType.new(@cardnumber, @carddate, @cardcvv) 
+	request.transactionRequest.payment.creditCard = CreditCardType.new(@cardnumber, @carddate, @cardcvv)
+
+	# Contestant First and Last Names + Address
+	request.transactionRequest.billTo = BillTo.new()
+	request.transactionRequest.billTo.firstName = @namefirst
+	request.transactionRequest.billTo.lastName = @namelast
+	request.transactionRequest.billTo.address = @address
+	request.transactionRequest.billTo.city = @city
+	request.transactionRequest.billTo.state = @state
+	request.transactionRequest.billTo.zip = @zip
+	request.transactionRequest.billTo.country = "US"
+
 	request.transactionRequest.transactionType = TransactionTypeEnum::AuthCaptureTransaction
 
 	# HARDCODED GL CODES for BCs NEEDS to be updated!
@@ -25,10 +36,8 @@ def charge_credit_card()
 
 				# Capture the response variables for all transactions.
 				@response = response
-				@avs = response.avs_response
-				@avsCode = response.avsResultCode
-				@cvv = response.cvv_response
-				@cvvCode = response.cvvResultCode
+				@avsCode = response.transactionResponse.avsResultCode
+				@cvvCode = response.transactionResponse.cvvResultCode
 
 			if response.transactionResponse.authCode != "000000"
 				@responseKind = "OK"
