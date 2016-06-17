@@ -47,7 +47,8 @@ end
 
 def load
 	@serial = @paymentdate["_Serial"].to_s
-	@cardname = @paymentdate["T54_Link | DIRECTORY ~ contestant::zzC_Name_FL"]
+	@namefirst = @paymentdate["T54_Link | DIRECTORY ~ contestant::Name_First"]
+	@namelast = @paymentdate["T54_Link | DIRECTORY ~ contestant::Name_Last"]
 
 	# Address values.
 	@address = @paymentdate["T54_PaymentMethod | CONTACTINFO::Add_Address1"]
@@ -78,9 +79,7 @@ end
 def update
 		# SAVE the response values for all transactions.
 		@paymentdate[:zzPP_Response] = @response
-		@paymentdate[:zzPP_Response_AVS] = @avs
 		@paymentdate[:zzPP_Response_AVS_Code] = @avsCode
-		@paymentdate[:zzPP_Response_CVV] = @cvv
 		@paymentdate[:zzPP_Response_CVV_Code] = @cvvCode
 
 	if @responseKind == "OK"
