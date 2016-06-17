@@ -2,7 +2,7 @@
 
 def transaction
 	config = YAML.load_file(File.dirname(__FILE__) + "/../config/credentials.yml")
-	Transaction.new(config['api_login_id'], config['api_transaction_key'], :gateway => :production)
+	Transaction.new(config['api_login_id'], config['api_transaction_key'], :gateway => :sandbox)
 end
 
 def charge_credit_card()
@@ -22,6 +22,14 @@ def charge_credit_card()
 
 	if response.transactionResponse != nil
 		if response.messages.resultCode == MessageTypeEnum::Ok
+
+				# Capture the response variables for all transactions.
+				@response = response
+				@avs = response.avs_response
+				@avsCode = response.avsResultCode
+				@cvv = response.cvv_response
+				@cvvCode = response.cvvResultCode
+
 			if response.transactionResponse.authCode != "000000"
 				@responseKind = "OK"
 				@transactionID = response.transactionResponse.transId
