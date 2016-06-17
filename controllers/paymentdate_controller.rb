@@ -46,12 +46,21 @@ def process
 end
 
 def load
-	@serial = @paymentdate["_Serial"]
-	rel = "T54_PaymentDate | PAYMENTMETHOD::"
-	@cardname = @paymentdate["#{rel}zzC_Name_Full"]
-	@cardnumber = @paymentdate["#{rel}CreditCard_Number"]
-	@carddate = @paymentdate["#{rel}MMYY"]
-	@cardcvv = @paymentdate["#{rel}CVV"]
+	@serial = @paymentdate["_Serial"].to_s
+	@cardname = @paymentdate["T54_Link | DIRECTORY ~ contestant::zzC_Name_FL"]
+
+	# Address values.
+	@address = @paymentdate["T54_PaymentMethod | CONTACTINFO::Add_Address1"]
+	@city = @paymentdate["T54_PaymentMethod | CONTACTINFO::Add_City"]
+	@state = @paymentdate["T54_PaymentMethod | CONTACTINFO::Add_State"]
+	@zip = @paymentdate["T54_PaymentMethod | CONTACTINFO::Add_Zip"]
+
+	# Credit Card values.
+	@cardnumber = @paymentdate["T54_PAYMENTMETHOD::CreditCard_Number"]
+	@carddate = @paymentdate["T54_PAYMENTMETHOD::MMYY"]
+	@cardcvv = @paymentdate["T54_PAYMENTMETHOD::CVV"]
+
+	# Transaction details.
 	@amount = @paymentdate["Amount"].to_f
 	@bc = @paymentdate["T54_LINK::zzC_BC_Location_ABBR"]
 end
@@ -60,13 +69,20 @@ def report
 	if @responseKind == "OK"
 		puts "[Success] CardNumber: #{@cardnumber} Authorization: #{@authorizationCode})"
 	elsif @responseKind == "Error"
-		puts "[Error] CardNumber: #{@cardnumber} Error: #{@responseCode} #{@responseError} #{@responseMessage})"
+		puts "[Error] CardNumber: #{@cardnumber} Error: #{@responseCode} #{@responseError})"
 	elsif @responseKind == "Failure"
 		puts "[Failure] PaymentDate Serial: #{@serial} Error: #{@responseMessage})"
 	end
 end
 
 def update
+		# SAVE the response values for all transactions.
+		@paymentdate[:zzPP_Response] = @response
+		@paymentdate[:zzPP_Response_AVS] = @avs
+		@paymentdate[:zzPP_Response_AVS_Code] = @avsCode
+		@paymentdate[:zzPP_Response_CVV] = @cvv
+		@paymentdate[:zzPP_Response_CVV_Code] = @cvvCode
+
 	if @responseKind == "OK"
 		@paymentdate[:zzF_Status] = "Approved"
 		@paymentdate[:zzPP_Transaction] = @transactionID
