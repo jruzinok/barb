@@ -67,32 +67,62 @@ def load
 end
 
 def report
-	if @responseKind == "OK"
-		puts "[Success] CardNumber: #{@cardnumber} Authorization: #{@authorizationCode})"
-	elsif @responseKind == "Error"
-		puts "[Error] CardNumber: #{@cardnumber} Error: #{@responseCode} #{@responseError})"
-	elsif @responseKind == "Failure"
-		puts "[Failure] PaymentDate Serial: #{@serial} Error: #{@responseMessage})"
+	if @responseKind == "Approved"
+		puts "[#{@responseKind}] CardNumber: #{@cardnumber} Authorization: #{@authorizationCode})"
+	else
+		puts "[#{@responseKind}] CardNumber: #{@cardnumber} Error: #{@responseError})"
 	end
+
+	puts "RESPONSECODE: #{@responseCode}"
+	puts "RESPONSEMESSAGE: #{@responseMessage}"
+	puts "RESPONSEERROR: #{@responseError}"
+	puts "\n----------------------------------------"
 end
 
 def update
 		# SAVE the response values for all transactions.
+
+	# Record the transaction results for each processed payment.
+	if @resultCode == "OK"
+		@paymentdate[:zzPP_Transaction] = @transactionID
+
 		@paymentdate[:zzPP_Response] = @response
 		@paymentdate[:zzPP_Response_AVS_Code] = @avsCode
 		@paymentdate[:zzPP_Response_CVV_Code] = @cvvCode
 
-	if @responseKind == "OK"
-		@paymentdate[:zzF_Status] = "Approved"
-		@paymentdate[:zzPP_Transaction] = @transactionID
-		@paymentdate[:zzPP_Authorization_Code] = @authorizationCode
-	elsif @responseKind == "Error"
-		@paymentdate[:zzF_Status] = "Declined"
 		@paymentdate[:zzPP_Response_Code] = @responseCode
-		@paymentdate[:zzPP_Response_Error] = @responseError
-		@paymentdate[:zzPP_Response_Message] = @responseMessage
-	elsif @responseKind == "Failure"
-		@paymentdate[:zzPP_Response_Message] = @responseMessage
+
+		if @responseKind == "Approved"
+			@paymentdate[:zzF_Status] = "Approved"
+			@paymentdate[:zzPP_Authorization_Code] = @authorizationCode
+			@paymentdate[:zzPP_Response_Message] = @responseMessage
+
+		elsif @responseKind == "Declined"
+			@paymentdate[:zzF_Status] = "Declined"
+			@paymentdate[:zzPP_Response_Error] = @responseError
+
+		elsif @responseKind == "Error"
+			@paymentdate[:zzF_Status] = "Error"
+			@paymentdate[:zzPP_Response_Error] = @responseError
+
+		elsif @responseKind == "HeldforReview"
+			@paymentdate[:zzF_Status] = "HeldForReview"
+			@paymentdate[:zzPP_Response_Error] = @responseError
+		end
+
+	# These payments were NOT processes.
+	else
+		if @responseKind == "TransactionError"
+			@paymentdate[:zzF_Status] = "Error"
+			@paymentdate[:zzPP_Transaction] = @transactionID
+
+			@paymentdate[:zzPP_Response] = @response
+			@paymentdate[:zzPP_Response_Code] = @responseCode
+			@paymentdate[:zzPP_Response_Error] = @responseError
+
+		elsif @responseKind == "TransactionFailure"
+			@paymentdate[:zzPP_Response_Error] = @responseError
+		end
 	end
 
 	@paymentdate.save
