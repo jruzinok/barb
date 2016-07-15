@@ -39,6 +39,7 @@ def process
 		@step2 = charge_credit_card()
 		@step3 = report
 		@step4 = update
+		@step5 = clear
 	end
 
 	# This final step calls the Payment Processor Tool script in the Payment Processor application file.
@@ -126,4 +127,17 @@ def update
 	end
 
 	@paymentdate.save
+end
+
+def clear
+	@response = ""
+	@resultCode = ""
+	@transactionID = ""
+	@avsCode = ""
+	@cvvCode = ""
+	@responseCode = ""
+	@responseKind = ""
+	@authorizationCode = ""
+	@responseMessage = ""
+	@responseError = ""
 end
