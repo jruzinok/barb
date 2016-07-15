@@ -2,7 +2,7 @@
 
 def transaction
 	config = YAML.load_file(File.dirname(__FILE__) + "/../config/credentials.yml")
-	transaction = Transaction.new(config['api_login_id'], config['api_transaction_key'], :gateway => :sandbox)
+	transaction = Transaction.new(config['api_login_id'], config['api_transaction_key'], :gateway => :production)
 end
 
 def charge_credit_card()
