@@ -1,17 +1,21 @@
- include AuthorizeNet::API
+include AuthorizeNet::API
 
-def transaction
-	config = YAML.load_file(File.dirname(__FILE__) + "/../config/credentials.yml")
-	transaction = Transaction.new(config['api_login_id'], config['api_transaction_key'], :gateway => :production)
-end
-
-def charge_credit_card()
+def create_request
 	request = CreateTransactionRequest.new
 	request.transactionRequest = TransactionRequestType.new()
+	request.transactionRequest.transactionType = TransactionTypeEnum::AuthCaptureTransaction
 	request.transactionRequest.amount = @amount
+end
+
+def charge_credit_card
 	request.transactionRequest.payment = PaymentType.new
 	request.transactionRequest.payment.creditCard = CreditCardType.new(@cardnumber, @carddate, @cardcvv)
-	request.transactionRequest.transactionType = TransactionTypeEnum::AuthCaptureTransaction
+end
+
+def charge_customer_profile(customerProfileId = '36731856', customerPaymentProfileId = '33211899')
+	request.transactionRequest.profile = CustomerProfilePaymentType.new
+	request.transactionRequest.profile.customerProfileId = customerProfileId
+	request.transactionRequest.profile.paymentProfile = PaymentProfile.new(customerPaymentProfileId)
 end
 
 # HARDCODED GL CODES MUST be updated to set the year value dynamically.
@@ -27,6 +31,11 @@ def set_gl_codes
 		request.transactionRequest.order.description = "422"	
 	end
 
+end
+
+def transaction
+	config = YAML.load_file(File.dirname(__FILE__) + "/../config/credentials.yml")
+	transaction = Transaction.new(config['api_login_id'], config['api_transaction_key'], :gateway => :production)
 end
 
 def capture_response
