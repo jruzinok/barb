@@ -1,6 +1,6 @@
 include AuthorizeNet::API
 
-# This method string all the following methods together.
+# This method connects all of the payment processing methods together.
 def process_payment
 	@process1 = create_request
 
@@ -27,10 +27,10 @@ def charge_credit_card
 	request.transactionRequest.payment.creditCard = CreditCardType.new(@cardnumber, @carddate, @cardcvv)
 end
 
-def charge_customer_profile(customerProfileId = '36731856', customerPaymentProfileId = '33211899')
+def charge_customer_profile
 	request.transactionRequest.profile = CustomerProfilePaymentType.new
-	request.transactionRequest.profile.customerProfileId = customerProfileId
-	request.transactionRequest.profile.paymentProfile = PaymentProfile.new(customerPaymentProfileId)
+	request.transactionRequest.profile.customerProfileId = @profile_id
+	request.transactionRequest.profile.paymentProfile = PaymentProfile.new(@payment_id)
 end
 
 # HARDCODED GL CODES MUST be updated to set the year value dynamically.
