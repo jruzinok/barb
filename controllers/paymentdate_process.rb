@@ -1,5 +1,20 @@
 include AuthorizeNet::API
 
+# This method string all the following methods together.
+def process_payment
+	@process1 = create_request
+
+	if @has_authorize_ids == true
+		@process2 = charge_customer_profile
+	else
+		@process2 = charge_credit_card
+	end
+
+	@process3 = set_gl_codes
+	@process4 = initiate_transaction
+	@process5 = capture_response
+end
+
 def create_request
 	request = CreateTransactionRequest.new
 	request.transactionRequest = TransactionRequestType.new()
@@ -33,13 +48,13 @@ def set_gl_codes
 
 end
 
-def transaction
+def initiate_transaction
 	config = YAML.load_file(File.dirname(__FILE__) + "/../config/credentials.yml")
 	transaction = Transaction.new(config['api_login_id'], config['api_transaction_key'], :gateway => :production)
 end
 
 def capture_response
-	response = transaction.create_transaction(request)
+	response = initiate_transaction.create_transaction(request)
 
 	if response.transactionResponse != nil
 
