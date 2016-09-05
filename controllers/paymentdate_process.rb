@@ -11,28 +11,31 @@ def charge_credit_card()
 	request.transactionRequest.amount = @amount
 	request.transactionRequest.payment = PaymentType.new
 	request.transactionRequest.payment.creditCard = CreditCardType.new(@cardnumber, @carddate, @cardcvv)
-
 	request.transactionRequest.transactionType = TransactionTypeEnum::AuthCaptureTransaction
+end
 
-	# HARDCODED GL CODES for BCs NEEDS to be updated!
-	request.transactionRequest.order = OrderType.new()
-	request.transactionRequest.order.invoiceNumber = "BCOMP#{@bc}16"
-	request.transactionRequest.order.description = "422"
+# HARDCODED GL CODES MUST be updated to set the year value dynamically.
+def set_gl_codes
+	if @database == "PTD"
+		request.transactionRequest.order = OrderType.new()
+		request.transactionRequest.order.invoiceNumber = "PTD16"
+		request.transactionRequest.order.description = "423"	
+	elsif @database == "BC"
+		# HARDCODED GL CODES for BCs MUST be updated to be dynamic.
+		request.transactionRequest.order = OrderType.new()
+		request.transactionRequest.order.invoiceNumber = "BCOMP#{@bc}16"
+		request.transactionRequest.order.description = "422"	
+	end
 
-	# Contestant First and Last Names + Address
-	# transaction.set_fields = {first_name: @namefirst}
-	# transaction.set_fields = {last_name: @namelast}
-	# transaction.set_fields = {address: @address}
-	# transaction.set_fields = {city: @city}
-	# transaction.set_fields = {state: @state}
-	# transaction.set_fields = {zip: @zip}
+end
 
+def capture_response
 	response = transaction.create_transaction(request)
 
 	if response.transactionResponse != nil
 
 		# Capture the response variables for all transactions.
-		# @response = response
+		@response = response
 		# @avsCode = response.transactionResponse.avsResultCode
 		# @cvvCode = response.transactionResponse.cvvResultCode
 
