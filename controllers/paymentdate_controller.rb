@@ -36,7 +36,7 @@ def process
 		# These "steps" are for clarity sake.
 		# Later, these objects could be saved somewhere to log the steps of each batch when it's run.
 		@step1 = load
-		@step2 = charge_credit_card()
+		@step2 = process_payment
 		@step3 = report
 		@step4 = update
 		@step5 = clear
@@ -56,6 +56,11 @@ def load
 	@city = @paymentdate["T54_PaymentMethod | CONTACTINFO::Add_City"]
 	@state = @paymentdate["T54_PaymentMethod | CONTACTINFO::Add_State"]
 	@zip = @paymentdate["T54_PaymentMethod | CONTACTINFO::Add_Zip"]
+
+	# TBD: CAPTURE the customer's profile id and payment id.
+	@profile_id = @paymentdate["T54_Link | DIRECTORY ~ payingperson::TBD<<AUTHORIZE_NET_PROFILE_ID>>TBD"]
+	@payment_id = @paymentdate["T54_PAYMENTMETHOD::TBD<<AUTHORIZE_NET_PAYMENT_ID>>TBD"]
+	@has_authorize_ids = @profile_id && @payment_id ? true : false #oneline if/else statement.
 
 	# Credit Card values.
 	@cardnumber = @paymentdate["T54_PAYMENTMETHOD::CreditCard_Number"]
