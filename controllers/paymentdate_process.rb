@@ -5,7 +5,34 @@ def initiate_transaction
 	transaction = Transaction.new(config['api_login_id'], config['api_transaction_key'], :gateway => :production)
 end
 
-def capture_response
+# This method connects all of the payment processing methods together.
+def process_payment
+	request = CreateTransactionRequest.new
+	request.transactionRequest = TransactionRequestType.new()
+	request.transactionRequest.amount = @amount
+	request.transactionRequest.transactionType = TransactionTypeEnum::AuthCaptureTransaction
+	
+	if @has_authorize_ids == true
+		request.transactionRequest.profile = CustomerProfilePaymentType.new
+		request.transactionRequest.profile.customerProfileId = @profile_id
+		request.transactionRequest.profile.paymentProfile = PaymentProfile.new(@payment_id)	
+	else
+		request.transactionRequest.payment = PaymentType.new
+		request.transactionRequest.payment.creditCard = CreditCardType.new(@cardnumber, @carddate, @cardcvv)
+	end
+
+	# HARDCODED GL CODES MUST be updated to set the year value dynamically.
+	if @database == "PTD"
+		request.transactionRequest.order = OrderType.new()
+		request.transactionRequest.order.invoiceNumber = "PTD16"
+		request.transactionRequest.order.description = "423"	
+	elsif @database == "BC"
+		request.transactionRequest.order = OrderType.new()
+		request.transactionRequest.order.invoiceNumber = "BCOMP#{@bc}16"
+		request.transactionRequest.order.description = "422"	
+	end
+	
+	# PASS the transaction request and CAPTURE the transaction response.
 	response = initiate_transaction.create_transaction(request)
 
 	if response.transactionResponse != nil
