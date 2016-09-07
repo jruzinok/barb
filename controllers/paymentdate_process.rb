@@ -32,7 +32,7 @@ def process_payment
 
 	# CREATE the transaction.
 	transaction = Transaction.new(credentials['api_login_id'], credentials['api_transaction_key'], :gateway => :sandbox)
-
+	
 	# PASS the transaction request and CAPTURE the transaction response.
 	response = transaction.create_transaction(request)
 
@@ -40,8 +40,8 @@ def process_payment
 
 		# Capture the response variables for all transactions.
 		@response = response
-		# @avsCode = response.transactionResponse.avsResultCode
-		# @cvvCode = response.transactionResponse.cvvResultCode
+		@avsCode = response.transactionResponse.avsResultCode
+		@cvvCode = response.transactionResponse.cvvResultCode
 
 		# The transaction has a response.
 		if response.messages.resultCode == MessageTypeEnum::Ok
