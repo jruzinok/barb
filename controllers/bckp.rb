@@ -1,19 +1,47 @@
 include AuthorizeNet::API
 
-def initiate_transaction
-	config = YAML.load_file(File.dirname(__FILE__) + "/../config/credentials.yml")
-	transaction = Transaction.new(config['api_login_id'], config['api_transaction_key'], :gateway => :production)
-end
+# This method connects all of the payment processing methods together.
+def process_payment
+	request = CreateTransactionRequest.new
+	request.transactionRequest = TransactionRequestType.new()
+	request.transactionRequest.amount = @amount
+	request.transactionRequest.transactionType = TransactionTypeEnum::AuthCaptureTransaction
+	
+	if @has_authorize_ids == true
+		request.transactionRequest.profile = CustomerProfilePaymentType.new
+		request.transactionRequest.profile.customerProfileId = @profile_id
+		request.transactionRequest.profile.paymentProfile = PaymentProfile.new(@payment_id)	
+	else
+		request.transactionRequest.payment = PaymentType.new
+		request.transactionRequest.payment.creditCard = CreditCardType.new(@cardnumber, @carddate, @cardcvv)
+	end
 
-def capture_response
-	response = initiate_transaction.create_transaction(request)
+	# HARDCODED GL CODES MUST be updated to set the year value dynamically.
+	if @database == "PTD"
+		request.transactionRequest.order = OrderType.new()
+		request.transactionRequest.order.invoiceNumber = "PTD16"
+		request.transactionRequest.order.description = "423"	
+	elsif @database == "BC"
+		request.transactionRequest.order = OrderType.new()
+		request.transactionRequest.order.invoiceNumber = "BCOMP#{@bc}16"
+		request.transactionRequest.order.description = "422"	
+	end
+
+	# LOAD the Authorize.net api credentials.
+	credentials = YAML.load_file(File.dirname(__FILE__) + "/../config/credentials.yml")
+
+	# CREATE the transaction.
+	transaction = Transaction.new(credentials['api_login_id'], credentials['api_transaction_key'], :gateway => :sandbox)
+	
+	# PASS the transaction request and CAPTURE the transaction response.
+	response = transaction.create_transaction(request)
 
 	if response.transactionResponse != nil
 
 		# Capture the response variables for all transactions.
 		@response = response
-		# @avsCode = response.transactionResponse.avsResultCode
-		# @cvvCode = response.transactionResponse.cvvResultCode
+		@avsCode = response.transactionResponse.avsResultCode
+		@cvvCode = response.transactionResponse.cvvResultCode
 
 		# The transaction has a response.
 		if response.messages.resultCode == MessageTypeEnum::Ok
