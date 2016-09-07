@@ -43,7 +43,7 @@ def process
 	end
 
 	# This final step calls the Payment Processor Tool script in the Payment Processor application file.
-	@step5 = BCPaymentDate.find({:_kF_PaymentBatch => @batch}, :post_script => ["PaymentProcessorCallBack", "#{@batch}\nInitiate from Ruby"])
+	# @step6 = BCPaymentDate.find({:_kF_PaymentBatch => @batch}, :post_script => ["PaymentProcessorCallBack", "#{@batch}\nInitiate from Ruby"])
 end
 
 def load
@@ -58,8 +58,8 @@ def load
 	@zip = @paymentdate["T54_PaymentMethod | CONTACTINFO::Add_Zip"]
 
 	# TBD: CAPTURE the customer's profile id and payment id.
-	@profile_id = @paymentdate["T54_Link | DIRECTORY ~ payingperson::TBD<<AUTHORIZE_NET_PROFILE_ID>>TBD"]
-	@payment_id = @paymentdate["T54_PAYMENTMETHOD::TBD<<AUTHORIZE_NET_PAYMENT_ID>>TBD"]
+	@profile_id = @paymentdate["T54_DIRECTORY::Token_Profile_ID"]
+	@payment_id = @paymentdate["T54_PAYMENTMETHOD::Token_Payment_ID"]
 	@has_authorize_ids = @profile_id && @payment_id ? true : false #oneline if/else statement.
 
 	# Credit Card values.
