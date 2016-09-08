@@ -16,11 +16,11 @@ def process_payment
 	request.transactionRequest.amount = @amount
 	request.transactionRequest.transactionType = TransactionTypeEnum::AuthCaptureTransaction
 	
-	if @has_authorize_ids == true
+	if @ids_or_card == "ids"
 		request.transactionRequest.profile = CustomerProfilePaymentType.new
 		request.transactionRequest.profile.customerProfileId = @profile_id
 		request.transactionRequest.profile.paymentProfile = PaymentProfile.new(@payment_id)	
-	else
+	elsif @ids_or_card == "card"
 		request.transactionRequest.payment = PaymentType.new
 		request.transactionRequest.payment.creditCard = CreditCardType.new(@cardnumber, @carddate, @cardcvv)
 	end
