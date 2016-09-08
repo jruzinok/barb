@@ -1,5 +1,14 @@
 include AuthorizeNet::API
 
+def transaction
+	# LOAD the Authorize.net api credentials.
+	credentials = YAML.load_file(File.dirname(__FILE__) + "/../config/credentials.yml")
+
+	# CREATE the transaction.
+	transaction = Transaction.new(credentials['api_login_id'], credentials['api_transaction_key'], :gateway => :sandbox)
+end
+
+
 # This method connects all of the payment processing methods together.
 def process_payment
 	request = CreateTransactionRequest.new
@@ -26,12 +35,6 @@ def process_payment
 		request.transactionRequest.order.invoiceNumber = "BCOMP#{@bc}16"
 		request.transactionRequest.order.description = "422"	
 	end
-
-	# LOAD the Authorize.net api credentials.
-	credentials = YAML.load_file(File.dirname(__FILE__) + "/../config/credentials.yml")
-
-	# CREATE the transaction.
-	transaction = Transaction.new(credentials['api_login_id'], credentials['api_transaction_key'], :gateway => :sandbox)
 	
 	# PASS the transaction request and CAPTURE the transaction response.
 	response = transaction.create_transaction(request)
