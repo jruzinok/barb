@@ -36,7 +36,7 @@ def process
 		# These "steps" are for clarity sake.
 		# Later, these objects could be saved somewhere to log the steps of each batch when it's run.
 		@step1 = load
-		@step2 = process_payment
+		@step2 = process_or_skip
 		@step3 = report
 		@step4 = update
 		@step5 = clear
@@ -60,7 +60,6 @@ def load
 	# TBD: CAPTURE the customer's profile id and payment id.
 	@profile_id = @paymentdate["T54_DIRECTORY::Token_Profile_ID"]
 	@payment_id = @paymentdate["T54_PAYMENTMETHOD::Token_Payment_ID"]
-	@has_authorize_ids = @profile_id && @payment_id ? true : false #oneline if/else statement.
 
 	# Credit Card values.
 	@cardnumber = @paymentdate["T54_PAYMENTMETHOD::CreditCard_Number"]
@@ -70,6 +69,64 @@ def load
 	# Transaction details.
 	@amount = @paymentdate["Amount"].to_f
 	@bc = @paymentdate["T54_LINK::zzC_BC_Location_ABBR"]
+end
+
+# This determines whether or not to process this payment or not.
+def process_or_skip
+
+	# Check if this payment is by ids or card.
+	ids_or_card
+
+	if @ids_or_card == "ids" || @ids_or_card == "card"
+		process_payment
+	end
+end
+
+# This determines if this transaction should be processed using Authorize IDs or a CC.
+def ids_or_card
+
+	# If this record has (Authorize.net) IDs, validate them.
+	if @profile_id && @payment_id
+
+		# Validate the IDs.
+		validate_ids
+
+		if @valid_authorize_ids == true
+			@ids_or_card = "ids"
+		else
+			@ids_or_card = "Error"
+		end
+
+	# If this record has credit card values, use them.
+	else
+		@ids_or_card = "card"
+	end
+end
+
+def validate_ids
+	request = ValidateCustomerPaymentProfileRequest.new
+
+	#Edit this part to select a specific customer
+	request.customerProfileId = @profile_id
+	request.customerPaymentProfileId = @payment_id
+	request.validationMode = ValidationModeEnum::TestMode
+
+	# PASS the transaction request and CAPTURE the transaction response.
+	response = transaction.validate_customer_payment_profile(request)
+
+	if response.messages.resultCode == MessageTypeEnum::Ok
+		@valid_authorize_ids = true
+	else
+		@valid_authorize_ids = false
+
+		# Capture the complete response and set the ResultCode (logic variable) to Error.
+		@response = response
+		@resultCode = "ERROR"
+
+		@responseKind = "TokenError"
+		@responseCode = response.messages.messages[0].code
+		@responseError = response.messages.messages[0].text
+	end
 end
 
 def report
@@ -122,6 +179,11 @@ def update
 			@paymentdate[:zzF_Status] = "Error"
 			@paymentdate[:zzPP_Transaction] = @transactionID
 
+			@paymentdate[:zzPP_Response] = @response
+			@paymentdate[:zzPP_Response_Code] = @responseCode
+			@paymentdate[:zzPP_Response_Error] = @responseError
+
+		elsif @responseKind == "TokenError"
 			@paymentdate[:zzPP_Response] = @response
 			@paymentdate[:zzPP_Response_Code] = @responseCode
 			@paymentdate[:zzPP_Response_Error] = @responseError
