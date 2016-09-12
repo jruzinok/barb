@@ -47,7 +47,7 @@ def process
 end
 
 def load
-	@serial = @paymentdate["_Serial"].to_s
+	@serial = @paymentdate["_Serial"].to_i
 	@namefirst = @paymentdate["T54_Link | DIRECTORY ~ contestant::Name_First"]
 	@namelast = @paymentdate["T54_Link | DIRECTORY ~ contestant::Name_Last"]
 
@@ -147,15 +147,11 @@ def report
 		"Profile: #{@profile_id} Payment: #{@payment_id}"
 	end
 
-	if @responseKind == "Approved"
-		puts "[#{@responseKind}] CardNumber: #{@cardnumber} Authorization: #{@authorizationCode})"
-	else
-		puts "[#{@responseKind}] CardNumber: #{@cardnumber} Error: #{@responseError})"
-	end
-
-	puts "RESPONSECODE: #{@responseCode}"
-	puts "RESPONSEMESSAGE: #{@responseMessage}"
-	puts "RESPONSEERROR: #{@responseError}"
+	puts "\nRESPONSE: [#{@responseKind}]"
+	puts "MESSAGE: #{responseOutput}"
+	puts "CODE: #{@responseCode}"
+	puts "RECORD: #{@serial}"
+	puts "METHOD: #{paymentMethod}"
 	puts "\n----------------------------------------"
 end
 
