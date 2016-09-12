@@ -130,6 +130,23 @@ def validate_ids
 end
 
 def report
+
+	# This determines what to output, either the authorization or error data.
+	responseOutput =
+	if @responseKind == "Approved"
+		"Authorization: #{@authorizationCode}"
+	else
+		"Error: #{@responseError}"
+	end
+
+	# This determines what to output, either the card number or customer profile and payment ids.
+	paymentMethod =
+	if @ids_or_card == "card"
+		"Card: #{@cardnumber}"
+	else
+		"Profile: #{@profile_id} Payment: #{@payment_id}"
+	end
+
 	if @responseKind == "Approved"
 		puts "[#{@responseKind}] CardNumber: #{@cardnumber} Authorization: #{@authorizationCode})"
 	else
