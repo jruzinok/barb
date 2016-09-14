@@ -9,9 +9,9 @@ require 'openssl'
 # This loads the Ruby 2 FileMaker server configuration settings.
 config = YAML.load_file(File.dirname(__FILE__) + "/config/rfm.yml")
 
-require_relative 'models/paymentdate.rb'
-require_relative 'controllers/paymentdate_controller.rb'
-require_relative 'controllers/paymentdate_process.rb'
+require_relative 'paymentdate_model.rb'
+require_relative 'paymentdate_controller.rb'
+require_relative 'paymentdate_process.rb'
 
 class CreditCard < Sinatra::Application
 
