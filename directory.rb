@@ -1,4 +1,4 @@
-def create_customer_profile
+def create_customer
 	find_directory
 
 	if @record_found = true && @has_profile == false
