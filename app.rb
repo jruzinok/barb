@@ -30,10 +30,10 @@ class Profiles < Sinatra::Application
 		create_customer
 	end
 
-	post '/create-payment/:database/:directory_id/:paymentmethod_id' do
+	post '/create-payment/:database/:directory_id/:payment_method_id' do
 		@database = params[:database]
 		@directory_id = params[:directory_id]
-		@paymentmethod_id = params[:paymentmethod_id]
+		@payment_method_id = params[:payment_method_id]
 		create_payment
 	end
 end
