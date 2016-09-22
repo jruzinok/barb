@@ -12,6 +12,8 @@ config = YAML.load_file(File.dirname(__FILE__) + "/config/rfm.yml")
 require_relative 'model.rb'
 require_relative 'paymentdate_controller.rb'
 require_relative 'paymentdate_process.rb'
+require_relative 'directory.rb'
+require_relative 'paymentmethod.rb'
 
 class CreditCard < Sinatra::Application
 
@@ -27,13 +29,13 @@ class Profiles < Sinatra::Application
 	get '/create-customer/:database/:directory_id' do
 		@database = params[:database]
 		@directory_id = params[:directory_id]
-		create_customer
+		create_customer_token
 	end
 
 	post '/create-payment/:database/:directory_id/:payment_method_id' do
 		@database = params[:database]
 		@directory_id = params[:directory_id]
 		@payment_method_id = params[:payment_method_id]
-		create_payment
+		create_payment_token
 	end
 end
