@@ -24,9 +24,16 @@ end
 
 class Profiles < Sinatra::Application
 
-	get '/create-customer-profile/:database/:directory_id' do
+	get '/create-customer/:database/:directory_id' do
 		@database = params[:database]
 		@directory_id = params[:directory_id]
-		create_customer_profile
+		create_customer
+	end
+
+	post '/create-payment/:database/:directory_id/:paymentmethod_id' do
+		@database = params[:database]
+		@directory_id = params[:directory_id]
+		@paymentmethod_id = params[:paymentmethod_id]
+		create_payment
 	end
 end
