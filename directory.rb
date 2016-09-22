@@ -1,7 +1,7 @@
-def create_customer
+def create_customer_token
 	find_directory
 
-	if @record_found = true && @has_profile == false
+	if @directory_found = true && @has_customer_token == false
 		request = CreateCustomerProfileRequest.new
 		request.profile = CustomerProfileType.new(@directory_id,@namefull,nil, nil)
 
@@ -10,7 +10,7 @@ def create_customer
 		# The transaction has a response.
 		if @response.messages.resultCode == MessageTypeEnum::Ok
 			@responseKind = "OK"
-			@profile_id = @response.customerProfileId
+			@customer_token = @response.customerProfileId
 		else
 			@responseKind = "ERROR"
 			@responseCode = @response.messages.messages[0].code
@@ -27,10 +27,10 @@ def find_directory
 		@directory = BCDirectory.find(:__kP_Directory => @directory_id)
 
 		if @directory[0] != nil
-			@record_found = true
+			@directory_found = true
 			load_directory
 		else
-			@record_found = false
+			@directory_found = false
 		end
 	end
 end
@@ -39,22 +39,22 @@ def load_directory
 	@namefirst = @directory["Name_First"]
 	@namelast = @directory["Name_Last"]
 	@namefull = @namefirst +" "+ @namelast
-	@profile_id = @directory["Token_Profile_ID"]
+	@customer_token = @directory["Token_Profile_ID"]
 
-	check_profile
+	check_customer_token
 end
 
-def check_profile
-	if @profile_id != nil
-		@has_profile = true
+def check_customer_token
+	if @customer_token != nil
+		@has_customer_token = true
 	else
-		@has_profile = false
+		@has_customer_token = false
 	end
 end
 
 def update_directory
 	if @responseKind == "OK"
-		@directory[:Token_Profile_ID] = @profile_id
+		@directory[:Token_Profile_ID] = @customer_token
 	else
 		@directory[:zzPP_Response] = @response
 		@directory[:zzPP_Response_Code] = @responseCode
