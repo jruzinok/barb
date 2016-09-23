@@ -26,16 +26,22 @@ end
 
 class Profiles < Sinatra::Application
 
-	get '/create-customer/:database/:directory_id' do
+	get '/create-customer-token/:database/:directory_id' do
 		@database = params[:database]
 		@directory_id = params[:directory_id]
 		create_customer_token
 	end
 
-	post '/create-payment/:database/:directory_id/:payment_method_id' do
+	post '/create-payment-token/:database/:directory_id/:payment_method_id' do
 		@database = params[:database]
 		@directory_id = params[:directory_id]
 		@payment_method_id = params[:payment_method_id]
+
+		# Grab the credit card values from the POST object.
+		@cardnumber = params[:CreditCard]
+		@carddate = params[:MMYY]
+		@cardcvv = params[:CVV]
+
 		create_payment_token
 	end
 end
