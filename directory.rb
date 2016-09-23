@@ -36,6 +36,7 @@ def find_directory
 end
 
 def load_directory
+	@directory = @directory[0] # Load the record from the first position of the array.
 	@namefirst = @directory["Name_First"]
 	@namelast = @directory["Name_Last"]
 	@namefull = @namefirst +" "+ @namelast
@@ -60,7 +61,6 @@ def update_directory
 		@directory[:zzPP_Response_Code] = @responseCode
 		@directory[:zzPP_Response_Error] = @responseError
 	end
-end
 
 	@directory.save
 end
