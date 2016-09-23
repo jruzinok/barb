@@ -73,7 +73,6 @@ def update_payment_method
 		@payment_method[:zzPP_Response] = @response
 		@payment_method[:zzPP_Response_Error] = @responseError
 	end
-end
 
 	@payment_method.save
 end
