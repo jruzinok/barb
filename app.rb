@@ -42,6 +42,10 @@ class Profiles < Sinatra::Application
 		@carddate = params[:MMYY]
 		@cardcvv = params[:CVV]
 
+		# Return the response back to FileMaker.
+		status @status
+		body @body
+
 		create_payment_token
 	end
 end
