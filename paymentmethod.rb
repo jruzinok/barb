@@ -1,10 +1,14 @@
 def create_payment_token
 	find_directory
 	find_payment_method
+ 
+	if @directory_found == true && @has_customer_token == false && @preventloop != true
+		@preventloop = true
+		create_customer_token
+		create_payment_token
 
-	if @directory_found = true && @has_customer_token == true && @payment_method_found = true && @has_payment_token == false
+	elsif @directory_found == true && @has_customer_token == true && @payment_method_found == true && @has_payment_token == false
 		request = CreateCustomerPaymentProfileRequest.new
-		request.customerProfileId = @customer_token
 		creditcard = CreditCardType.new(@cardnumber,@carddate,@cardcvv)
 		payment = PaymentType.new(creditcard)
 		profile = CustomerPaymentProfileType.new(nil,nil,payment,nil,nil)
@@ -15,6 +19,7 @@ def create_payment_token
 		profile.billTo.city = @city
 		profile.billTo.state = @state
 		profile.billTo.zip = @zip
+		request.customerProfileId = @customer_token
 		request.paymentProfile = profile
 
 		@response = transaction.create_customer_payment_profile(request)
@@ -47,6 +52,7 @@ def find_payment_method
 end
 
 def load_payment_method
+	@payment_method = @payment_method[0]
 	@namefirst = @payment_method["Name_First"]
 	@namelast = @payment_method["Name_Last"]
 	@address = @payment_method["T55_CONTACTINFO::Add_Address1"]
