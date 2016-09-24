@@ -1,9 +1,9 @@
 def create_customer_token
 	find_directory
 
-	if @directory_found = true && @has_customer_token == false
+	if @directory_found == true && @has_customer_token == false
 		request = CreateCustomerProfileRequest.new
-		request.profile = CustomerProfileType.new(@directory_id,@namefull,nil, nil)
+		request.profile = CustomerProfileType.new(@serial,@namefull,nil,nil,nil) #(merchantCustomerId,description,email,paymentProfiles,shipToList)
 
 		@response = transaction.create_customer_profile(request)
 
@@ -38,8 +38,9 @@ end
 def load_directory
 	@directory = @directory[0] # Load the record from the first position of the array.
 	@namefirst = @directory["Name_First"]
+	@serial = @directory["_Serial"].to_i
 	@namelast = @directory["Name_Last"]
-	@namefull = @namefirst +" "+ @namelast
+	@namefull = "#{@namefirst} #{@namelast}"
 	@customer_token = @directory["Token_Profile_ID"]
 
 	check_customer_token
