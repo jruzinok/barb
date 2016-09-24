@@ -34,6 +34,7 @@ def create_payment_token
 		end
 
 		update_payment_method
+		payment_method_response ("authorize")
 		clear_response
 	end
 end
@@ -47,6 +48,7 @@ def find_payment_method
 			load_payment_method
 		else
 			@payment_method_found = false
+			payment_method_response ("filemaker")
 		end
 	end
 end
@@ -87,4 +89,14 @@ def clear_response
 	@response = ""
 	@responseKind = ""
 	@responseError = ""
+end
+
+def payment_method_response (kind)
+	if kind == "authorize"
+		@status = 200
+		@body = "CreatePaymentToken#{@responseKind}"
+	elsif kind == "filemaker"
+		@status = 400
+		@body = "PaymentMethodFindError"
+	end
 end
