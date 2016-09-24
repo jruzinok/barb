@@ -18,6 +18,7 @@ def create_customer_token
 		end
 
 		update_directory
+		directory_response ("authorize")
 		clear_response
 	end
 end
@@ -31,6 +32,7 @@ def find_directory
 			load_directory
 		else
 			@directory_found = false
+			directory_response ("filemaker")
 		end
 	end
 end
@@ -71,4 +73,14 @@ def clear_response
 	@responseKind = ""
 	@responseCode = ""
 	@responseError = ""
+end
+
+def directory_response (kind)
+	if kind == "authorize"
+		@status = 200
+		@body = "CreateCustomerToken#{@responseKind}"
+	elsif kind == "filemaker"
+		@status = 400
+		@body = "DirectoryFindError"
+	end
 end
