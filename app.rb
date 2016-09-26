@@ -6,6 +6,8 @@ require 'authorizenet'
 require 'sinatra'
 require 'openssl'
 
+set :environment, :production
+
 # This loads the Ruby 2 FileMaker server configuration settings.
 config = YAML.load_file(File.dirname(__FILE__) + "/config/rfm.yml")
 
@@ -14,6 +16,7 @@ require_relative 'paymentdate_controller.rb'
 require_relative 'paymentdate_process.rb'
 require_relative 'directory.rb'
 require_relative 'paymentmethod.rb'
+require_relative 'shared.rb'
 
 class CreditCard < Sinatra::Application
 
@@ -42,10 +45,10 @@ class Profiles < Sinatra::Application
 		@carddate = params[:MMYY]
 		@cardcvv = params[:CVV]
 
+		create_payment_token
+
 		# Return the response back to FileMaker.
 		status @status
 		body @body
-
-		create_payment_token
 	end
 end
