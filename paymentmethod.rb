@@ -47,7 +47,7 @@ def create_payment_token
 		log_error_to_console
 	end
 
-	payment_method_response
+	set_response
 	clear_response
 end
 
@@ -72,7 +72,7 @@ def find_payment_method
 			@payment_method_found = false
 			@statusCode = 300
 			@statusMessage = "[ERROR] PaymentMethodRecordNotFound"
-			payment_method_response
+			set_response
 			log_error_to_console
 		end
 	end
