@@ -5,20 +5,25 @@ def create_customer_token
 		request = CreateCustomerProfileRequest.new
 		request.profile = CustomerProfileType.new(@serial,@namefull,nil,nil,nil) #(merchantCustomerId,description,email,paymentProfiles,shipToList)
 
-		@response = transaction.create_customer_profile(request)
+		@theResponse = transaction.create_customer_profile(request)
 
 		# The transaction has a response.
-		if @response.messages.resultCode == MessageTypeEnum::Ok
+		if @theResponse.messages.resultCode == MessageTypeEnum::Ok
 			@responseKind = "OK"
-			@customer_token = @response.customerProfileId
+			@customer_token = @theResponse.customerProfileId
+			@statusCode = 200
+			@statusMessage = "[OK] CustomerTokenCreated"
 		else
 			@responseKind = "ERROR"
-			@responseCode = @response.messages.messages[0].code
-			@responseError = @response.messages.messages[0].text
+			@responseCode = @theResponse.messages.messages[0].code
+			@responseError = @theResponse.messages.messages[0].text
+			@statusCode = 210
+			@statusMessage = "[ERROR] CustomerTokenNotCreated"
+			log_error_to_console
 		end
 
 		update_directory
-		directory_response ("authorize")
+		set_response
 		clear_response
 	end
 end
@@ -32,7 +37,10 @@ def find_directory
 			load_directory
 		else
 			@directory_found = false
-			directory_response ("filemaker")
+			@statusCode = 300
+			@statusMessage = "[ERROR] DirectoryRecordNotFound"
+			set_response
+			log_error_to_console
 		end
 	end
 end
@@ -60,27 +68,10 @@ def update_directory
 	if @responseKind == "OK"
 		@directory[:Token_Profile_ID] = @customer_token
 	else
-		@directory[:zzPP_Response] = @response
+		@directory[:zzPP_Response] = @theResponse
 		@directory[:zzPP_Response_Code] = @responseCode
 		@directory[:zzPP_Response_Error] = @responseError
 	end
 
 	@directory.save
-end
-
-def clear_response
-	@response = ""
-	@responseKind = ""
-	@responseCode = ""
-	@responseError = ""
-end
-
-def directory_response (kind)
-	if kind == "authorize"
-		@status = 200
-		@body = "CreateCustomerToken#{@responseKind}"
-	elsif kind == "filemaker"
-		@status = 400
-		@body = "DirectoryFindError"
-	end
 end
