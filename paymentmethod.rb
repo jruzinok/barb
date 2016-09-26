@@ -1,13 +1,14 @@
 def create_payment_token
 	find_directory
 	find_payment_method
+	create_payment_token_logic
  
-	if @directory_found == true && @has_customer_token == false && @preventloop != true
+	if @logic == "CreateCustomerToken"
 		@preventloop = true
 		create_customer_token
 		create_payment_token
 
-	elsif @directory_found == true && @has_customer_token == true && @payment_method_found == true && @has_payment_token == false
+	elsif @logic == "CreatePaymentToken"
 		request = CreateCustomerPaymentProfileRequest.new
 		creditcard = CreditCardType.new(@cardnumber,@carddate,@cardcvv)
 		payment = PaymentType.new(creditcard)
@@ -22,20 +23,41 @@ def create_payment_token
 		request.customerProfileId = @customer_token
 		request.paymentProfile = profile
 
-		@response = transaction.create_customer_payment_profile(request)
+		@theResponse = transaction.create_customer_payment_profile(request)
 
 		# The transaction has a response.
-		if @response.messages.resultCode == MessageTypeEnum::Ok
+		if @theResponse.messages.resultCode == MessageTypeEnum::Ok
 			@responseKind = "OK"
-			@payment_token = @response.customerPaymentProfileId
+			@payment_token = @theResponse.customerPaymentProfileId
+			@statusCode = 200
+			@statusMessage = "[OK] PaymentTokenCreated"
 		else
 			@responseKind = "ERROR"
-			@responseError = @response.messages.messages[0].text
+			@responseError = @theResponse.messages.messages[0].text
+			@statusCode = 210
+			@statusMessage = "[ERROR] PaymentTokenNotCreated"
+			log_error_to_console
 		end
 
 		update_payment_method
-		payment_method_response ("authorize")
-		clear_response
+
+	elsif @logic == "PaymentTokenAlreadyCreated"
+		@statusCode = 220
+		@statusMessage = "[ERROR] PaymentTokenAlreadyCreated"
+		log_error_to_console
+	end
+
+	payment_method_response
+	clear_response
+end
+
+def create_payment_token_logic
+	if @directory_found == true && @has_customer_token == false && @preventloop != true
+		@logic = "CreateCustomerToken"
+	elsif @directory_found == true && @has_customer_token == true && @payment_method_found == true && @has_payment_token == false
+		@logic = "CreatePaymentToken"
+	elsif @directory_found == true && @has_customer_token == true && @payment_method_found == true && @has_payment_token == true
+		@logic = "PaymentTokenAlreadyCreated"
 	end
 end
 
@@ -48,7 +70,10 @@ def find_payment_method
 			load_payment_method
 		else
 			@payment_method_found = false
-			payment_method_response ("filemaker")
+			@statusCode = 300
+			@statusMessage = "[ERROR] PaymentMethodRecordNotFound"
+			payment_method_response
+			log_error_to_console
 		end
 	end
 end
@@ -78,25 +103,9 @@ def update_payment_method
 	if @responseKind == "OK"
 		@payment_method[:Token_Payment_ID] = @payment_token
 	else
-		@payment_method[:zzPP_Response] = @response
+		@payment_method[:zzPP_Response] = @theResponse
 		@payment_method[:zzPP_Response_Error] = @responseError
 	end
 
 	@payment_method.save
-end
-
-def clear_response
-	@response = ""
-	@responseKind = ""
-	@responseError = ""
-end
-
-def payment_method_response (kind)
-	if kind == "authorize"
-		@status = 200
-		@body = "CreatePaymentToken#{@responseKind}"
-	elsif kind == "filemaker"
-		@status = 400
-		@body = "PaymentMethodFindError"
-	end
 end
