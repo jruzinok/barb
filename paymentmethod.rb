@@ -33,6 +33,7 @@ def create_payment_token
 			@statusMessage = "[OK] PaymentTokenCreated"
 		else
 			@responseKind = "ERROR"
+			@responseCode = @theResponse.messages.messages[0].code
 			@responseError = @theResponse.messages.messages[0].text
 			@statusCode = 210
 			@statusMessage = "[ERROR] PaymentTokenNotCreated"
@@ -104,6 +105,7 @@ def update_payment_method
 		@payment_method[:Token_Payment_ID] = @payment_token
 	else
 		@payment_method[:zzPP_Response] = @theResponse
+		@payment_method[:zzPP_Response_Code] = @responseCode
 		@payment_method[:zzPP_Response_Error] = @responseError
 	end
 
