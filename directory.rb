@@ -31,17 +31,19 @@ end
 def find_directory
 	if @database == "BC"
 		@directory = BCDirectory.find(:__kP_Directory => @directory_id)
+	elsif @database == "PTD"
+		@directory = PTDDirectory.find(:__kP_Directory => @directory_id)
+	end
 
-		if @directory[0] != nil
-			@directory_found = true
-			load_directory
-		else
-			@directory_found = false
-			@statusCode = 300
-			@statusMessage = "[ERROR] DirectoryRecordNotFound"
-			set_response
-			log_error_to_console
-		end
+	if @directory[0] != nil
+		@directory_found = true
+		load_directory
+	else
+		@directory_found = false
+		@statusCode = 300
+		@statusMessage = "[ERROR] DirectoryRecordNotFound"
+		set_response
+		log_error_to_console
 	end
 end
 
