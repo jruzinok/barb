@@ -65,17 +65,19 @@ end
 def find_payment_method
 	if @database == "BC"
 		@payment_method = BCPaymentMethod.find(:__kP_PaymentMethod => @payment_method_id)
+	elsif @database == "PTD"
+		@payment_method = PTDPaymentMethod.find(:__kP_PaymentMethod => @payment_method_id)
+	end
 
-		if @payment_method[0] != nil
-			@payment_method_found = true
-			load_payment_method
-		else
-			@payment_method_found = false
-			@statusCode = 300
-			@statusMessage = "[ERROR] PaymentMethodRecordNotFound"
-			set_response
-			log_error_to_console
-		end
+	if @payment_method[0] != nil
+		@payment_method_found = true
+		load_payment_method
+	else
+		@payment_method_found = false
+		@statusCode = 300
+		@statusMessage = "[ERROR] PaymentMethodRecordNotFound"
+		set_response
+		log_error_to_console
 	end
 end
 
