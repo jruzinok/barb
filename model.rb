@@ -10,7 +10,7 @@ end
 
 class PTDPaymentMethod < Rfm::Base
 	config :database => 'PTD17'
-	config :layout => 'T56_WEB_PAYMENTMETHOD'
+	config :layout => 'T55_WEB_PAYMENTMETHOD'
 end
 
 class BCPaymentMethod < Rfm::Base
@@ -20,7 +20,7 @@ end
 
 class PTDDirectory < Rfm::Base
 	config :database => 'PTD17'
-	config :layout => 'T56_WEB_DIRECTORY'
+	config :layout => 'T55_WEB_DIRECTORY'
 end
 
 class BCDirectory < Rfm::Base
