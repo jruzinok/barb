@@ -6,6 +6,14 @@ def check_customer_token
 	end
 end
 
+def check_payment_token
+	if @payment_token != nil
+		@has_payment_token = true
+	else
+		@has_payment_token = false
+	end
+end
+
 def set_response
 	@status = @statusCode
 	@body = @statusMessage
