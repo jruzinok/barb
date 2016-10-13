@@ -27,3 +27,8 @@ class BCDirectory < Rfm::Base
 	config :database => 'Data'
 	config :layout => 'T55_WEB_DIRECTORY'
 end
+
+class DialerLeadPayment < Rfm::Base
+	config :database => 'DialerLeads'
+	config :layout => 'WEB_PAYMENT'
+end
