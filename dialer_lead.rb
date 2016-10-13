@@ -22,7 +22,7 @@ def create_dialer_lead_customer_token
 			log_error_to_console
 		end
 
-		update_dialier_lead
+		update_dialer_lead
 		set_response
 		clear_response			
 	end
