@@ -59,14 +59,6 @@ def load_directory
 	check_customer_token
 end
 
-def check_customer_token
-	if @customer_token != nil
-		@has_customer_token = true
-	else
-		@has_customer_token = false
-	end
-end
-
 def update_directory
 	if @responseKind == "OK"
 		@directory[:Token_Profile_ID] = @customer_token
