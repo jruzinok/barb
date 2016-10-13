@@ -16,6 +16,8 @@ require_relative 'paymentdate_controller.rb'
 require_relative 'paymentdate_process.rb'
 require_relative 'directory.rb'
 require_relative 'paymentmethod.rb'
+require_relative 'dialerlead.rb'
+require_relative 'dialerpayment.rb'
 require_relative 'shared.rb'
 
 class CreditCard < Sinatra::Application
@@ -54,6 +56,7 @@ class Profiles < Sinatra::Application
 
 	# This was designed to be called from the BookingDialer php web app.
 	post '/create-dialer-lead-payment/:lead_id' do
+		@database = "DL"
 		@recordtype = "DialerLead"
 		process_create_dialier_payment_request
 
@@ -64,6 +67,7 @@ class Profiles < Sinatra::Application
 
 	# This was designed to be called from the BookingDialer php web app.
 	post '/create-dialer-guest-payment/:lead_id/:guest_id' do
+		@database = "DL"
 		@recordtype = "DialerGuest"
 		process_create_dialier_payment_request
 
