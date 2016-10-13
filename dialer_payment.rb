@@ -1,30 +1,19 @@
-def save_dailerpayment
+def save_dailer_payment
 	if @responseKind == "OK"
-		@dailerpayment = DialerPayment.new
+		@dailer_payment = DialerPayment.new
 
-		@dailerpayment[:_kF_DialerLead] = @lead_id
-		@dailerpayment[:_kF_Guest] = @guest_id
+		@dailer_payment[:_kF_DialerLead] = @lead_id
+		@dailer_payment[:_kF_Guest] = @guest_id
+		@dailer_payment[:_kF_PaymentMethod] = @payment_method_id
 
-		@dailerpayment[:Token_Profile_ID] = @customer_token
-		@dailerpayment[:Token_Payment_ID] = @payment_token
-
-		@dailerpayment[:Date] = @date
-		@dailerpayment[:Amount] = @amount
-		
-		@dailerpayment[:Name_First] = @namefirst
-		@dailerpayment[:Name_Last] = @namelast
-		@dailerpayment[:CreditCard_Number] = @cardnumber
-		@dailerpayment[:MMYY] = @carddate
-		@dailerpayment[:CVV] = @cardcvv
-		@dailerpayment[:Address_Address] = @address
-		@dailerpayment[:Address_City] = @city
-		@dailerpayment[:Address_State] = @state
-		@dailerpayment[:Address_Zip] = @zip
+		@dailer_payment[:Date] = @date
+		@dailer_payment[:Amount] = @amount
+		@dailer_payment[:zzPP_Response_Code] = @responseCode
 	else
-		@dailerpayment[:zzPP_Response] = @theResponse
-		@dailerpayment[:zzPP_Response_Code] = @responseCode
-		@dailerpayment[:zzPP_Response_Error] = @responseError
+		@dailer_payment[:zzPP_Response] = @theResponse
+		@dailer_payment[:zzPP_Response_Code] = @responseCode
+		@dailer_payment[:zzPP_Response_Error] = @responseError
 	end
 
-	@dailerpayment.save
+	@dailer_payment.save
 end
