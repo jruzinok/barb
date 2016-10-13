@@ -63,7 +63,7 @@ class Profiles < Sinatra::Application
 	end
 
 	# This was designed to be called from the BookingDialer php web app.
-	post '/create-dialer-guest-payment/:guest_id' do
+	post '/create-dialer-guest-payment/:lead_id/:guest_id' do
 		@recordtype = "DialerGuest"
 		process_create_dialier_payment_request
 
