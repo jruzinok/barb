@@ -94,14 +94,6 @@ def load_payment_method
 	check_payment_token
 end
 
-def check_payment_token
-	if @payment_token != nil
-		@has_payment_token = true
-	else
-		@has_payment_token = false
-	end
-end
-
 def update_payment_method
 	if @responseKind == "OK"
 		@payment_method[:Token_Payment_ID] = @payment_token
