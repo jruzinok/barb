@@ -51,4 +51,24 @@ class Profiles < Sinatra::Application
 		status @status
 		body @body
 	end
+
+	# This was designed to be called from the BookingDialer php web app.
+	post '/create-dialer-lead-payment/:lead_id' do
+		@recordtype = "DialerLead"
+		process_create_dialier_payment_request
+
+		# Return the response back to the Dialer.
+		status @status
+		body @body
+	end
+
+	# This was designed to be called from the BookingDialer php web app.
+	post '/create-dialer-guest-payment/:guest_id' do
+		@recordtype = "DialerGuest"
+		process_create_dialier_payment_request
+
+		# Return the response back to the Dialer.
+		status @status
+		body @body
+	end
 end
