@@ -42,3 +42,8 @@ class DialerGuest < Rfm::Base
 	config :database => 'DialerLeads'
 	config :layout => 'WEB_DIALERGUEST'
 end
+
+class DialerPaymentMethod < Rfm::Base
+	config :database => 'DialerLeads'
+	config :layout => 'WEB_PAYMENTMETHOD'
+end
