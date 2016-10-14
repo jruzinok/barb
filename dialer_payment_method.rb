@@ -55,7 +55,24 @@ def find_dialer_payment_method
 	end
 end
 
+def find_dialer_payment_method_by_payment_token
+	@payment_method = DialerPaymentMethod.find(:Token_Payment_ID => @payment_token)
+
+	if @payment_method[0] != nil
+		@payment_method_found = true
+		load_dialer_payment_method
+	else
+		@payment_method_found = false
+		@statusCode = 300
+		@statusMessage = "[ERROR] PaymentMethodRecordNotFound"
+		set_response
+		log_error_to_console
+	end
+end
+
 def load_dialer_payment_method
+	@payment_method = @payment_method[0] # Load the record from the first position of the array.
+	@payment_method_id = @payment_method["__kP_PaymentMethod"]
 	@payment_token = @payment_method["Token_Payment_ID"]
 
 	check_payment_token
@@ -86,4 +103,9 @@ def save_dialer_payment_method
 	end
 
 	@dailer_payment_method.save
+
+	# GRAB the ID from the newly created PaymentMethod.
+	if @responseKind == "OK"
+		find_dialer_payment_method_by_payment_token
+	end
 end
