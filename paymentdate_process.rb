@@ -29,11 +29,15 @@ def process_payment
 	if @database == "PTD"
 		request.transactionRequest.order = OrderType.new()
 		request.transactionRequest.order.invoiceNumber = "PTD16"
-		request.transactionRequest.order.description = "423"	
+		request.transactionRequest.order.description = "423"
 	elsif @database == "BC"
 		request.transactionRequest.order = OrderType.new()
 		request.transactionRequest.order.invoiceNumber = "BCOMP#{@bc}16"
-		request.transactionRequest.order.description = "422"	
+		request.transactionRequest.order.description = "422"
+	elsif @database == "DL" #DialerLeads
+		request.transactionRequest.order = OrderType.new()
+		request.transactionRequest.order.invoiceNumber = "PTD17"
+		request.transactionRequest.order.description = "423"
 	end
 	
 	# PASS the transaction request and CAPTURE the transaction response.
