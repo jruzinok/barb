@@ -18,7 +18,7 @@ require_relative 'directory.rb'
 require_relative 'paymentmethod.rb'
 require_relative 'dialer_logic.rb'
 require_relative 'dialer_lead.rb'
-require_relative 'dialer_paymentmethod.rb'
+require_relative 'dialer_payment_method.rb'
 require_relative 'dialer_payment.rb'
 require_relative 'shared.rb'
 
