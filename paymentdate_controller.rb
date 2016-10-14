@@ -58,8 +58,8 @@ def load
 	@zip = @paymentdate["T54_PaymentMethod | CONTACTINFO::Add_Zip"]
 
 	# TBD: CAPTURE the customer's profile id and payment id.
-	@profile_id = @paymentdate["T54_DIRECTORY::Token_Profile_ID"]
-	@payment_id = @paymentdate["T54_PAYMENTMETHOD::Token_Payment_ID"]
+	@customer_token = @paymentdate["T54_DIRECTORY::Token_Profile_ID"]
+	@payment_token = @paymentdate["T54_PAYMENTMETHOD::Token_Payment_ID"]
 
 	# Credit Card values.
 	@cardnumber = @paymentdate["T54_PAYMENTMETHOD::CreditCard_Number"]
@@ -86,7 +86,7 @@ end
 def ids_or_card
 
 	# If this record has (Authorize.net) IDs, validate them.
-	if @profile_id && @payment_id
+	if @customer_token && @payment_token
 
 		# Validate the IDs.
 		validate_ids
@@ -107,8 +107,8 @@ def validate_ids
 	request = ValidateCustomerPaymentProfileRequest.new
 
 	#Edit this part to select a specific customer
-	request.customerProfileId = @profile_id
-	request.customerPaymentProfileId = @payment_id
+	request.customerProfileId = @customer_token
+	request.customerPaymentProfileId = @payment_token
 	request.validationMode = ValidationModeEnum::TestMode
 
 	# PASS the transaction request and CAPTURE the transaction response.
@@ -120,7 +120,7 @@ def validate_ids
 		@valid_authorize_ids = false
 
 		# Capture the complete response and set the ResultCode (logic variable) to Error.
-		@response = response
+		@theResponse = response
 		@resultCode = "ERROR"
 
 		@responseKind = "TokenError"
@@ -144,7 +144,7 @@ def report
 	if @ids_or_card == "card"
 		"Card: #{@cardnumber}"
 	else
-		"Profile: #{@profile_id} Payment: #{@payment_id}"
+		"Profile: #{@customer_token} Payment: #{@payment_token}"
 	end
 
 	puts "\nRESPONSE: [#{@responseKind}]"
@@ -162,7 +162,7 @@ def update
 	if @resultCode == "OK"
 		@paymentdate[:zzPP_Transaction] = @transactionID
 
-		@paymentdate[:zzPP_Response] = @response
+		@paymentdate[:zzPP_Response] = @theResponse
 		@paymentdate[:zzPP_Response_AVS_Code] = @avsCode
 		@paymentdate[:zzPP_Response_CVV_Code] = @cvvCode
 
@@ -192,12 +192,12 @@ def update
 			@paymentdate[:zzF_Status] = "Error"
 			@paymentdate[:zzPP_Transaction] = @transactionID
 
-			@paymentdate[:zzPP_Response] = @response
+			@paymentdate[:zzPP_Response] = @theResponse
 			@paymentdate[:zzPP_Response_Code] = @responseCode
 			@paymentdate[:zzPP_Response_Error] = @responseError
 
 		elsif @responseKind == "TokenError"
-			@paymentdate[:zzPP_Response] = @response
+			@paymentdate[:zzPP_Response] = @theResponse
 			@paymentdate[:zzPP_Response_Code] = @responseCode
 			@paymentdate[:zzPP_Response_Error] = @responseError
 
@@ -210,7 +210,7 @@ def update
 end
 
 def clear
-	@response = ""
+	@theResponse = ""
 	@resultCode = ""
 	@transactionID = ""
 	@avsCode = ""

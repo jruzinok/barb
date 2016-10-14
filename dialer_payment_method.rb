@@ -1,4 +1,5 @@
 def create_dialer_payment_token
+ find_dialer_lead
  
 	if @has_customer_token == true
 		request = CreateCustomerPaymentProfileRequest.new
@@ -35,8 +36,8 @@ def create_dialer_payment_token
 		save_dialer_payment_method
 	end
 
-	set_response
-	clear_response
+	# set_response
+	# clear_response
 end
 
 def find_dialer_payment_method
@@ -61,13 +62,13 @@ def load_dialer_payment_method
 end
 
 def save_dialer_payment_method
-	if @responseKind == "OK"
-		@dailer_payment_method = DialerPaymentMethod.new
+	@dailer_payment_method = DialerPaymentMethod.new
 
+	if @responseKind == "OK"
 		@dailer_payment_method[:_kF_DialerLead] = @lead_id
 		@dailer_payment_method[:_kF_Guest] = @guest_id
 
-		@dailer_payment[:Token_Payment_ID] = @payment_token
+		@dailer_payment_method[:Token_Payment_ID] = @payment_token
 
 		@dailer_payment_method[:Name_First] = @namefirst
 		@dailer_payment_method[:Name_Last] = @namelast

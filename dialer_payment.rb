@@ -1,8 +1,8 @@
 def save_processed_dailer_payment
 	# Record the transaction results for each processed payment.
-	if @resultCode == "OK"
-		@dailer_payment = DialerPayment.new
+	@dailer_payment = DialerPayment.new
 
+	if @resultCode == "OK"
 		@dailer_payment[:_kF_DialerLead] = @lead_id
 		@dailer_payment[:_kF_Guest] = @guest_id
 		@dailer_payment[:_kF_PaymentMethod] = @payment_method_id
@@ -11,7 +11,7 @@ def save_processed_dailer_payment
 		@dailer_payment[:Amount] = @amount
 		@dailer_payment[:zzPP_Transaction] = @transactionID
 
-		@dailer_payment[:zzPP_Response] = @response
+		@dailer_payment[:zzPP_Response] = @theResponse
 		@dailer_payment[:zzPP_Response_AVS_Code] = @avsCode
 		@dailer_payment[:zzPP_Response_CVV_Code] = @cvvCode
 
@@ -41,12 +41,12 @@ def save_processed_dailer_payment
 			@dailer_payment[:zzF_Status] = "Error"
 			@dailer_payment[:zzPP_Transaction] = @transactionID
 
-			@dailer_payment[:zzPP_Response] = @response
+			@dailer_payment[:zzPP_Response] = @theResponse
 			@dailer_payment[:zzPP_Response_Code] = @responseCode
 			@dailer_payment[:zzPP_Response_Error] = @responseError
 
 		elsif @responseKind == "TokenError"
-			@dailer_payment[:zzPP_Response] = @response
+			@dailer_payment[:zzPP_Response] = @theResponse
 			@dailer_payment[:zzPP_Response_Code] = @responseCode
 			@dailer_payment[:zzPP_Response_Error] = @responseError
 

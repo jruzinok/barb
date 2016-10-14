@@ -1,6 +1,6 @@
 def process_create_dialer_payment_method_request
-	parse_create_dialer_payment_post
-
+	parse_create_dialer_payment_method_post
+	puts "[LEADID] #{@lead_id}"
 	if @request_type == "Charge"
 		create_dialer_tokens
 		process_dialer_payment
@@ -47,5 +47,6 @@ def process_dialer_payment
 	@step2 = process_payment
 	@step3 = report
 	@step4 = save_processed_dailer_payment
-	@step5 = clear
+	@step5 = set_response
+	@step6 = clear
 end
