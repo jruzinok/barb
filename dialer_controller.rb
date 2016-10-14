@@ -1,11 +1,22 @@
 def process_create_dialer_payment_method_request
 	parse_create_dialer_payment_method_post
-	puts "[LEADID] #{@lead_id}"
 	if @request_type == "Charge"
 		create_dialer_tokens
 		process_dialer_payment
 	elsif @request_type == "Schedule"
 		create_dialer_tokens
+		save_scheduled_dailer_payment
+	end
+
+end
+
+def process_create_dialer_payment_request
+	parse_create_dialer_payment_method_post
+	if @request_type == "Charge"
+		load_dialer_tokens
+		process_dialer_payment
+	elsif @request_type == "Schedule"
+		load_dialer_tokens
 		save_scheduled_dailer_payment
 	end
 
@@ -30,6 +41,16 @@ def parse_create_dialer_payment_method_post
 	@city = params[:Address_City]
 	@state = params[:Address_State]
 	@zip = params[:Address_Zip]
+end
+
+def load_dialer_tokens
+	if @recordtype == "DialerLead"
+		find_dialer_lead
+		find_dialer_payment_method
+	elsif @recordtype == "DialerGuest"
+		# create_dialer_guest_customer_token
+		# create_dialer_payment_token
+	end
 end
 
 def create_dialer_tokens
