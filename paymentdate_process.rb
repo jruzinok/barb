@@ -18,8 +18,8 @@ def process_payment
 	
 	if @ids_or_card == "ids"
 		request.transactionRequest.profile = CustomerProfilePaymentType.new
-		request.transactionRequest.profile.customerProfileId = @profile_id
-		request.transactionRequest.profile.paymentProfile = PaymentProfile.new(@payment_id)	
+		request.transactionRequest.profile.customerProfileId = @customer_token
+		request.transactionRequest.profile.paymentProfile = PaymentProfile.new(@payment_token)	
 	elsif @ids_or_card == "card"
 		request.transactionRequest.payment = PaymentType.new
 		request.transactionRequest.payment.creditCard = CreditCardType.new(@cardnumber, @carddate, @cardcvv)
@@ -46,7 +46,7 @@ def process_payment
 	if response.transactionResponse != nil
 
 		# Capture the response variables for all transactions.
-		@response = response
+		@theResponse = response
 		@avsCode = response.transactionResponse.avsResultCode
 		@cvvCode = response.transactionResponse.cvvResultCode
 
