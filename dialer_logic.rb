@@ -33,10 +33,10 @@ def parse_create_dialer_payment_method_post
 end
 
 def create_dialer_tokens
-	if @recordtype = "DialerLead"
+	if @recordtype == "DialerLead"
 		create_dialer_lead_customer_token
 		create_dialer_payment_token
-	elsif @recordtype = "DialerGuest"
+	elsif @recordtype == "DialerGuest"
 		# create_dialer_guest_customer_token
 		# create_dialer_payment_token
 	end
