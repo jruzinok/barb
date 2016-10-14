@@ -1,4 +1,4 @@
-def save_dailer_payment
+def save_processed_dailer_payment
 	# Record the transaction results for each processed payment.
 	if @resultCode == "OK"
 		@dailer_payment = DialerPayment.new
@@ -56,4 +56,17 @@ def save_dailer_payment
 	end
 
 	@dailer_payment.save
+end
+
+def save_scheduled_dailer_payment
+		@dailer_payment = DialerPayment.new
+
+		@dailer_payment[:_kF_DialerLead] = @lead_id
+		@dailer_payment[:_kF_Guest] = @guest_id
+		@dailer_payment[:_kF_PaymentMethod] = @payment_method_id
+
+		@dailer_payment[:Date] = @date
+		@dailer_payment[:Amount] = @amount
+
+		@dailer_payment.save
 end
