@@ -2,10 +2,14 @@ def process_create_dialer_payment_method_request
 	parse_create_dialer_payment_method_post
 	if @request_type == "Charge"
 		create_dialer_tokens
-		process_dialer_payment
+		if @responseKind == "OK"
+			process_dialer_payment
+		end
 	elsif @request_type == "Schedule"
 		create_dialer_tokens
-		save_scheduled_dailer_payment
+		if @responseKind == "OK"
+			save_scheduled_dailer_payment
+		end
 	end
 
 end
@@ -48,18 +52,22 @@ def load_dialer_tokens
 		find_dialer_lead
 		find_dialer_payment_method
 	elsif @recordtype == "DialerGuest"
-		# create_dialer_guest_customer_token
-		# create_dialer_payment_token
+		find_dialer_guest
+		find_dialer_payment_method
 	end
 end
 
 def create_dialer_tokens
 	if @recordtype == "DialerLead"
 		create_dialer_lead_customer_token
-		create_dialer_payment_token
+		if @responseKind == "OK"
+			create_dialer_payment_token
+		end
 	elsif @recordtype == "DialerGuest"
-		# create_dialer_guest_customer_token
-		# create_dialer_payment_token
+		create_dialer_guest_customer_token
+		if @responseKind == "OK"
+			create_dialer_payment_token
+		end
 	end
 end
 
@@ -69,5 +77,5 @@ def process_dialer_payment
 	@step3 = report
 	@step4 = save_processed_dailer_payment
 	@step5 = set_response
-	@step6 = clear
+	# @step6 = clear
 end

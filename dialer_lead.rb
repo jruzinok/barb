@@ -23,8 +23,8 @@ def create_dialer_lead_customer_token
 		end
 
 		update_dialer_lead
-		# set_response
-		# clear_response	
+		set_response
+		# clear_response
 	end
 end
 
