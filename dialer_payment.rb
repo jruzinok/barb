@@ -67,6 +67,7 @@ def save_scheduled_dailer_payment
 
 		@dailer_payment[:Date] = @date
 		@dailer_payment[:Amount] = @amount
+		@dailer_payment[:zzF_Status] = "Pending"
 
 		@dailer_payment.save
 end
