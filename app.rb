@@ -90,7 +90,7 @@ class Profiles < Sinatra::Application
 	post '/create-dialer-guest-payment-method/:lead_id/:guest_id' do
 		@database = "DL"
 		@recordtype = "DialerGuest"
-		process_create_dialer_payment_request
+		process_create_dialer_payment_method_request
 
 		# Return the response back to the Dialer.
 		status @status
@@ -101,7 +101,7 @@ class Profiles < Sinatra::Application
 	post '/create-dialer-guest-payment/:lead_id/:guest_id/:payment_method_id' do
 		@database = "DL"
 		@recordtype = "DialerGuest"
-		process_create_dialer_payment_method_request
+		process_create_dialer_payment_request
 
 		# Return the response back to the Dialer.
 		status @status
