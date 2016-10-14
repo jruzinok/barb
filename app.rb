@@ -3,10 +3,18 @@ require 'yaml'
 require 'rfm'
 require 'authorizenet'
 # require 'rack-flash'
+require 'rack/cors'
 require 'sinatra'
 require 'openssl'
 
 set :environment, :production
+
+use Rack::Cors do
+	allow do
+		origins '*'
+		resource '*', headers: :any, methods: :any
+	end
+end
 
 # This loads the Ruby 2 FileMaker server configuration settings.
 config = YAML.load_file(File.dirname(__FILE__) + "/config/rfm.yml")
@@ -55,8 +63,6 @@ class Profiles < Sinatra::Application
 		status @status
 		body @body
 	end
-
-
 
 	# This was designed to be called from the BookingDialer php web app.
 	post '/create-dialer-lead-payment-method/:lead_id' do
