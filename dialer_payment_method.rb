@@ -1,5 +1,11 @@
 def create_dialer_payment_token
- find_dialer_lead
+
+	# Ugly, but'll it'll do for now.
+	if @recordtype == "DialerLead"
+		find_dialer_lead
+	elsif @recordtype == "DialerGuest"
+		find_dialer_guest
+	end
  
 	if @has_customer_token == true
 		request = CreateCustomerPaymentProfileRequest.new
