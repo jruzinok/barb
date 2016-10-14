@@ -23,8 +23,8 @@ def create_dialer_lead_customer_token
 		end
 
 		update_dialer_lead
-		set_response
-		clear_response			
+		# set_response
+		# clear_response	
 	end
 end
 
@@ -45,10 +45,10 @@ end
 
 def load_dialer_lead
 	@dialer_lead = @dialer_lead[0] # Load the record from the first position of the array.
-	@namefirst = @dialer_lead["Name_First"]
+	@namefirst = @dialer_lead["First Name"]
 	@serial = @dialer_lead["_Serial"].to_i
 	@customer = "#{@database}#{@serial}" # The "ID" used to create a customer profile.
-	@namelast = @dialer_lead["Name_Last"]
+	@namelast = @dialer_lead["Last Name"]
 	@namefull = "#{@namefirst} #{@namelast}"
 	@customer_token = @dialer_lead["Token_Profile_ID"]
 
