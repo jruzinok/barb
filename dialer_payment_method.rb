@@ -36,7 +36,7 @@ def create_dialer_payment_token
 		save_dialer_payment_method
 	end
 
-	# set_response
+	set_response
 	# clear_response
 end
 
