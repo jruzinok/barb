@@ -1,11 +1,5 @@
 def create_dialer_payment_token
-
-	# Ugly, but'll it'll do for now.
-	if @recordtype == "DialerLead"
-		find_dialer_lead
-	elsif @recordtype == "DialerGuest"
-		find_dialer_guest
-	end
+	find_dialer_lead
  
 	if @has_customer_token == true
 		request = CreateCustomerPaymentProfileRequest.new
@@ -13,8 +7,8 @@ def create_dialer_payment_token
 		payment = PaymentType.new(creditcard)
 		profile = CustomerPaymentProfileType.new(nil,nil,payment,nil,nil)
 		profile.billTo = CustomerAddressType.new
-		profile.billTo.firstName = @namefirst
-		profile.billTo.lastName = @namelast
+		profile.billTo.firstName = @namefirstCC
+		profile.billTo.lastName = @namelastCC
 		profile.billTo.address = @address
 		profile.billTo.city = @city
 		profile.billTo.state = @state
@@ -93,8 +87,8 @@ def save_dialer_payment_method
 
 		@dailer_payment_method[:Token_Payment_ID] = @payment_token
 
-		@dailer_payment_method[:Name_First] = @namefirst
-		@dailer_payment_method[:Name_Last] = @namelast
+		@dailer_payment_method[:Name_First] = @namefirstCC
+		@dailer_payment_method[:Name_Last] = @namelastCC
 		@dailer_payment_method[:CreditCard_Number] = @cardnumber
 		@dailer_payment_method[:MMYY] = @carddate
 		@dailer_payment_method[:CVV] = @cardcvv
