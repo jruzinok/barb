@@ -36,8 +36,8 @@ def parse_create_dialer_payment_method_post
 	@date = @params[:Date]
 	@amount = @params[:Amount]
 	
-	@namefirst = params[:Name_First]
-	@namelast = params[:Name_Last]
+	@namefirstCC = params[:Name_First]
+	@namelastCC = params[:Name_Last]
 	@cardnumber = params[:CreditCard]
 	@carddate = params[:MMYY]
 	@cardcvv = params[:CVV]
@@ -48,26 +48,21 @@ def parse_create_dialer_payment_method_post
 end
 
 def load_dialer_tokens
-	if @recordtype == "DialerLead"
+	# if @recordtype == "DialerLead"
 		find_dialer_lead
 		find_dialer_payment_method
-	elsif @recordtype == "DialerGuest"
-		find_dialer_guest
-		find_dialer_payment_method
-	end
+	# elsif @recordtype == "DialerGuest"
+	# 	find_dialer_guest
+	# 	find_dialer_payment_method
+	# end
 end
 
 def create_dialer_tokens
-	if @recordtype == "DialerLead"
-		create_dialer_lead_customer_token
-		if @responseKind == "OK"
-			create_dialer_payment_token
-		end
-	elsif @recordtype == "DialerGuest"
-		create_dialer_guest_customer_token
-		if @responseKind == "OK"
-			create_dialer_payment_token
-		end
+	create_dialer_lead_customer_token
+	if @responseKind == "OK"
+		create_dialer_payment_token
+	elsif @dialer_lead_found == true && @has_customer_token == true
+		create_dialer_payment_token
 	end
 end
 
