@@ -33,8 +33,8 @@ def parse_create_dialer_payment_method_post
 	@request_type = params[:request_type] #Charge or Schedule
 
 	# Grab the values from the POST object.
-	@date = @params[:Date]
-	@amount = @params[:Amount]
+	@date = params[:Date]
+	@amount = params[:Amount]
 	
 	@namefirstCC = params[:Name_First]
 	@namelastCC = params[:Name_Last]
@@ -45,6 +45,32 @@ def parse_create_dialer_payment_method_post
 	@city = params[:Address_City]
 	@state = params[:Address_State]
 	@zip = params[:Address_Zip]
+
+	log_post_variables_to_console
+end
+
+def log_post_variables_to_console
+	puts "\n\n\n\n\n"
+	puts "----------------------------------------"
+	puts "[POST VALUES]"
+	puts "----------------------------------------"
+	puts "[LEAD] #{@lead_id}"
+	puts "[GUEST] #{@guest_id}"
+	puts "[PMDATE] #{@payment_method_id}"
+	puts "[TYPE] #{@request_type}" #Charge or Schedule
+
+	# Grab the values from the POST object.
+	puts "[DATE] #{@Date}"
+	puts "[AMOUNT] #{@Amount}"
+	
+	puts "[FIRST] #{@Name_First}"
+	puts "[LAST] #{@Name_Last}"
+	puts "[CARD] #{@CreditCard}"
+	puts "[MMYY] #{@MMYY}"
+	puts "[ADDRESS] #{@Address_Address}"
+	puts "[CITY] #{@Address_City}"
+	puts "[STATE] #{@Address_State}"
+	puts "[ZIP] #{@Address_Zip}"
 end
 
 def load_dialer_tokens
