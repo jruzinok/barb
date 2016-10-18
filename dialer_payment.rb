@@ -1,8 +1,7 @@
 def save_processed_dailer_payment
 	# Record the transaction results for each processed payment.
 	@dailer_payment = DialerPayment.new
-
-	if @resultCode == "OK"
+	
 		@dailer_payment[:_kF_DialerLead] = @lead_id
 		@dailer_payment[:_kF_Guest] = @guest_id
 		@dailer_payment[:_kF_PaymentMethod] = @payment_method_id
@@ -17,6 +16,8 @@ def save_processed_dailer_payment
 
 		@dailer_payment[:zzPP_Response_Code] = @responseCode
 
+	if @resultCode == "OK"
+	
 		if @responseKind == "Approved"
 			@dailer_payment[:zzF_Status] = "Approved"
 			@dailer_payment[:zzPP_Authorization_Code] = @authorizationCode
