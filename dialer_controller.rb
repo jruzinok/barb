@@ -3,25 +3,25 @@ def process_create_dialer_payment_method_request
 	if @request_type == "Charge"
 		create_dialer_tokens
 		if @responseKind == "OK"
-			process_dialer_payment
+			process_dialer_payment_date
 		end
 	elsif @request_type == "Schedule"
 		create_dialer_tokens
 		if @responseKind == "OK"
-			save_scheduled_dailer_payment
+			save_scheduled_dailer_payment_date
 		end
 	end
 
 end
 
-def process_create_dialer_payment_request
+def process_create_dialer_payment_date_request
 	parse_create_dialer_payment_method_post
 	if @request_type == "Charge"
 		load_dialer_tokens
-		process_dialer_payment
+		process_dialer_payment_date
 	elsif @request_type == "Schedule"
 		load_dialer_tokens
-		save_scheduled_dailer_payment
+		save_scheduled_dailer_payment_date
 	end
 
 end
@@ -92,11 +92,11 @@ def create_dialer_tokens
 	end
 end
 
-def process_dialer_payment
+def process_dialer_payment_date
 	@step1 = ids_or_card
 	@step2 = process_payment
 	@step3 = report
-	@step4 = save_processed_dailer_payment
+	@step4 = save_processed_dailer_payment_date
 	@step5 = set_response
 	# @step6 = clear
 end
