@@ -19,16 +19,16 @@ end
 # This loads the Ruby 2 FileMaker server configuration settings.
 config = YAML.load_file(File.dirname(__FILE__) + "/config/rfm.yml")
 
-require_relative 'model.rb'
-require_relative 'paymentdate_controller.rb'
-require_relative 'paymentdate_process.rb'
+require_relative 'authorize.rb'
 require_relative 'directory.rb'
-require_relative 'paymentmethod.rb'
 require_relative 'dialer_controller.rb'
-require_relative 'dialer_lead.rb'
 require_relative 'dialer_guest.rb'
+require_relative 'dialer_lead.rb'
+require_relative 'dialer_payment_date.rb'
 require_relative 'dialer_payment_method.rb'
-require_relative 'dialer_payment.rb'
+require_relative 'model.rb'
+require_relative 'payment_method.rb'
+require_relative 'payment_date.rb'
 require_relative 'shared.rb'
 
 class CreditCard < Sinatra::Application
@@ -80,7 +80,7 @@ class Profiles < Sinatra::Application
 	post '/create-dialer-lead-payment/:lead_id/:payment_method_id' do
 		@database = "DL"
 		@recordtype = "DialerLead"
-		process_create_dialer_payment_request
+		process_create_dialer_payment_date_request
 
 		# Return the response back to the Dialer.
 		status @status
@@ -102,7 +102,7 @@ class Profiles < Sinatra::Application
 	post '/create-dialer-guest-payment/:lead_id/:guest_id/:payment_method_id' do
 		@database = "DL"
 		@recordtype = "DialerGuest"
-		process_create_dialer_payment_request
+		process_create_dialer_payment_date_request
 
 		# Return the response back to the Dialer.
 		status @status
