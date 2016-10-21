@@ -6,17 +6,17 @@ require 'bigdecimal'
 
 def find_by_batch
 	if @database == "PTD"
-		@paymentdates = PTDPaymentDate.find(:_kF_PaymentBatch => @batch)
+		@payment_dates = PTDPaymentDate.find(:_kF_PaymentBatch => @batch)
 	elsif @database == "BC"
-		@paymentdates = BCPaymentDate.find(:_kF_PaymentBatch => @batch)
+		@payment_dates = BCPaymentDate.find(:_kF_PaymentBatch => @batch)
 	end
 end
 
 def find_by_status_and_date
 	if @database == "PTD"
-		@paymentdates = PTDPaymentDate.find(:zzF_Status => @status, :Date => @date)
+		@payment_dates = PTDPaymentDate.find(:zzF_Status => @status, :Date => @date)
 	elsif @database == "BC"
-		@paymentdates = BCPaymentDate.find(:zzF_Status => @status, :Date => @date)
+		@payment_dates = BCPaymentDate.find(:zzF_Status => @status, :Date => @date)
 	end
 end
 
@@ -31,14 +31,14 @@ def process
 	puts "\n[TIMESTAMP] #{Time.now.utc.iso8601}"
 	puts "\n----------------------------------------"
 
-	@paymentdates.each do |pd|
-		@paymentdate = pd
+	@payment_dates.each do |pd|
+		@payment_date = pd
 		# These "steps" are for clarity sake.
 		# Later, these objects could be saved somewhere to log the steps of each batch when it's run.
-		@step1 = load
+		@step1 = load_payment_date
 		@step2 = process_or_skip
 		@step3 = report
-		@step4 = update
+		@step4 = update_payment_date
 		@step5 = clear
 	end
 
@@ -46,29 +46,29 @@ def process
 	# @step6 = BCPaymentDate.find({:_kF_PaymentBatch => @batch}, :post_script => ["PaymentProcessorCallBack", "#{@batch}\nInitiate from Ruby"])
 end
 
-def load
-	@serial = @paymentdate["_Serial"].to_i
-	@namefirst = @paymentdate["T54_Link | DIRECTORY ~ contestant::Name_First"]
-	@namelast = @paymentdate["T54_Link | DIRECTORY ~ contestant::Name_Last"]
+def load_payment_date
+	@serial = @payment_date["_Serial"].to_i
+	@namefirst = @payment_date["T54_Link | DIRECTORY ~ contestant::Name_First"]
+	@namelast = @payment_date["T54_Link | DIRECTORY ~ contestant::Name_Last"]
 
 	# Address values.
-	@address = @paymentdate["T54_PaymentMethod | CONTACTINFO::Add_Address1"]
-	@city = @paymentdate["T54_PaymentMethod | CONTACTINFO::Add_City"]
-	@state = @paymentdate["T54_PaymentMethod | CONTACTINFO::Add_State"]
-	@zip = @paymentdate["T54_PaymentMethod | CONTACTINFO::Add_Zip"]
+	@address = @payment_date["T54_PaymentMethod | CONTACTINFO::Add_Address1"]
+	@city = @payment_date["T54_PaymentMethod | CONTACTINFO::Add_City"]
+	@state = @payment_date["T54_PaymentMethod | CONTACTINFO::Add_State"]
+	@zip = @payment_date["T54_PaymentMethod | CONTACTINFO::Add_Zip"]
 
 	# TBD: CAPTURE the customer's profile id and payment id.
-	@customer_token = @paymentdate["T54_DIRECTORY::Token_Profile_ID"]
-	@payment_token = @paymentdate["T54_PAYMENTMETHOD::Token_Payment_ID"]
+	@customer_token = @payment_date["T54_DIRECTORY::Token_Profile_ID"]
+	@payment_token = @payment_date["T54_PAYMENTMETHOD::Token_Payment_ID"]
 
 	# Credit Card values.
-	@cardnumber = @paymentdate["T54_PAYMENTMETHOD::CreditCard_Number"]
-	@carddate = @paymentdate["T54_PAYMENTMETHOD::MMYY"]
-	@cardcvv = @paymentdate["T54_PAYMENTMETHOD::CVV"]
+	@cardnumber = @payment_date["T54_PAYMENTMETHOD::CreditCard_Number"]
+	@carddate = @payment_date["T54_PAYMENTMETHOD::MMYY"]
+	@cardcvv = @payment_date["T54_PAYMENTMETHOD::CVV"]
 
 	# Transaction details.
-	@amount = @paymentdate["Amount"].to_f
-	@bc = @paymentdate["T54_LINK::zzC_BC_Location_ABBR"]
+	@amount = @payment_date["Amount"].to_f
+	@bc = @payment_date["T54_LINK::zzC_BC_Location_ABBR"]
 end
 
 # This determines whether or not to process this payment or not.
@@ -155,58 +155,58 @@ def report
 	puts "\n----------------------------------------"
 end
 
-def update
+def update_payment_date
 		# SAVE the response values for all transactions.
 
 	# Record the transaction results for each processed payment.
 	if @resultCode == "OK"
-		@paymentdate[:zzPP_Transaction] = @transactionID
+		@payment_date[:zzPP_Transaction] = @transactionID
 
-		@paymentdate[:zzPP_Response] = @theResponse
-		@paymentdate[:zzPP_Response_AVS_Code] = @avsCode
-		@paymentdate[:zzPP_Response_CVV_Code] = @cvvCode
+		@payment_date[:zzPP_Response] = @theResponse
+		@payment_date[:zzPP_Response_AVS_Code] = @avsCode
+		@payment_date[:zzPP_Response_CVV_Code] = @cvvCode
 
-		@paymentdate[:zzPP_Response_Code] = @responseCode
+		@payment_date[:zzPP_Response_Code] = @responseCode
 
 		if @responseKind == "Approved"
-			@paymentdate[:zzF_Status] = "Approved"
-			@paymentdate[:zzPP_Authorization_Code] = @authorizationCode
-			@paymentdate[:zzPP_Response_Message] = @responseMessage
+			@payment_date[:zzF_Status] = "Approved"
+			@payment_date[:zzPP_Authorization_Code] = @authorizationCode
+			@payment_date[:zzPP_Response_Message] = @responseMessage
 
 		elsif @responseKind == "Declined"
-			@paymentdate[:zzF_Status] = "Declined"
-			@paymentdate[:zzPP_Response_Error] = @responseError
+			@payment_date[:zzF_Status] = "Declined"
+			@payment_date[:zzPP_Response_Error] = @responseError
 
 		elsif @responseKind == "Error"
-			@paymentdate[:zzF_Status] = "Error"
-			@paymentdate[:zzPP_Response_Error] = @responseError
+			@payment_date[:zzF_Status] = "Error"
+			@payment_date[:zzPP_Response_Error] = @responseError
 
 		elsif @responseKind == "HeldforReview"
-			@paymentdate[:zzF_Status] = "HeldForReview"
-			@paymentdate[:zzPP_Response_Error] = @responseError
+			@payment_date[:zzF_Status] = "HeldForReview"
+			@payment_date[:zzPP_Response_Error] = @responseError
 		end
 
 	# These payments were NOT processes.
 	else
 		if @responseKind == "TransactionError"
-			@paymentdate[:zzF_Status] = "Error"
-			@paymentdate[:zzPP_Transaction] = @transactionID
+			@payment_date[:zzF_Status] = "Error"
+			@payment_date[:zzPP_Transaction] = @transactionID
 
-			@paymentdate[:zzPP_Response] = @theResponse
-			@paymentdate[:zzPP_Response_Code] = @responseCode
-			@paymentdate[:zzPP_Response_Error] = @responseError
+			@payment_date[:zzPP_Response] = @theResponse
+			@payment_date[:zzPP_Response_Code] = @responseCode
+			@payment_date[:zzPP_Response_Error] = @responseError
 
 		elsif @responseKind == "TokenError"
-			@paymentdate[:zzPP_Response] = @theResponse
-			@paymentdate[:zzPP_Response_Code] = @responseCode
-			@paymentdate[:zzPP_Response_Error] = @responseError
+			@payment_date[:zzPP_Response] = @theResponse
+			@payment_date[:zzPP_Response_Code] = @responseCode
+			@payment_date[:zzPP_Response_Error] = @responseError
 
 		elsif @responseKind == "TransactionFailure"
-			@paymentdate[:zzPP_Response_Error] = @responseError
+			@payment_date[:zzPP_Response_Error] = @responseError
 		end
 	end
 
-	@paymentdate.save
+	@payment_date.save
 end
 
 def clear
