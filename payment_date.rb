@@ -1,26 +1,6 @@
 require 'bigdecimal'
 
-# def show
-# 	@record = PaymentDate.find params[:id]
-# end
-
-def find_by_batch
-	if @database == "PTD"
-		@payment_dates = PTDPaymentDate.find(:_kF_PaymentBatch => @batch)
-	elsif @database == "BC"
-		@payment_dates = BCPaymentDate.find(:_kF_PaymentBatch => @batch)
-	end
-end
-
-def find_by_status_and_date
-	if @database == "PTD"
-		@payment_dates = PTDPaymentDate.find(:zzF_Status => @status, :Date => @date)
-	elsif @database == "BC"
-		@payment_dates = BCPaymentDate.find(:zzF_Status => @status, :Date => @date)
-	end
-end
-
-def process
+def process_payment_dates
 	find_by_batch
 
 	# This outputs the batch id. It's used to display acts as the header or beginning of the process
@@ -37,13 +17,21 @@ def process
 		# Later, these objects could be saved somewhere to log the steps of each batch when it's run.
 		@step1 = load_payment_date
 		@step2 = process_or_skip
-		@step3 = report
+		@step3 = log_result_to_console
 		@step4 = update_payment_date
-		@step5 = clear
+		@step5 = clear_response
 	end
 
 	# This final step calls the Payment Processor Tool script in the Payment Processor application file.
 	# @step6 = BCPaymentDate.find({:_kF_PaymentBatch => @batch}, :post_script => ["PaymentProcessorCallBack", "#{@batch}\nInitiate from Ruby"])
+end
+
+def find_by_batch
+	if @database == "PTD"
+		@payment_dates = PTDPaymentDate.find(:_kF_PaymentBatch => @batch)
+	elsif @database == "BC"
+		@payment_dates = BCPaymentDate.find(:_kF_PaymentBatch => @batch)
+	end
 end
 
 def load_payment_date
@@ -69,90 +57,6 @@ def load_payment_date
 	# Transaction details.
 	@amount = @payment_date["Amount"].to_f
 	@bc = @payment_date["T54_LINK::zzC_BC_Location_ABBR"]
-end
-
-# This determines whether or not to process this payment or not.
-def process_or_skip
-
-	# Check if this payment is by ids or card.
-	ids_or_card
-
-	if @ids_or_card == "ids" || @ids_or_card == "card"
-		process_payment
-	end
-end
-
-# This determines if this transaction should be processed using Authorize IDs or a CC.
-def ids_or_card
-
-	# If this record has (Authorize.net) IDs, validate them.
-	if @customer_token && @payment_token
-
-		# Validate the IDs.
-		validate_ids
-
-		if @valid_authorize_ids == true
-			@ids_or_card = "ids"
-		else
-			@ids_or_card = "Error"
-		end
-
-	# If this record has credit card values, use them.
-	else
-		@ids_or_card = "card"
-	end
-end
-
-def validate_ids
-	request = ValidateCustomerPaymentProfileRequest.new
-
-	#Edit this part to select a specific customer
-	request.customerProfileId = @customer_token
-	request.customerPaymentProfileId = @payment_token
-	request.validationMode = ValidationModeEnum::TestMode
-
-	# PASS the transaction request and CAPTURE the transaction response.
-	response = transaction.validate_customer_payment_profile(request)
-
-	if response.messages.resultCode == MessageTypeEnum::Ok
-		@valid_authorize_ids = true
-	else
-		@valid_authorize_ids = false
-
-		# Capture the complete response and set the ResultCode (logic variable) to Error.
-		@theResponse = response
-		@resultCode = "ERROR"
-
-		@responseKind = "TokenError"
-		@responseCode = response.messages.messages[0].code
-		@responseError = response.messages.messages[0].text
-	end
-end
-
-def report
-
-	# This determines what to output, either the authorization or error data.
-	responseOutput =
-	if @responseKind == "Approved"
-		"Authorization: #{@authorizationCode}"
-	else
-		"Error: #{@responseError}"
-	end
-
-	# This determines what to output, either the card number or customer profile and payment ids.
-	paymentMethod =
-	if @ids_or_card == "card"
-		"Card: #{@cardnumber}"
-	else
-		"Profile: #{@customer_token} Payment: #{@payment_token}"
-	end
-
-	puts "\nRESPONSE: [#{@responseKind}]"
-	puts "MESSAGE: #{responseOutput}"
-	puts "CODE: #{@responseCode}"
-	puts "RECORD: #{@serial}"
-	puts "METHOD: #{paymentMethod}"
-	puts "\n----------------------------------------"
 end
 
 def update_payment_date
@@ -207,17 +111,4 @@ def update_payment_date
 	end
 
 	@payment_date.save
-end
-
-def clear
-	@theResponse = ""
-	@resultCode = ""
-	@transactionID = ""
-	@avsCode = ""
-	@cvvCode = ""
-	@responseCode = ""
-	@responseKind = ""
-	@authorizationCode = ""
-	@responseMessage = ""
-	@responseError = ""
 end

@@ -93,7 +93,7 @@ def create_dialer_tokens
 end
 
 def process_dialer_payment_date
-	@step1 = ids_or_card
+	@step1 = card_or_token
 	@step2 = process_payment
 	@step3 = report
 	@step4 = save_processed_dailer_payment_date
