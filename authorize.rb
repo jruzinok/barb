@@ -53,8 +53,8 @@ def process_payment
 	# HARDCODED GL CODES MUST be updated to set the year value dynamically.
 	if @database == "PTD"
 		request.transactionRequest.order = OrderType.new()
-		request.transactionRequest.order.invoiceNumber = "PTD16"
-		request.transactionRequest.order.description = "423"
+		request.transactionRequest.order.invoiceNumber = "PTD17"
+		request.transactionRequest.order.description = "424" # This needs to be set dynamically to either 424 or 423.
 	elsif @database == "BC"
 		request.transactionRequest.order = OrderType.new()
 		request.transactionRequest.order.invoiceNumber = "BCOMP#{@bc}16"
@@ -62,7 +62,7 @@ def process_payment
 	elsif @database == "DL" #DialerLeads
 		request.transactionRequest.order = OrderType.new()
 		request.transactionRequest.order.invoiceNumber = "PTD17"
-		request.transactionRequest.order.description = "423"
+		request.transactionRequest.order.description = "424" # This needs to be set dynamically to either 424 or 423.
 	end
 	
 	# PASS the transaction request and CAPTURE the transaction response.

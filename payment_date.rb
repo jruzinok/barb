@@ -22,8 +22,12 @@ def process_payment_dates
 		@step5 = clear_response
 	end
 
-	# This final step calls the Payment Processor Tool script in the Payment Processor application file.
-	# @step6 = BCPaymentDate.find({:_kF_PaymentBatch => @batch}, :post_script => ["PaymentProcessorCallBack", "#{@batch}\nInitiate from Ruby"])
+	# This final step calls a script in either the Data File or PTD17 which in turn calls a Payment Processor Tool script in the Payment Processor application file.
+	if @database == "PTD"
+		@step6 = PTDPaymentDate.find({:_kF_PaymentBatch => @batch}, :post_script => ["PaymentProcessorCallBack", "#{@batch}\nInitiate from Ruby\nPTD"])
+	elsif @database == "BC"
+		@step6 = BCPaymentDate.find({:_kF_PaymentBatch => @batch}, :post_script => ["PaymentProcessorCallBack", "#{@batch}\nInitiate from Ruby\nBC"])
+	end
 end
 
 def find_by_batch
@@ -36,16 +40,8 @@ end
 
 def load_payment_date
 	@serial = @payment_date["_Serial"].to_i
-	@namefirst = @payment_date["T54_Link | DIRECTORY ~ contestant::Name_First"]
-	@namelast = @payment_date["T54_Link | DIRECTORY ~ contestant::Name_Last"]
 
-	# Address values.
-	@address = @payment_date["T54_PaymentMethod | CONTACTINFO::Add_Address1"]
-	@city = @payment_date["T54_PaymentMethod | CONTACTINFO::Add_City"]
-	@state = @payment_date["T54_PaymentMethod | CONTACTINFO::Add_State"]
-	@zip = @payment_date["T54_PaymentMethod | CONTACTINFO::Add_Zip"]
-
-	# TBD: CAPTURE the customer's profile id and payment id.
+	# TBD: CAPTURE the customer's and payment tokens.
 	@customer_token = @payment_date["T54_DIRECTORY::Token_Profile_ID"]
 	@payment_token = @payment_date["T54_PAYMENTMETHOD::Token_Payment_ID"]
 
@@ -56,7 +52,11 @@ def load_payment_date
 
 	# Transaction details.
 	@amount = @payment_date["Amount"].to_f
-	@bc = @payment_date["T54_LINK::zzC_BC_Location_ABBR"]
+
+	if @database == "BC"
+		@bc = @payment_date["T54_LINK::zzC_BC_Location_ABBR"]
+	end
+
 end
 
 def update_payment_date

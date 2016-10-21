@@ -1,4 +1,3 @@
 require './app.rb'
 
-run CreditCard
-run Profiles
+run PaymentProcessor
