@@ -31,16 +31,17 @@ require_relative 'payment_method.rb'
 require_relative 'payment_date.rb'
 require_relative 'shared.rb'
 
-class CreditCard < Sinatra::Application
+class PaymentProcessor < Sinatra::Application
 
 	get '/process/:database/:batch' do
 		@database = params[:database]
 		@batch = params[:batch]
-		process
-	end
-end
+		process_payment_dates
 
-class Profiles < Sinatra::Application
+		# Return the response back to FileMaker.
+		status 200
+		body "Processed"
+	end
 
 	get '/create-customer-token/:database/:directory_id' do
 		@database = params[:database]
