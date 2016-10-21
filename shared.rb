@@ -52,17 +52,17 @@ def set_response
 end
 
 def clear_response
-	@theResponse = ""
-	@responseKind = ""
-	@responseCode = ""
-	@responseError = ""
-	@resultCode = ""
-	@avsCode = ""
-	@cvvCode = ""
-	@transactionID = ""
-	@authorizationCode = ""
-	@responseMessage = ""
-	@responseError = ""
+	@theResponse = nil
+	@responseKind = nil
+	@responseCode = nil
+	@responseError = nil
+	@resultCode = nil
+	@avsCode = nil
+	@cvvCode = nil
+	@transactionID = nil
+	@authorizationCode = nil
+	@responseMessage = nil
+	@responseError = nil
 end
 
 def log_error_to_console
