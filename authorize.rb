@@ -8,6 +8,31 @@ def transaction
 	transaction = Transaction.new(credentials['api_login_id'], credentials['api_transaction_key'], :gateway => :sandbox)
 end
 
+def validate_tokens
+	request = ValidateCustomerPaymentProfileRequest.new
+
+	#Edit this part to select a specific customer
+	request.customerProfileId = @customer_token
+	request.customerPaymentProfileId = @payment_token
+	request.validationMode = ValidationModeEnum::TestMode
+
+	# PASS the transaction request and CAPTURE the transaction response.
+	response = transaction.validate_customer_payment_profile(request)
+
+	if response.messages.resultCode == MessageTypeEnum::Ok
+		@valid_tokens = true
+	else
+		@valid_tokens = false
+
+		# Capture the complete response and set the ResultCode (logic variable) to Error.
+		@theResponse = response
+		@resultCode = "ERROR"
+
+		@responseKind = "TokenError"
+		@responseCode = response.messages.messages[0].code
+		@responseError = response.messages.messages[0].text
+	end
+end
 
 # This method connects all of the payment processing methods together.
 def process_payment
@@ -16,11 +41,11 @@ def process_payment
 	request.transactionRequest.amount = @amount
 	request.transactionRequest.transactionType = TransactionTypeEnum::AuthCaptureTransaction
 	
-	if @ids_or_card == "ids"
+	if @card_or_token == "ids"
 		request.transactionRequest.profile = CustomerProfilePaymentType.new
 		request.transactionRequest.profile.customerProfileId = @customer_token
 		request.transactionRequest.profile.paymentProfile = PaymentProfile.new(@payment_token)	
-	elsif @ids_or_card == "card"
+	elsif @card_or_token == "card"
 		request.transactionRequest.payment = PaymentType.new
 		request.transactionRequest.payment.creditCard = CreditCardType.new(@cardnumber, @carddate, @cardcvv)
 	end
