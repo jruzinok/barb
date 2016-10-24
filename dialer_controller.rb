@@ -95,7 +95,7 @@ end
 def process_dialer_payment_date
 	@step1 = card_or_token
 	@step2 = process_payment
-	@step3 = report
+	@step3 = log_result_to_console
 	@step4 = save_processed_dailer_payment_date
 	@step5 = set_response
 	# @step6 = clear
