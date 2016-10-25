@@ -46,6 +46,39 @@ def card_or_token
 	end
 end
 
+# This GL Code is referenced in the process_payment method.
+# This GL Code is used to categorize tranasactions.
+def ptd_gl_code
+	date = Time.now
+	month = date.month
+	year = date.year
+	nextyear = year + 1
+
+	# October is when the GL Code swithces to 424.
+	month_ptd = 10
+
+	if (month >= month_ptd)
+		@ptd_gl_code = "424"
+		@ptd_invoice_number = "PTD#{short_year(nextyear)}"
+	else
+		@ptd_gl_code = "423"
+		@ptd_invoice_number = "PTD#{short_year(year)}"
+	end
+
+end
+
+def bc_gl_code
+	date = Time.now
+	year = date.year
+
+	@bc_gl_code = "422"
+	@bc_invoice_number = "BCOMP#{@bc}#{short_year(year)}"
+end
+
+def short_year (yr)
+	yr.to_s.split(//).last(2).join("").to_s
+end
+
 def set_response
 	@status = @statusCode
 	@body = @statusMessage
