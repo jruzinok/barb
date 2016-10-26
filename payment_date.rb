@@ -11,6 +11,9 @@ def process_payment_dates
 	puts "\n[TIMESTAMP] #{Time.now.utc.iso8601}"
 	puts "\n----------------------------------------"
 
+	# SET the GL Codes.
+	@step0 = set_gl_codes
+
 	@payment_dates.each do |pd|
 		@payment_date = pd
 		# These "steps" are for clarity sake.
