@@ -5,7 +5,7 @@ def transaction
 	credentials = YAML.load_file(File.dirname(__FILE__) + "/config/credentials.yml")
 
 	# CREATE the transaction.
-	transaction = Transaction.new(credentials['api_login_id'], credentials['api_transaction_key'], :gateway => :sandbox)
+	transaction = Transaction.new(credentials['api_login_id'], credentials['api_transaction_key'], :gateway => :production)
 end
 
 def validate_tokens
