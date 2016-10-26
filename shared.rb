@@ -46,6 +46,15 @@ def card_or_token
 	end
 end
 
+# SET the GL Codes.
+def set_gl_codes
+	if @database == "PTD"
+		ptd_gl_code
+	elsif @database == "BC"
+		bc_gl_code
+	end
+end
+
 # This GL Code is referenced in the process_payment method.
 # This GL Code is used to categorize tranasactions.
 def ptd_gl_code

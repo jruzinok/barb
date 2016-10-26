@@ -90,6 +90,7 @@ def create_dialer_tokens
 end
 
 def process_dialer_payment_date
+	@step0 = set_gl_codes
 	@step1 = card_or_token
 	@step2 = process_payment
 	@step3 = log_result_to_console
