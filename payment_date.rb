@@ -72,20 +72,20 @@ def update_payment_date
 
 		@payment_date[:zzPP_Response_Code] = @responseCode
 
-		if @responseKind == "Approved"
+		if @responseKind == "Approved" || @transactionResponseCode == "1"
 			@payment_date[:zzF_Status] = "Approved"
 			@payment_date[:zzPP_Authorization_Code] = @authorizationCode
 			@payment_date[:zzPP_Response_Message] = @responseMessage
 
-		elsif @responseKind == "Declined"
+		elsif @responseKind == "Declined" || @transactionResponseCode == "2"
 			@payment_date[:zzF_Status] = "Declined"
 			@payment_date[:zzPP_Response_Error] = @responseError
 
-		elsif @responseKind == "Error"
+		elsif @responseKind == "Error" || @transactionResponseCode == "3"
 			@payment_date[:zzF_Status] = "Error"
 			@payment_date[:zzPP_Response_Error] = @responseError
 
-		elsif @responseKind == "HeldforReview"
+		elsif @responseKind == "HeldforReview" || @transactionResponseCode == "4"
 			@payment_date[:zzF_Status] = "HeldForReview"
 			@payment_date[:zzPP_Response_Error] = @responseError
 		end
