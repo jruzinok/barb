@@ -30,6 +30,7 @@ require_relative 'model.rb'
 require_relative 'payment_method.rb'
 require_relative 'payment_date.rb'
 require_relative 'shared.rb'
+require_relative 'transaction_attempt.rb'
 
 class PaymentProcessor < Sinatra::Application
 
@@ -60,6 +61,21 @@ class PaymentProcessor < Sinatra::Application
 		@cardcvv = params[:CVV]
 
 		create_payment_token
+
+		# Return the response back to FileMaker.
+		status @status
+		body @body
+	end
+
+	post '/process-transaction-attempt/:database/:directory_id/:statement_id/:payment_method_id' do
+		@database = params[:database]
+		@directory_id = params[:directory_id]
+		@statement_id = params[:statement_id]
+		@payment_method_id = params[:payment_method_id]
+		@amount = params[:Amount]
+		@date = params[:Date]
+
+		process_transaction_attempt
 
 		# Return the response back to FileMaker.
 		status @status
