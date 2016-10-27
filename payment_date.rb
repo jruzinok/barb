@@ -63,17 +63,16 @@ def load_payment_date
 end
 
 def update_payment_date
-		# SAVE the response values for all transactions.
+
+	# SAVE the response values for all transactions.
+	@payment_date[:zzPP_Transaction] = @transactionID
+	@payment_date[:zzPP_Response] = @theResponse
+	@payment_date[:zzPP_Response_AVS_Code] = @avsCode
+	@payment_date[:zzPP_Response_CVV_Code] = @cvvCode
+	@payment_date[:zzPP_Response_Code] = @responseCode
 
 	# Record the transaction results for each processed payment.
 	if @resultCode == "OK"
-		@payment_date[:zzPP_Transaction] = @transactionID
-
-		@payment_date[:zzPP_Response] = @theResponse
-		@payment_date[:zzPP_Response_AVS_Code] = @avsCode
-		@payment_date[:zzPP_Response_CVV_Code] = @cvvCode
-
-		@payment_date[:zzPP_Response_Code] = @responseCode
 
 		if @responseKind == "Approved" || @transactionResponseCode == "1"
 			@payment_date[:zzF_Status] = "Approved"
