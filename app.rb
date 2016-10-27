@@ -38,7 +38,7 @@ class PaymentProcessor < Sinatra::Application
 	# This route is for the php WebDialer to check that it can connect to the sinatra PaymentProcessor.
 	get '/ping' do
 		status 200
-		body 1
+		body "1"
 	end
 
 	get '/process/:database/:batch' do
