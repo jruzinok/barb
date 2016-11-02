@@ -16,10 +16,6 @@ def create_payment_token
 		profile.billTo = CustomerAddressType.new
 		profile.billTo.firstName = @namefirst
 		profile.billTo.lastName = @namelast
-		profile.billTo.address = @address
-		profile.billTo.city = @city
-		profile.billTo.state = @state
-		profile.billTo.zip = @zip
 		request.customerProfileId = @customer_token
 		request.paymentProfile = profile
 
@@ -85,10 +81,6 @@ def load_payment_method
 	@payment_method = @payment_method[0]
 	@namefirst = @payment_method["Name_First"]
 	@namelast = @payment_method["Name_Last"]
-	@address = @payment_method["T55_CONTACTINFO::Add_Address1"]
-	@city = @payment_method["T55_CONTACTINFO::Add_City"]
-	@state = @payment_method["T55_CONTACTINFO::Add_State"]
-	@zip = @payment_method["T55_CONTACTINFO::Add_Zip"]
 	@payment_token = @payment_method["Token_Payment_ID"]
 
 	check_payment_token
@@ -97,10 +89,14 @@ end
 def update_payment_method
 	if @responseKind == "OK"
 		@payment_method[:Token_Payment_ID] = @payment_token
+		@payment_method[:zzF_Status] = "Active"
+		@payment_method[:zzF_Type] = "Token"
 	else
 		@payment_method[:zzPP_Response] = @theResponse
 		@payment_method[:zzPP_Response_Code] = @responseCode
 		@payment_method[:zzPP_Response_Error] = @responseError
+		@payment_method[:zzF_Status] = "Inactive"
+		@payment_method[:zzF_Type] = "Error"
 	end
 
 	@payment_method.save
