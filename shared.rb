@@ -20,8 +20,11 @@ def process_or_skip
 	# Check if this payment is by ids or card.
 	card_or_token
 
-	if @card_or_token == "ids" || @card_or_token == "card"
+	if @card_or_tokens == "tokens" || @card_or_tokens == "card"
+		@process_or_skip = "Process"
 		process_payment
+	else
+		@process_or_skip = "Skip"
 	end
 end
 
@@ -35,20 +38,20 @@ def card_or_token
 		validate_tokens
 
 		if @valid_tokens == true
-			@card_or_token = "ids"
+			@card_or_tokens = "tokens"
 		else
-			@card_or_token = "Error"
+			@card_or_tokens = "error"
 		end
 
 	# If this record has credit card values, use them.
 	else
-		@card_or_token = "card"
+		@card_or_tokens = "card"
 	end
 end
 
 # SET the GL Codes.
 def set_gl_codes
-	if @database == "PTD"
+	if @database == "PTD" || @database == "DL"
 		ptd_gl_code
 	elsif @database == "BC"
 		bc_gl_code
@@ -67,11 +70,11 @@ def ptd_gl_code
 	month_ptd = 10
 
 	if (month >= month_ptd)
-		@ptd_gl_code = "424"
-		@ptd_invoice_number = "PTD#{short_year(nextyear)}"
+		@gl_code = "424"
+		@invoice = "PTD#{short_year(nextyear)}"
 	else
-		@ptd_gl_code = "423"
-		@ptd_invoice_number = "PTD#{short_year(year)}"
+		@gl_code = "423"
+		@invoice = "PTD#{short_year(year)}"
 	end
 
 end
@@ -80,8 +83,8 @@ def bc_gl_code
 	date = Time.now
 	year = date.year
 
-	@bc_gl_code = "422"
-	@bc_invoice_number = "BCOMP#{@bc}#{short_year(year)}"
+	@gl_code = "422"
+	@invoice = "BCOMP#{@bc}#{short_year(year)}"
 end
 
 def short_year (yr)
@@ -109,20 +112,20 @@ end
 
 def log_error_to_console
 	puts "\n\n\n\n\n"
-	puts "\n----------------------------------------"
-	puts "\n[DATABASE] #{@database}"
+	puts "----------------------------------------"
+	puts "[DATABASE] #{@database}"
 	if @database == "BC" || @database == "PTD"
-		puts "\n[DIRECTORY] #{@directory_id}"
-		puts "\n[PAYMENTMETHOD] #{@payment_method_id}"
+		puts "[DIRECTORY] #{@directory_id}"
+		puts "[PAYMENTMETHOD] #{@payment_method_id}"
 	elsif @database == "DL"
-		puts "\n[LEAD] #{@lead_id}"
-		puts "\n[GUEST] #{@guest_id}"
+		puts "[LEAD] #{@lead_id}"
+		puts "[GUEST] #{@guest_id}"
 	end
-	puts "\n#{@statusMessage}"
-	puts "\n[CODE] #{@responseCode}"
-	puts "\n[REASON] #{@responseError}"
-	puts "\n[TIMESTAMP] #{Time.now.utc.iso8601}"
-	puts "\n----------------------------------------"
+	puts "#{@statusMessage}"
+	puts "[CODE] #{@responseCode}"
+	puts "[REASON] #{@responseError}"
+	puts "[TIMESTAMP] #{Time.now.utc.iso8601}"
+	puts "----------------------------------------"
 	puts "\n\n\n\n\n"
 end
 
@@ -138,16 +141,21 @@ def log_result_to_console
 
 	# This determines what to output, either the card number or customer profile and payment ids.
 	paymentMethod =
-	if @card_or_token == "card"
+	if @card_or_tokens == "tokens"
+		"Profile: #{@customer_token} Payment: #{@payment_token}"
+	elsif @card_or_tokens == "card"
 		"Card: #{@cardnumber}"
 	else
-		"Profile: #{@customer_token} Payment: #{@payment_token}"
+		"Error"
 	end
 
-	puts "\nRESPONSE: [#{@responseKind}]"
-	puts "MESSAGE: #{responseOutput}"
-	puts "CODE: #{@responseCode}"
-	puts "RECORD: #{@serial}"
-	puts "METHOD: #{paymentMethod}"
+	puts "\n[RESPONSE] #{@responseKind}"
+	puts "[MESSAGE] #{responseOutput}"
+	puts "[CODE] #{@responseCode}"
+	puts "[RECORD] #{@serial}"
+	puts "[DIRECTORY] #{@directory_id}"
+	puts "[PAYMENTMETHOD] #{@payment_method_id}"
+	puts "[METHOD] #{paymentMethod}"
+	puts "[P or S] #{@process_or_skip}"
 	puts "\n----------------------------------------"
 end
