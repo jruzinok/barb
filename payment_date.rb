@@ -5,11 +5,11 @@ def process_payment_dates
 
 	# This outputs the batch id. It's used to display acts as the header or beginning of the process
 	puts "\n\n\n\n\n"
-	puts "\n----------------------------------------"
-	puts "\n[DATABASE] #{@database}"
-	puts "\n[BATCH] #{@batch})"
-	puts "\n[TIMESTAMP] #{Time.now.utc.iso8601}"
-	puts "\n----------------------------------------"
+	puts "----------------------------------------"
+	puts "[DATABASE] #{@database}"
+	puts "[BATCH] #{@batch}"
+	puts "[TIMESTAMP] #{Time.now.utc.iso8601}"
+	puts "----------------------------------------"
 
 	# SET the GL Codes.
 	@step0 = set_gl_codes
@@ -43,6 +43,8 @@ end
 
 def load_payment_date
 	@serial = @payment_date["_Serial"].to_i
+	@directory_id = @payment_date["_kF_Directory"]
+	@payment_method_id = @payment_date["_kF_PaymentMethod"]
 
 	# TBD: CAPTURE the customer's and payment tokens.
 	@customer_token = @payment_date["T54_DIRECTORY::Token_Profile_ID"]
@@ -64,37 +66,37 @@ end
 
 def update_payment_date
 
-	# SAVE the response values for all transactions.
-	@payment_date[:zzPP_Transaction] = @transactionID
-	@payment_date[:zzPP_Response] = @theResponse
-	@payment_date[:zzPP_Response_AVS_Code] = @avsCode
-	@payment_date[:zzPP_Response_CVV_Code] = @cvvCode
-	@payment_date[:zzPP_Response_Code] = @responseCode
+	if @process_or_skip == "Process"
+		
+		# SAVE the response values for all transactions.
+		@payment_date[:zzPP_Transaction] = @transactionID
+		@payment_date[:zzPP_Response] = @theResponse
+		@payment_date[:zzPP_Response_AVS_Code] = @avsCode
+		@payment_date[:zzPP_Response_CVV_Code] = @cvvCode
+		@payment_date[:zzPP_Response_Code] = @responseCode
 
-	# Record the transaction results for each processed payment.
-	if @resultCode == "OK"
-
-		if @responseKind == "Approved" || @transactionResponseCode == "1"
+		# These transaction WERE processed.
+		if @responseKind == "Approved"
 			@payment_date[:zzF_Status] = "Approved"
 			@payment_date[:zzPP_Authorization_Code] = @authorizationCode
 			@payment_date[:zzPP_Response_Message] = @responseMessage
 
-		elsif @responseKind == "Declined" || @transactionResponseCode == "2"
+		elsif @responseKind == "Declined"
 			@payment_date[:zzF_Status] = "Declined"
 			@payment_date[:zzPP_Response_Error] = @responseError
 
-		elsif @responseKind == "Error" || @transactionResponseCode == "3"
+		elsif @responseKind == "Error"
 			@payment_date[:zzF_Status] = "Error"
 			@payment_date[:zzPP_Response_Error] = @responseError
 
-		elsif @responseKind == "HeldforReview" || @transactionResponseCode == "4"
+		elsif @responseKind == "HeldforReview"
 			@payment_date[:zzF_Status] = "HeldForReview"
 			@payment_date[:zzPP_Response_Error] = @responseError
-		end
 
-	# These payments were NOT processes.
-	else
-		if @responseKind == "TransactionError"
+
+
+	# These transaction were NOT processed.
+		elsif @responseKind == "TransactionError"
 			@payment_date[:zzF_Status] = "Error"
 			@payment_date[:zzPP_Transaction] = @transactionID
 
@@ -107,10 +109,11 @@ def update_payment_date
 			@payment_date[:zzPP_Response_Code] = @responseCode
 			@payment_date[:zzPP_Response_Error] = @responseError
 
+		# This transaction was NOT sent to Authorize.net successfully.
 		elsif @responseKind == "TransactionFailure"
 			@payment_date[:zzPP_Response_Error] = @responseError
 		end
-	end
 
-	@payment_date.save
+		@payment_date.save
+	end
 end
