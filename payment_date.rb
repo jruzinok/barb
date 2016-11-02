@@ -3,6 +3,9 @@ require 'bigdecimal'
 def process_payment_dates
 	find_by_batch
 
+	# This is used to mark the record's Date Processed.
+	@today = Time.new
+
 	# This outputs the batch id. It's used to display acts as the header or beginning of the process
 	puts "\n\n\n\n\n"
 	puts "----------------------------------------"
@@ -75,45 +78,55 @@ def update_payment_date
 		@payment_date[:zzPP_Response_CVV_Code] = @cvvCode
 		@payment_date[:zzPP_Response_Code] = @responseCode
 
-		# These transaction WERE processed.
-		if @responseKind == "Approved"
-			@payment_date[:zzF_Status] = "Approved"
-			@payment_date[:zzPP_Authorization_Code] = @authorizationCode
-			@payment_date[:zzPP_Response_Message] = @responseMessage
+		if @resultCode == "OK"
 
-		elsif @responseKind == "Declined"
-			@payment_date[:zzF_Status] = "Declined"
-			@payment_date[:zzPP_Response_Error] = @responseError
+			# RECORD the Date Processed.
+			@payment_date[:Date_Processed] = @today
 
-		elsif @responseKind == "Error"
-			@payment_date[:zzF_Status] = "Error"
-			@payment_date[:zzPP_Response_Error] = @responseError
+			# These transaction WERE processed.
+			if @responseKind == "Approved"
+				@payment_date[:zzF_Status] = "Approved"
+				@payment_date[:zzPP_Authorization_Code] = @authorizationCode
+				@payment_date[:zzPP_Response_Message] = @responseMessage
 
-		elsif @responseKind == "HeldforReview"
-			@payment_date[:zzF_Status] = "HeldForReview"
-			@payment_date[:zzPP_Response_Error] = @responseError
+			elsif @responseKind == "Declined"
+				@payment_date[:zzF_Status] = "Declined"
+				@payment_date[:zzPP_Response_Error] = @responseError
 
+			elsif @responseKind == "Error"
+				@payment_date[:zzF_Status] = "Error"
+				@payment_date[:zzPP_Response_Error] = @responseError
 
+			elsif @responseKind == "HeldforReview"
+				@payment_date[:zzF_Status] = "HeldForReview"
+				@payment_date[:zzPP_Response_Error] = @responseError
+			end
 
-	# These transaction were NOT processed.
-		elsif @responseKind == "TransactionError"
-			@payment_date[:zzF_Status] = "Error"
-			@payment_date[:zzPP_Transaction] = @transactionID
+		elsif @resultCode == "ERROR"
 
-			@payment_date[:zzPP_Response] = @theResponse
-			@payment_date[:zzPP_Response_Code] = @responseCode
-			@payment_date[:zzPP_Response_Error] = @responseError
+			# These transaction were NOT processed.
+			if @responseKind == "TransactionError"
+				@payment_date[:zzF_Status] = "Error"
+				@payment_date[:zzPP_Transaction] = @transactionID
 
-		elsif @responseKind == "TokenError"
-			@payment_date[:zzPP_Response] = @theResponse
-			@payment_date[:zzPP_Response_Code] = @responseCode
-			@payment_date[:zzPP_Response_Error] = @responseError
+				@payment_date[:zzPP_Response] = @theResponse
+				@payment_date[:zzPP_Response_Code] = @responseCode
+				@payment_date[:zzPP_Response_Error] = @responseError
 
-		# This transaction was NOT sent to Authorize.net successfully.
-		elsif @responseKind == "TransactionFailure"
-			@payment_date[:zzPP_Response_Error] = @responseError
+			elsif @responseKind == "TokenError"
+				@payment_date[:zzPP_Response] = @theResponse
+				@payment_date[:zzPP_Response_Code] = @responseCode
+				@payment_date[:zzPP_Response_Error] = @responseError
+
+			# This transaction was NOT sent to Authorize.net successfully.
+			elsif @responseKind == "TransactionFailure"
+				@payment_date[:zzPP_Response_Error] = @responseError
+			end
+
 		end
 
+		# SAVE the changes to the database.
 		@payment_date.save
+
 	end
 end
