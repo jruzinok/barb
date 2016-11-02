@@ -41,29 +41,19 @@ def process_payment
 	request.transactionRequest.amount = @amount
 	request.transactionRequest.transactionType = TransactionTypeEnum::AuthCaptureTransaction
 	
-	if @card_or_token == "ids"
+	if @card_or_tokens == "tokens"
 		request.transactionRequest.profile = CustomerProfilePaymentType.new
 		request.transactionRequest.profile.customerProfileId = @customer_token
 		request.transactionRequest.profile.paymentProfile = PaymentProfile.new(@payment_token)	
-	elsif @card_or_token == "card"
+	elsif @card_or_tokens == "card"
 		request.transactionRequest.payment = PaymentType.new
 		request.transactionRequest.payment.creditCard = CreditCardType.new(@cardnumber, @carddate, @cardcvv)
 	end
 
-	# HARDCODED GL CODES MUST be updated to set the year value dynamically.
-	if @database == "PTD"
-		request.transactionRequest.order = OrderType.new()
-		request.transactionRequest.order.invoiceNumber = @ptd_invoice_number
-		request.transactionRequest.order.description = @ptd_gl_code
-	elsif @database == "BC"
-		request.transactionRequest.order = OrderType.new()
-		request.transactionRequest.order.invoiceNumber = @bc_invoice_number
-		request.transactionRequest.order.description = @bc_gl_code
-	elsif @database == "DL" #DialerLeads
-		request.transactionRequest.order = OrderType.new()
-		request.transactionRequest.order.invoiceNumber = @ptd_invoice_number
-		request.transactionRequest.order.description = @ptd_gl_code
-	end
+	# The @gl_code and @invoice were set dynamically in the set_gl_code method located in the shared.rb file.
+	request.transactionRequest.order = OrderType.new()
+	request.transactionRequest.order.invoiceNumber = @invoice
+	request.transactionRequest.order.description = @gl_code
 	
 	# PASS the transaction request and CAPTURE the transaction response.
 	response = transaction.create_transaction(request)
