@@ -48,7 +48,7 @@ def load_dialer_lead
 	@dialer_lead = @dialer_lead[0] # Load the record from the first position of the array.
 	@namefirst = @dialer_lead["First Name"]
 	@serial = @dialer_lead["_Serial"].to_i
-	@customer = "#{@database}#{@serial}" # The "ID" used to create a customer profile.
+	@customer = "#{@database}#{@lead_id}" # The "ID" used to create a customer profile.
 	@namelast = @dialer_lead["Last Name"]
 	@namefull = "#{@namefirst} #{@namelast}"
 	@customer_token = @dialer_lead["Token_Profile_ID"]
