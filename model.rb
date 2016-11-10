@@ -33,6 +33,11 @@ class BCDirectory < Rfm::Base
 	config :layout => 'T55_WEB_DIRECTORY'
 end
 
+class BCPaymentProcessorLog < Rfm::Base
+	config :database => 'Data'
+	config :layout => 'T56__PAYMENTPROCESSORLOG'
+end
+
 class DialerPaymentDate < Rfm::Base
 	config :database => 'DialerLeads'
 	config :layout => 'WEB_PAYMENT'

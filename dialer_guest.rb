@@ -23,6 +23,7 @@ def create_dialer_guest_customer_token
 		end
 
 		update_dialer_guest
+		create_payment_processor_log
 		set_response
 		# clear_response
 	end

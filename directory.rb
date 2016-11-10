@@ -23,6 +23,7 @@ def create_customer_token
 		end
 
 		update_directory
+		create_payment_processor_log
 		set_response
 		clear_response
 	end

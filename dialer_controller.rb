@@ -9,6 +9,7 @@ def process_create_dialer_payment_method_request
 		create_dialer_tokens
 		if @responseKind == "OK"
 			save_scheduled_dailer_payment_date
+			create_payment_processor_log
 		end
 	end
 
@@ -22,6 +23,7 @@ def process_create_dialer_payment_date_request
 	elsif @request_type == "Schedule"
 		load_dialer_tokens
 		save_scheduled_dailer_payment_date
+		create_payment_processor_log
 	end
 
 end
@@ -95,6 +97,7 @@ def process_dialer_payment_date
 	@step2 = process_payment
 	@step3 = log_result_to_console
 	@step4 = save_processed_dailer_payment_date
-	@step5 = set_response
-	@step6 = clear_response
+	@step5 = create_payment_processor_log
+	@step6 = set_response
+	@step7 = clear_response
 end

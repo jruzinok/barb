@@ -28,9 +28,10 @@ def process_onetime_payment
 		@step3 = process_payment
 		@step4 = log_result_to_console
 		@step5 = save_transaction_attempt
+		@step6 = create_payment_processor_log
 	end
 
-	@step6 = set_response
+	@step7 = set_response
 end
 
 def save_transaction_attempt
@@ -74,7 +75,8 @@ def save_transaction_attempt
 		end
 
 	# These payments were NOT processes.
-	else
+	elsif @resultCode == "ERROR"
+
 		if @responseKind == "TransactionError"
 			@transaction_attempt[:zzF_Status] = "Error"
 			@transaction_attempt[:zzPP_Transaction] = @transactionID

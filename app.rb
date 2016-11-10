@@ -31,6 +31,7 @@ require_relative 'payment_method.rb'
 require_relative 'payment_date.rb'
 require_relative 'shared.rb'
 require_relative 'transaction_attempt.rb'
+require_relative 'payment_processor_log.rb'
 
 class PaymentProcessor < Sinatra::Application
 
@@ -42,6 +43,8 @@ class PaymentProcessor < Sinatra::Application
 	end
 
 	get '/process/:database/:batch' do
+		@process = "Batch Process"
+		@processType = "Payment"
 		@database = params[:database]
 		@batch = params[:batch]
 		process_payment_dates
@@ -52,12 +55,16 @@ class PaymentProcessor < Sinatra::Application
 	end
 
 	get '/create-customer-token/:database/:directory_id' do
+		@process = "Create Customer Token"
+		@processType = "Token"
 		@database = params[:database]
 		@directory_id = params[:directory_id]
 		create_customer_token
 	end
 
 	post '/create-payment-token/:database/:directory_id/:payment_method_id' do
+		@process = "Create Payment Token"
+		@processType = "Token"
 		@database = params[:database]
 		@directory_id = params[:directory_id]
 		@payment_method_id = params[:payment_method_id]
@@ -75,6 +82,8 @@ class PaymentProcessor < Sinatra::Application
 	end
 
 	post '/process-transaction-attempt/:database/:directory_id/:statement_id/:payment_method_id' do
+		@process = "Transaction Attempt"
+		@processType = "Payment"
 		@database = params[:database]
 		@directory_id = params[:directory_id]
 		@statement_id = params[:statement_id]
@@ -91,6 +100,8 @@ class PaymentProcessor < Sinatra::Application
 
 	# This was designed to be called from the BookingDialer php web app.
 	post '/create-dialer-lead-payment-method/:lead_id' do
+		@process = "Create Dialer Lead PaymentMethod"
+		@processType = "Token"
 		@database = "DL"
 		@recordtype = "DialerLead"
 		process_create_dialer_payment_method_request
@@ -102,6 +113,8 @@ class PaymentProcessor < Sinatra::Application
 
 	# This was designed to be called from the BookingDialer php web app.
 	post '/create-dialer-lead-payment/:lead_id/:payment_method_id' do
+		@process = "Create Dialer Lead PaymentDate"
+		@processType = "Payment"
 		@database = "DL"
 		@recordtype = "DialerLead"
 		process_create_dialer_payment_date_request
@@ -113,6 +126,8 @@ class PaymentProcessor < Sinatra::Application
 
 	# This was designed to be called from the BookingDialer php web app.
 	post '/create-dialer-guest-payment-method/:lead_id/:guest_id' do
+		@process = "Create Dialer Guest PaymentMethod"
+		@processType = "Token"
 		@database = "DL"
 		@recordtype = "DialerGuest"
 		process_create_dialer_payment_method_request
@@ -124,6 +139,8 @@ class PaymentProcessor < Sinatra::Application
 
 	# This was designed to be called from the BookingDialer php web app.
 	post '/create-dialer-guest-payment/:lead_id/:guest_id/:payment_method_id' do
+		@process = "Create Dialer Guest PaymentDate"
+		@processType = "Payment"
 		@database = "DL"
 		@recordtype = "DialerGuest"
 		process_create_dialer_payment_date_request
