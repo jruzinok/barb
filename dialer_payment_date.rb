@@ -2,19 +2,19 @@ def save_processed_dailer_payment_date
 	# Record the transaction results for each processed payment.
 	@dailer_payment = DialerPaymentDate.new
 	
-		@dailer_payment[:_kF_DialerLead] = @lead_id
-		@dailer_payment[:_kF_Guest] = @guest_id
-		@dailer_payment[:_kF_PaymentMethod] = @payment_method_id
+	@dailer_payment[:_kF_DialerLead] = @lead_id
+	@dailer_payment[:_kF_Guest] = @guest_id
+	@dailer_payment[:_kF_PaymentMethod] = @payment_method_id
 
-		@dailer_payment[:Date] = @date
-		@dailer_payment[:Amount] = @amount
-		@dailer_payment[:zzPP_Transaction] = @transactionID
+	@dailer_payment[:Date] = @date
+	@dailer_payment[:Amount] = @amount
+	@dailer_payment[:zzPP_Transaction] = @transactionID
 
-		@dailer_payment[:zzPP_Response] = @theResponse
-		@dailer_payment[:zzPP_Response_AVS_Code] = @avsCode
-		@dailer_payment[:zzPP_Response_CVV_Code] = @cvvCode
+	@dailer_payment[:zzPP_Response] = @theResponse
+	@dailer_payment[:zzPP_Response_AVS_Code] = @avsCode
+	@dailer_payment[:zzPP_Response_CVV_Code] = @cvvCode
 
-		@dailer_payment[:zzPP_Response_Code] = @responseCode
+	@dailer_payment[:zzPP_Response_Code] = @responseCode
 
 	if @resultCode == "OK"
 	
@@ -37,7 +37,8 @@ def save_processed_dailer_payment_date
 		end
 
 	# These payments were NOT processes.
-	else
+	elsif @resultCode == "ERROR"
+
 		if @responseKind == "TransactionError"
 			@dailer_payment[:zzF_Status] = "Error"
 			@dailer_payment[:zzPP_Transaction] = @transactionID
