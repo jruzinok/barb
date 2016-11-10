@@ -34,6 +34,7 @@ def create_dialer_payment_token
 		end
 
 		save_dialer_payment_method
+		create_payment_processor_log
 	end
 
 	set_response
