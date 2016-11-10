@@ -37,6 +37,7 @@ def create_payment_token
 		end
 
 		update_payment_method
+		create_payment_processor_log
 
 	elsif @logic == "PaymentTokenAlreadyCreated"
 		@statusCode = 220

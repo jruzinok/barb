@@ -23,6 +23,7 @@ def create_dialer_lead_customer_token
 		end
 
 		update_dialer_lead
+		create_payment_processor_log
 		set_response
 		# clear_response
 	end

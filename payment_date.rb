@@ -25,14 +25,15 @@ def process_payment_dates
 		@step2 = process_or_skip
 		@step3 = log_result_to_console
 		@step4 = update_payment_date
-		@step5 = clear_response
+		@step5 = create_payment_processor_log
+		@step6 = clear_response
 	end
 
 	# This final step calls a script in either the Data File or PTD17 which in turn calls a Payment Processor Tool script in the Payment Processor application file.
 	if @database == "PTD"
-		@step6 = PTDPaymentDate.find({:_kF_PaymentBatch => @batch}, :post_script => ["PaymentProcessorCallBack", "#{@batch}\nInitiate from Ruby\nPTD"])
+		@step7 = PTDPaymentDate.find({:_kF_PaymentBatch => @batch}, :post_script => ["PaymentProcessorCallBack", "#{@batch}\nInitiate from Ruby\nPTD"])
 	elsif @database == "BC"
-		@step6 = BCPaymentDate.find({:_kF_PaymentBatch => @batch}, :post_script => ["PaymentProcessorCallBack", "#{@batch}\nInitiate from Ruby\nBC"])
+		@step7 = BCPaymentDate.find({:_kF_PaymentBatch => @batch}, :post_script => ["PaymentProcessorCallBack", "#{@batch}\nInitiate from Ruby\nBC"])
 	end
 end
 
@@ -45,6 +46,7 @@ def find_by_batch
 end
 
 def load_payment_date
+	@payment_date_id = @payment_date["__kP_PaymentDate"]
 	@serial = @payment_date["_Serial"].to_i
 	@directory_id = @payment_date["_kF_Directory"]
 	@payment_method_id = @payment_date["_kF_PaymentMethod"]
@@ -69,19 +71,17 @@ end
 
 def update_payment_date
 
-	if @process_or_skip == "Process"
-		
-		# SAVE the response values for all transactions.
-		@payment_date[:zzPP_Transaction] = @transactionID
-		@payment_date[:zzPP_Response] = @theResponse
-		@payment_date[:zzPP_Response_AVS_Code] = @avsCode
-		@payment_date[:zzPP_Response_CVV_Code] = @cvvCode
-		@payment_date[:zzPP_Response_Code] = @responseCode
-
 		if @resultCode == "OK"
 
 			# RECORD the Date Processed.
 			@payment_date[:Date_Processed] = @today
+
+			# SAVE the response values for all transactions.
+			@payment_date[:zzPP_Transaction] = @transactionID
+			@payment_date[:zzPP_Response] = @theResponse
+			@payment_date[:zzPP_Response_AVS_Code] = @avsCode
+			@payment_date[:zzPP_Response_CVV_Code] = @cvvCode
+			@payment_date[:zzPP_Response_Code] = @responseCode
 
 			# These transaction WERE processed.
 			if @responseKind == "Approved"
@@ -104,11 +104,12 @@ def update_payment_date
 
 		elsif @resultCode == "ERROR"
 
+			# Regardless of the type of error, set the PaymentDate Status to Error.
+			@payment_date[:zzF_Status] = "Error"
+
 			# These transaction were NOT processed.
 			if @responseKind == "TransactionError"
-				@payment_date[:zzF_Status] = "Error"
 				@payment_date[:zzPP_Transaction] = @transactionID
-
 				@payment_date[:zzPP_Response] = @theResponse
 				@payment_date[:zzPP_Response_Code] = @responseCode
 				@payment_date[:zzPP_Response_Error] = @responseError
@@ -128,5 +129,4 @@ def update_payment_date
 		# SAVE the changes to the database.
 		@payment_date.save
 
-	end
 end
