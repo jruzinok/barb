@@ -117,6 +117,7 @@ def log_error_to_console
 	if @database == "BC" || @database == "PTD"
 		puts "[DIRECTORY] #{@directory_id}"
 		puts "[PAYMENTMETHOD] #{@payment_method_id}"
+		puts "[PAYMENTDATE] #{@payment_date_id}"
 	elsif @database == "DL"
 		puts "[LEAD] #{@lead_id}"
 		puts "[GUEST] #{@guest_id}"
