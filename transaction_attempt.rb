@@ -4,15 +4,16 @@ def process_transaction_attempt
 
 	# This outputs the details of this Transacion Attempt to the console.
 	puts "\n\n\n\n\n"
-	puts "\n----------------------------------------"
-	puts "\n[TRANSACTION ATTEMPT]"
-	puts "\n[DATABASE] #{@database}"
-	puts "\n[DIRECTORY] #{@directory_id}"
-	puts "\n[PAYMENTMETHOD] #{@payment_method_id}"
-	puts "\n[DATE] #{@date}"
-	puts "\n[AMOUNT] #{@amount}"
-	puts "\n[TIMESTAMP] #{Time.now.utc.iso8601}"
-	puts "\n----------------------------------------"
+	puts "----------------------------------------"
+	puts "[PROCESS] TRANSACTION ATTEMPT"
+	puts "[DATABASE] #{@database}"
+	puts "[DIRECTORY] #{@directory_id}"
+	puts "[PAYMENTMETHOD] #{@payment_method_id}"
+	puts "[PAYMENTDATE] #{@payment_date_id}"
+	puts "[DATE] #{@date}"
+	puts "[AMOUNT] #{@amount}"
+	puts "[TIMESTAMP] #{Time.now.utc.iso8601}"
+	puts "----------------------------------------"
 
 	find_directory
 	find_payment_method
@@ -48,6 +49,7 @@ def save_transaction_attempt
 	@transaction_attempt[:_kF_Directory] = @directory_id
 	@transaction_attempt[:_kF_Statement] = @statement_id
 	@transaction_attempt[:_kF_PaymentMethod] = @payment_method_id
+	@transaction_attempt[:_kF_PaymentDate] = @payment_date_id # Sent when working Declined Payments.
 
 	# RECORD the Transaction details.
 	@transaction_attempt[:Amount] = @amount

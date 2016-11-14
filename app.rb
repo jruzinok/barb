@@ -90,6 +90,7 @@ class PaymentProcessor < Sinatra::Application
 		@payment_method_id = params[:payment_method_id]
 		@amount = params[:Amount]
 		@date = params[:Date]
+		@payment_date_id = params[:payment_date_id]
 
 		process_transaction_attempt
 
