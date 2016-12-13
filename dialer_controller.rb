@@ -15,6 +15,12 @@ def process_create_dialer_payment_method_request
 
 end
 
+# To ONLY create tokens.
+def process_create_dialer_payment_method_request_v2
+	parse_create_dialer_payment_method_post
+	create_dialer_tokens
+end
+
 def process_create_dialer_payment_date_request
 	parse_create_dialer_payment_method_post
 	if @request_type == "Charge"
