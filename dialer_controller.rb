@@ -49,10 +49,6 @@ def parse_create_dialer_payment_method_post
 	@cardnumber = params[:CreditCard]
 	@carddate = params[:MMYY]
 	@cardcvv = params[:CVV]
-	@address = params[:Address_Address]
-	@city = params[:Address_City]
-	@state = params[:Address_State]
-	@zip = params[:Address_Zip]
 
 	log_post_variables_to_console
 end
