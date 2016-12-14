@@ -37,6 +37,11 @@ def create_dialer_payment_token
 		create_payment_processor_log
 	end
 
+	# This sends the PaymentMethodID back to the Dialer php web app in the response body.
+	if @responseKind == "OK" && @payment_method_found == true
+		@statusMessage = @payment_method_id.to_s
+	end
+
 	set_response
 	# clear_response
 end
@@ -82,21 +87,16 @@ end
 def save_dialer_payment_method
 	@dailer_payment_method = DialerPaymentMethod.new
 
+	@dailer_payment_method[:_kF_DialerLead] = @lead_id
+	@dailer_payment_method[:_kF_Guest] = @guest_id
+	@dailer_payment_method[:Name_First] = @namefirstCC
+	@dailer_payment_method[:Name_Last] = @namelastCC
+	@dailer_payment_method[:CreditCard_Number] = @cardnumber
+	@dailer_payment_method[:MMYY] = @carddate
+	@dailer_payment_method[:CVV] = @cardcvv
+
 	if @responseKind == "OK"
-		@dailer_payment_method[:_kF_DialerLead] = @lead_id
-		@dailer_payment_method[:_kF_Guest] = @guest_id
-
 		@dailer_payment_method[:Token_Payment_ID] = @payment_token
-
-		@dailer_payment_method[:Name_First] = @namefirstCC
-		@dailer_payment_method[:Name_Last] = @namelastCC
-		@dailer_payment_method[:CreditCard_Number] = @cardnumber
-		@dailer_payment_method[:MMYY] = @carddate
-		@dailer_payment_method[:CVV] = @cardcvv
-		@dailer_payment_method[:Address_Address] = @address
-		@dailer_payment_method[:Address_City] = @city
-		@dailer_payment_method[:Address_State] = @state
-		@dailer_payment_method[:Address_Zip] = @zip
 	else
 		@dailer_payment_method[:zzPP_Response] = @theResponse
 		@dailer_payment_method[:zzPP_Response_Code] = @responseCode
