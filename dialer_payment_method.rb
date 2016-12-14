@@ -9,10 +9,6 @@ def create_dialer_payment_token
 		profile.billTo = CustomerAddressType.new
 		profile.billTo.firstName = @namefirstCC
 		profile.billTo.lastName = @namelastCC
-		profile.billTo.address = @address
-		profile.billTo.city = @city
-		profile.billTo.state = @state
-		profile.billTo.zip = @zip
 		request.customerProfileId = @customer_token
 		request.paymentProfile = profile
 
