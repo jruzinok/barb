@@ -27,7 +27,7 @@ def process_onetime_payment
 	if @directory_found == true && @payment_method_found == true	
 		@step2 = card_or_token
 		@step3 = process_payment
-		@step4 = log_result_to_console
+		@step4 = capture_response
 		@step5 = save_transaction_attempt
 		@step6 = create_payment_processor_log
 	end
@@ -35,8 +35,26 @@ def process_onetime_payment
 	@step7 = set_response
 end
 
+def capture_response
+	if @responseKind == "OK"
+		@statusCode = 200
+		@statusMessage = "[OK] TransactionApproved"
+		log_result_to_console
+	else
+		@responseCode = @theResponse.messages.messages[0].code
+		@responseError = @theResponse.messages.messages[0].text
+		@statusCode = 210
+		@statusMessage = "[ERROR] TransactionDeclined"
+		log_error_to_console
+	end	
+end
+
 def save_transaction_attempt
-	@transaction_attempt = PTDTransactionAttempt.new
+	if @database == "BC"
+		@transaction_attempt = BCTransactionAttempt.new
+	elsif @database == "PTD"
+		@transaction_attempt = PTDTransactionAttempt.new
+	end
 
 	# SAVE the response values for all transactions.
 	@transaction_attempt[:zzPP_Transaction] = @transactionID

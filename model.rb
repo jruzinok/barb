@@ -8,6 +8,11 @@ class PTDTransactionAttempt < Rfm::Base
 	config :layout => 'T56_WEB_TRANSACTIONATTEMPT'
 end
 
+class BCTransactionAttempt < Rfm::Base
+	config :database => 'Data'
+	config :layout => 'T56_WEB_TRANSACTIONATTEMPT'
+end
+
 class BCPaymentDate < Rfm::Base
 	config :database => 'Data'
 	config :layout => 'T54_WEB_PAYMENTDATE'
