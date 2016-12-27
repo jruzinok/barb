@@ -60,8 +60,8 @@ def create_payment_token_logic
 end
 
 def find_payment_method
-	if @database == "BC"
-		@payment_method = BCPaymentMethod.find(:__kP_PaymentMethod => @payment_method_id)
+	if @database == "BC" || @database == "CS"
+		@payment_method = DATAPaymentMethod.find(:__kP_PaymentMethod => @payment_method_id)
 	elsif @database == "PTD"
 		@payment_method = PTDPaymentMethod.find(:__kP_PaymentMethod => @payment_method_id)
 	end

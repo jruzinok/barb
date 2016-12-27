@@ -30,8 +30,8 @@ def create_dialer_lead_customer_token
 end
 
 def find_dialer_lead
-	@dialer_lead = DialerLead.find(:_kf_LeadID => @lead_id)
-	# @dialer_lead = DialerLead.find(:__p_DialerLeadID => @lead_id)
+	@dialer_lead = DIALERLead.find(:_kf_LeadID => @lead_id)
+	# @dialer_lead = DIALERLead.find(:__p_DialerLeadID => @lead_id)
 
 	if @dialer_lead[0] != nil
 		@dialer_lead_found = true

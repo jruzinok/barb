@@ -30,7 +30,7 @@ def create_dialer_guest_customer_token
 end
 
 def find_dialer_guest
-	@dialer_guest = DialerGuest.find(:__kP_Guest => @guest_id)
+	@dialer_guest = DIALERGuest.find(:__kP_Guest => @guest_id)
 
 	if @dialer_guest[0] != nil
 		@dialer_guest_found = true
