@@ -1,6 +1,6 @@
 def create_payment_processor_log
 	# Record the transaction results for each processed payment.
-	@payment_processor_log = BCPaymentProcessorLog.new
+	@payment_processor_log = DATAPaymentProcessorLog.new
 
 	# Authorize Details
 	@payment_processor_log[:zzPP_Transaction] = @transactionID

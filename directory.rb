@@ -30,8 +30,8 @@ def create_customer_token
 end
 
 def find_directory
-	if @database == "BC"
-		@directory = BCDirectory.find(:__kP_Directory => @directory_id)
+	if @database == "BC" || @database == "CS"
+		@directory = DATADirectory.find(:__kP_Directory => @directory_id)
 	elsif @database == "PTD"
 		@directory = PTDDirectory.find(:__kP_Directory => @directory_id)
 	end

@@ -53,7 +53,7 @@ end
 def set_gl_codes
 	if @database == "PTD" || @database == "DL"
 		ptd_gl_code
-	elsif @database == "BC"
+	elsif @database == "BC" || @database == "CS"
 		bc_gl_code
 	end
 end
@@ -114,7 +114,7 @@ def log_error_to_console
 	puts "\n\n\n\n\n"
 	puts "----------------------------------------"
 	puts "[DATABASE] #{@database}"
-	if @database == "BC" || @database == "PTD"
+	if @database == "BC" || @database == "CS" || @database == "PTD"
 		puts "[DIRECTORY] #{@directory_id}"
 		puts "[PAYMENTMETHOD] #{@payment_method_id}"
 		puts "[PAYMENTDATE] #{@payment_date_id}"
