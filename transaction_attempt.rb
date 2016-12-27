@@ -36,15 +36,21 @@ def process_onetime_payment
 end
 
 def capture_response
-	if @responseKind == "OK"
-		@statusCode = 200
-		@statusMessage = "[OK] TransactionApproved"
-		log_result_to_console
-	else
-		@responseCode = @theResponse.messages.messages[0].code
-		@responseError = @theResponse.messages.messages[0].text
+	if @resultCode == "OK"
+
+		if @responseKind == "Approved"
+			@statusCode = 200
+			@statusMessage = "[OK] Transaction#{@responseKind}"
+			log_result_to_console
+		else # Declined, Error, & HeldforReview
+			@statusCode = 205
+			@statusMessage = "[ERROR] Transaction#{@responseKind}"
+			log_error_to_console
+		end
+
+	else # Transactional Error (issue with CC or Authorize)
 		@statusCode = 210
-		@statusMessage = "[ERROR] TransactionDeclined"
+		@statusMessage = "[ERROR] #{@responseKind}"
 		log_error_to_console
 	end	
 end
