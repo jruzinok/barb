@@ -56,8 +56,8 @@ def capture_response
 end
 
 def save_transaction_attempt
-	if @database == "BC"
-		@transaction_attempt = BCTransactionAttempt.new
+	if @database == "BC" || @database == "CS"
+		@transaction_attempt = DATATransactionAttempt.new
 	elsif @database == "PTD"
 		@transaction_attempt = PTDTransactionAttempt.new
 	end

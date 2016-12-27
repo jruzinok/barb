@@ -8,12 +8,12 @@ class PTDTransactionAttempt < Rfm::Base
 	config :layout => 'T56_WEB_TRANSACTIONATTEMPT'
 end
 
-class BCTransactionAttempt < Rfm::Base
+class DATATransactionAttempt < Rfm::Base
 	config :database => 'Data'
 	config :layout => 'T56_WEB_TRANSACTIONATTEMPT'
 end
 
-class BCPaymentDate < Rfm::Base
+class DATAPaymentDate < Rfm::Base
 	config :database => 'Data'
 	config :layout => 'T54_WEB_PAYMENTDATE'
 end
@@ -23,7 +23,7 @@ class PTDPaymentMethod < Rfm::Base
 	config :layout => 'T55_WEB_PAYMENTMETHOD'
 end
 
-class BCPaymentMethod < Rfm::Base
+class DATAPaymentMethod < Rfm::Base
 	config :database => 'Data'
 	config :layout => 'T55_WEB_PAYMENTMETHOD'
 end
@@ -33,32 +33,32 @@ class PTDDirectory < Rfm::Base
 	config :layout => 'T55_WEB_DIRECTORY'
 end
 
-class BCDirectory < Rfm::Base
+class DATADirectory < Rfm::Base
 	config :database => 'Data'
 	config :layout => 'T55_WEB_DIRECTORY'
 end
 
-class BCPaymentProcessorLog < Rfm::Base
+class DATAPaymentProcessorLog < Rfm::Base
 	config :database => 'Data'
 	config :layout => 'T56__PAYMENTPROCESSORLOG'
 end
 
-class DialerPaymentDate < Rfm::Base
+class DIALERPaymentDate < Rfm::Base
 	config :database => 'DialerLeads'
 	config :layout => 'WEB_PAYMENT'
 end
 
-class DialerLead < Rfm::Base
+class DIALERLead < Rfm::Base
 	config :database => 'DialerLeads'
 	config :layout => 'WEB_DIALERLEAD'
 end
 
-class DialerGuest < Rfm::Base
+class DIALERGuest < Rfm::Base
 	config :database => 'DialerLeads'
 	config :layout => 'WEB_DIALERGUEST'
 end
 
-class DialerPaymentMethod < Rfm::Base
+class DIALERPaymentMethod < Rfm::Base
 	config :database => 'DialerLeads'
 	config :layout => 'WEB_PAYMENTMETHOD'
 end
