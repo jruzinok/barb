@@ -1,6 +1,6 @@
 def save_processed_dailer_payment_date
 	# Record the transaction results for each processed payment.
-	@dailer_payment = DialerPaymentDate.new
+	@dailer_payment = DIALERPaymentDate.new
 	
 	@dailer_payment[:_kF_DialerLead] = @lead_id
 	@dailer_payment[:_kF_Guest] = @guest_id
@@ -61,7 +61,7 @@ def save_processed_dailer_payment_date
 end
 
 def save_scheduled_dailer_payment_date
-		@dailer_payment = DialerPaymentDate.new
+		@dailer_payment = DIALERPaymentDate.new
 
 		@dailer_payment[:_kF_DialerLead] = @lead_id
 		@dailer_payment[:_kF_Guest] = @guest_id

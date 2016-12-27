@@ -21,7 +21,7 @@ def process_payment_dates
 		@payment_date = pd
 		# These "steps" are for clarity sake.
 		# Later, these objects could be saved somewhere to log the steps of each batch when it's run.
-		if @database == "PTD" || @database == "BC"
+		if @database == "PTD" || @database == "BC" || @database == "CS"
 			@step1 = load_payment_date
 		elsif @database == "DL"
 			@step1 = load_dialer_payment_date
@@ -37,20 +37,20 @@ def process_payment_dates
 	# This final step calls a script in either the Data File or PTD17 which in turn calls a Payment Processor Tool script in the Payment Processor application file.
 	if @database == "PTD"
 		@step7 = PTDPaymentDate.find({:_kF_PaymentBatch => @batch}, :post_script => ["PaymentProcessorCallBack", "#{@batch}\nInitiate from Ruby\nPTD"])
-	elsif @database == "BC"
-		@step7 = BCPaymentDate.find({:_kF_PaymentBatch => @batch}, :post_script => ["PaymentProcessorCallBack", "#{@batch}\nInitiate from Ruby\nBC"])
+	elsif @database == "BC" || @database == "CS"
+		@step7 = DATAPaymentDate.find({:_kF_PaymentBatch => @batch}, :post_script => ["PaymentProcessorCallBack", "#{@batch}\nInitiate from Ruby\nBC"])
 	elsif @database == "DL"
-		@step7 = DialerPaymentDate.find({:_kF_PaymentBatch => @batch}, :post_script => ["PaymentProcessorCallBack", "#{@batch}\nInitiate from Ruby\nDL"])
+		@step7 = DIALERPaymentDate.find({:_kF_PaymentBatch => @batch}, :post_script => ["PaymentProcessorCallBack", "#{@batch}\nInitiate from Ruby\nDL"])
 	end
 end
 
 def find_by_batch
 	if @database == "PTD"
 		@payment_dates = PTDPaymentDate.find(:_kF_PaymentBatch => @batch)
-	elsif @database == "BC"
-		@payment_dates = BCPaymentDate.find(:_kF_PaymentBatch => @batch)
+	elsif @database == "BC" || @database == "CS"
+		@payment_dates = DATAPaymentDate.find(:_kF_PaymentBatch => @batch)
 	elsif @database == "DL"
-		@payment_dates = DialerPaymentDate.find(:_kF_PaymentBatch => @batch)
+		@payment_dates = DIALERPaymentDate.find(:_kF_PaymentBatch => @batch)
 	end
 end
 
@@ -70,7 +70,7 @@ def load_payment_date
 
 	@amount = @payment_date["Amount"].to_f
 
-	if @database == "BC"
+	if @database == "BC" || @database == "CS"
 		@bc = @payment_date["T54_LINK::zzC_BC_Location_ABBR"]
 		# @bc = @payment_date["T54_DIRECTORY::zzC_Location_ABBR"] # Once BC17 goes live, this field will need to be used.
 	end
@@ -94,7 +94,7 @@ def update_payment_date
 		if @resultCode == "OK"
 
 			# RECORD the Date Processed.
-			if @database == "PTD" || @database == "BC"
+			if @database == "PTD" || @database == "BC" || @database == "CS"
 				@payment_date[:Date_Processed] = @today
 			end
 

@@ -43,7 +43,7 @@ def create_dialer_payment_token
 end
 
 def find_dialer_payment_method
-	@payment_method = DialerPaymentMethod.find(:__kP_PaymentMethod => @payment_method_id)
+	@payment_method = DIALERPaymentMethod.find(:__kP_PaymentMethod => @payment_method_id)
 
 	if @payment_method[0] != nil
 		@payment_method_found = true
@@ -58,7 +58,7 @@ def find_dialer_payment_method
 end
 
 def find_dialer_payment_method_by_payment_token
-	@payment_method = DialerPaymentMethod.find(:Token_Payment_ID => @payment_token)
+	@payment_method = DIALERPaymentMethod.find(:Token_Payment_ID => @payment_token)
 
 	if @payment_method[0] != nil
 		@payment_method_found = true
@@ -81,7 +81,7 @@ def load_dialer_payment_method
 end
 
 def save_dialer_payment_method
-	@dailer_payment_method = DialerPaymentMethod.new
+	@dailer_payment_method = DIALERPaymentMethod.new
 
 	@dailer_payment_method[:_kF_DialerLead] = @lead_id
 	@dailer_payment_method[:_kF_Guest] = @guest_id
