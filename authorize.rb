@@ -106,6 +106,8 @@ def process_payment
 
 	# A transactional FAILURE occurred. [NIL]
 	else
+		@resultCode = "ERROR"
+
 		@responseKind = "TransactionFailure"
 		@responseError = "A transactional FAILURE occurred."
 	end
