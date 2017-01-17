@@ -40,7 +40,7 @@ def save_processed_dailer_payment_date
 	elsif @resultCode == "ERROR"
 
 		if @responseKind == "TransactionError"
-			@dailer_payment[:zzF_Status] = "Error"
+			@dailer_payment[:zzF_Status] = "TransactionError"
 			@dailer_payment[:zzPP_Transaction] = @transactionID
 
 			@dailer_payment[:zzPP_Response] = @theResponse
@@ -48,11 +48,13 @@ def save_processed_dailer_payment_date
 			@dailer_payment[:zzPP_Response_Error] = @responseError
 
 		elsif @responseKind == "TokenError"
+			@dailer_payment[:zzF_Status] = "TokenError"
 			@dailer_payment[:zzPP_Response] = @theResponse
 			@dailer_payment[:zzPP_Response_Code] = @responseCode
 			@dailer_payment[:zzPP_Response_Error] = @responseError
 
 		elsif @responseKind == "TransactionFailure"
+			@dailer_payment[:zzF_Status] = "TransactionFailure"
 			@dailer_payment[:zzPP_Response_Error] = @responseError
 		end
 	end
