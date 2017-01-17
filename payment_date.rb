@@ -128,23 +128,23 @@ def update_payment_date
 
 		elsif @resultCode == "ERROR"
 
-			# Regardless of the type of error, set the PaymentDate Status to Error.
-			@payment_date[:zzF_Status] = "Error"
-
 			# These transaction were NOT processed.
 			if @responseKind == "TransactionError"
+				@payment_date[:zzF_Status] = "TransactionError"
 				@payment_date[:zzPP_Transaction] = @transactionID
 				@payment_date[:zzPP_Response] = @theResponse
 				@payment_date[:zzPP_Response_Code] = @responseCode
 				@payment_date[:zzPP_Response_Error] = @responseError
 
 			elsif @responseKind == "TokenError"
+				@payment_date[:zzF_Status] = "TokenError"
 				@payment_date[:zzPP_Response] = @theResponse
 				@payment_date[:zzPP_Response_Code] = @responseCode
 				@payment_date[:zzPP_Response_Error] = @responseError
 
 			# This transaction was NOT sent to Authorize.net successfully.
 			elsif @responseKind == "TransactionFailure"
+				@payment_date[:zzF_Status] = "TransactionFailure"
 				@payment_date[:zzPP_Response_Error] = @responseError
 			end
 

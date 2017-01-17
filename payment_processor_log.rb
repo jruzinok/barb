@@ -71,7 +71,7 @@ def create_payment_processor_log
 		elsif @resultCode == "ERROR"
 
 			if @responseKind == "TransactionError"
-				@payment_processor_log[:zzF_Status] = "Error"
+				@payment_processor_log[:zzF_Status] = "TransactionError"
 				@payment_processor_log[:zzPP_Transaction] = @transactionID
 
 				@payment_processor_log[:zzPP_Response] = @theResponse
@@ -79,11 +79,13 @@ def create_payment_processor_log
 				@payment_processor_log[:zzPP_Response_Error] = @responseError
 
 			elsif @responseKind == "TokenError"
+				@payment_processor_log[:zzF_Status] = "TokenError"
 				@payment_processor_log[:zzPP_Response] = @theResponse
 				@payment_processor_log[:zzPP_Response_Code] = @responseCode
 				@payment_processor_log[:zzPP_Response_Error] = @responseError
 
 			elsif @responseKind == "TransactionFailure"
+				@payment_processor_log[:zzF_Status] = "TransactionFailure"
 				@payment_processor_log[:zzPP_Response_Error] = @responseError
 			end
 		end
