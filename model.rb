@@ -62,3 +62,13 @@ class DIALERPaymentMethod < Rfm::Base
 	config :database => 'DialerLeads'
 	config :layout => 'WEB_PAYMENTMETHOD'
 end
+
+class CURRENTSTUDENTCurrentStudent < Rfm::Base
+	config :database => '__CURRENT_STUDENTS'
+	config :layout => 'WEB_CURRENT_STUDENT'
+end
+
+class CURRENTSTUDENTCreditCard < Rfm::Base
+	config :database => '__CURRENT_STUDENTS'
+	config :layout => 'WEB_CREDIT_CARD'
+end
