@@ -32,6 +32,8 @@ require_relative 'payment_date.rb'
 require_relative 'shared.rb'
 require_relative 'transaction_attempt.rb'
 require_relative 'payment_processor_log.rb'
+require_relative 'current_student.rb'
+require_relative 'current_student_credit_card.rb'
 
 class PaymentProcessor < Sinatra::Application
 
