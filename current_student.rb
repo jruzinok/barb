@@ -36,6 +36,7 @@ def find_current_student
 
 	if @current_student[0] != nil
 		@current_student_found = true
+		@current_student = @current_student[0] # Load the record from the first position of the array.
 		load_current_student
 	else
 		@current_student_found = false
@@ -47,7 +48,6 @@ def find_current_student
 end
 
 def load_current_student
-	@current_student = @current_student[0] # Load the record from the first position of the array.
 	@namefirst = @current_student["FIRST NAME"]
 	@serial = @current_student["_Serial"].to_i
 	@customer = "#{@database}#{@serial}" # The "ID" used to create a customer profile.
