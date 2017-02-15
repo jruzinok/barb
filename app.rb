@@ -33,10 +33,10 @@ require_relative 'shared.rb'
 require_relative 'transaction_attempt.rb'
 require_relative 'payment_processor_log.rb'
 require_relative 'current_student.rb'
+require_relative 'current_student_controller.rb'
 require_relative 'current_student_credit_card.rb'
 
 class PaymentProcessor < Sinatra::Application
-
 
 	# This route is for the php WebDialer to check that it can connect to the sinatra PaymentProcessor.
 	get '/ping' do
@@ -180,4 +180,31 @@ class PaymentProcessor < Sinatra::Application
 		status @status
 		body @body
 	end
+
+	# This was designed to create customer tokens for a batch of Current Student records.
+	get '/batch-tokenize-current-students/:batch' do
+		@process = "Batch Tokeninzation of Current Students"
+		@processType = "Token"
+		@database = "CS"
+		@batch = params[:batch]
+		batch_tokenize_current_students
+
+		# Return the response back to FileMaker.
+		status 200
+		body "Processed"
+	end
+
+	# This was designed to create payment tokens for a batch of Current Student's Credit Card records.
+	get '/batch-tokenize-current-student-credit-cards/:batch' do
+		@process = "Batch Tokeninzation of Current Students' Credit Cards"
+		@processType = "Token"
+		@database = "CS"
+		@batch = params[:batch]
+		batch_tokenize_current_student_credit_cards
+
+		# Return the response back to FileMaker.
+		status 200
+		body "Processed"
+	end
+
 end
