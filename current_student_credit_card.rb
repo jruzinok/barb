@@ -66,6 +66,7 @@ def find_credit_card
 
 	if @credit_card[0] != nil
 		@credit_card_found = true
+		@credit_card = @credit_card[0]
 		load_credit_card
 	else
 		@credit_card_found = false
@@ -77,11 +78,26 @@ def find_credit_card
 end
 
 def load_credit_card
-	@credit_card = @credit_card[0]
-	@namefirst = @credit_card["Name_First"]
-	@namelast = @credit_card["Name_Last"]
+	@namefirst = @credit_card["__CURRENT_STUDENTS::FIRST NAME"]
+	@namelast = @credit_card["__CURRENT_STUDENTS::LAST NAME"]
+	@cardnumber = @credit_card["zzC_CreditCard_Number"]
+	@carddate = @credit_card["zzC_MMYY"]
+	@cardcvv = @credit_card["cvc"]
 	@payment_token = @credit_card["Token_Payment_ID"]
 
+	check_payment_token
+end
+
+def load_credit_card_by_batch
+	@namefirst = @credit_card["__CURRENT_STUDENTS::FIRST NAME"]
+	@namelast = @credit_card["__CURRENT_STUDENTS::LAST NAME"]
+	@cardnumber = @credit_card["zzC_CreditCard_Number"]
+	@carddate = @credit_card["zzC_MMYY"]
+	@cardcvv = @credit_card["cvc"]
+	@customer_token = @credit_card["__CURRENT_STUDENTS::Token_Profile_ID"]
+	@payment_token = @credit_card["Token_Payment_ID"]
+
+	check_customer_token
 	check_payment_token
 end
 
