@@ -1,4 +1,4 @@
-def tokinize_current_students
+def batch_tokenize_current_students
 	find_current_students_by_batch
 
 	# This is used to mark the record's Date Processed.
@@ -19,10 +19,15 @@ def tokinize_current_students
 		# Later, these objects could be saved somewhere to log the steps of each batch when it's run.
 		@step1 = load_current_student
 		@step2 = create_current_student_customer_token_by_batch
-		@step3 = log_result_to_console
-		@step4 = update_current_student
-		@step5 = create_payment_processor_log # EITHER update this or create a new method to create a log.
-		@step6 = clear_response
+		@step3 = log_result_to_console_for_batch_tokenization
+
+		# This prevents the record from being updated if a token wasn't created/attempted.
+		if @flag_update_current_student == true
+			@step4 = update_current_student
+		end
+
+		@step5 = clear_response
+		@step6 = clear_batch_tokenization_variables
 	end
 
 end
@@ -50,8 +55,13 @@ def create_current_student_customer_token_by_batch
 			@responseError = @theResponse.messages.messages[0].text
 			@statusCode = 210
 			@statusMessage = "[ERROR] CustomerTokenNotCreated"
-			log_error_to_console
 		end
+
+		@flag_update_current_student = true
+
+	else
+		@flag_update_current_student = false
+
 	end
 end
 
@@ -59,7 +69,7 @@ end
 
 
 
-def tokinize_current_student_credit_cards
+def batch_tokenize_current_student_credit_cards
 	find_current_student_credit_cards_by_batch
 
 	# This is used to mark the record's Date Processed.
@@ -78,12 +88,17 @@ def tokinize_current_student_credit_cards
 		@credit_card = cc
 		# These "steps" are for clarity sake.
 		# Later, these objects could be saved somewhere to log the steps of each batch when it's run.
-		@step1 = load_credit_card
-		@step2 = process_or_skip
-		@step3 = log_result_to_console
-		@step4 = update_current_student
-		@step5 = create_payment_processor_log
-		@step6 = clear_response
+		@step1 = load_credit_card_by_batch
+		@step2 = create_current_student_payment_token_by_batch
+		@step3 = log_result_to_console_for_batch_tokenization
+
+		# This prevents the record from being updated if a token wasn't created/attempted.
+		if @flag_update_credit_card == true
+			@step4 = update_credit_card
+		end
+
+		@step5 = clear_response
+		@step6 = clear_batch_tokenization_variables
 	end
 
 end
@@ -92,7 +107,7 @@ def find_current_student_credit_cards_by_batch
 	@credit_cards = CURRENTSTUDENTCreditCard.find(:zzD_Batch => @batch)
 end
 
-def create_current_student_payment_token
+def create_current_student_payment_token_by_batch
 	if @has_customer_token == true && @has_payment_token == false
 		request = CreateCustomerPaymentProfileRequest.new
 		creditcard = CreditCardType.new(@cardnumber,@carddate,@cardcvv)
@@ -118,12 +133,34 @@ def create_current_student_payment_token
 			@responseError = @theResponse.messages.messages[0].text
 			@statusCode = 210
 			@statusMessage = "[ERROR] PaymentTokenNotCreated"
-			log_error_to_console
 		end
 
-		update_credit_card
-		create_payment_processor_log
+		@flag_update_credit_card = true
+
+	else
+		@flag_update_credit_card = false
 
 	end
 
+end
+
+def log_result_to_console_for_batch_tokenization
+	puts "\n[RESPONSE] #{@responseKind}"
+	puts "[CUSTOMER TOKEN] #{@customer_token}"
+	puts "[PAYMENT TOKEN] #{@payment_token}"
+	puts "[MESSAGE] #{@statusMessage}"
+	puts "[ERROR] #{@responseError}"
+	puts "[CODE] #{@responseCode}"
+	puts "[RECORD] #{@serial}"
+	puts "\n----------------------------------------"
+end
+
+def clear_batch_tokenization_variables
+	@serial = nil
+	@namefirst = nil
+	@namelast = nil
+	@namefull = nil
+	@customer = nil
+	@customer_token = nil
+	@payment_token = nil
 end
