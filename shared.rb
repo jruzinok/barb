@@ -53,8 +53,10 @@ end
 def set_gl_codes
 	if @database == "PTD" || @database == "DL"
 		ptd_gl_code
-	elsif @database == "BC" || @database == "CS"
+	elsif @database == "BC"
 		bc_gl_code
+	elsif @database == "CS"
+		cs_gl_code
 	end
 end
 
@@ -85,6 +87,25 @@ def bc_gl_code
 
 	@gl_code = "422"
 	@invoice = "BCOMP#{@bc}#{short_year(year)}"
+end
+
+def cs_gl_code
+	date = Time.now
+	year = date.year
+
+	unless @classdate.nil?
+		if @today < @classdate
+			@gl_code = "403"
+		elsif @today < @classdate + 7
+			@gl_code = "402"
+		else
+			@gl_code = "401"
+		end
+	else
+		@gl_code = "401"
+	end
+
+	@invoice = "CS#{short_year(year)}"
 end
 
 def short_year (yr)
