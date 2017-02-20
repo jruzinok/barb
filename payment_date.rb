@@ -4,6 +4,7 @@ def process_payment_dates
 	find_by_batch
 
 	# This is used to mark the record's Date Processed.
+	# It's also used to determine the GL Code for Current Student Payment Dates.
 	@today = Time.new
 
 	# This outputs the batch id. It's used to display acts as the header or beginning of the process
@@ -32,6 +33,7 @@ def process_payment_dates
 		@step4 = update_payment_date
 		@step5 = create_payment_processor_log
 		@step6 = clear_response
+		@step7 = clear_payment_date_variables
 	end
 
 	# This final step calls a script in either the Data File or PTD17 which in turn calls a Payment Processor Tool script in the Payment Processor application file.
@@ -72,9 +74,12 @@ def load_payment_date
 
 	@amount = @payment_date["Amount"].to_f
 
-	if @database == "BC" || @database == "CS"
-		@bc = @payment_date["T54_LINK::zzC_BC_Location_ABBR"]
-		# @bc = @payment_date["T54_DIRECTORY::zzC_Location_ABBR"] # Once BC17 goes live, this field will need to be used.
+	if @database == "BC"
+		@bc = @payment_date["T54_DIRECTORY::zzC_Location_ABBR"]
+		set_gl_codes # The GL Code needs to be set for each PaymentDate record.
+	elsif @database == "CS"
+		@classdate = @payment_date["Date_Class"]
+		set_gl_codes # The GL Code needs to be set for each PaymentDate record.
 	end
 
 end
@@ -89,6 +94,22 @@ def load_dialer_payment_date
 	@customer_token = @payment_date["DialerLeads::Token_Profile_ID"]
 	@payment_token = @payment_date["PaymentMethod::Token_Payment_ID"]
 	@amount = @payment_date["Amount"].to_f
+end
+
+def clear_payment_date_variables
+	@directory_id = nil
+	@lead_id = nil
+	@guest_id = nil
+	@payment_method_id = nil
+	@payment_date_id = nil
+	@serial = nil
+	@namefirst = nil
+	@namelast = nil
+	@namefull = nil
+	@customer = nil
+	@customer_token = nil
+	@payment_token = nil
+	@amount = nil
 end
 
 def update_payment_date
