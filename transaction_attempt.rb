@@ -2,6 +2,9 @@ require 'bigdecimal'
 
 def process_transaction_attempt
 
+	# This is used to determine the GL Code for Current Student Payment Dates.
+	@today = Time.new
+
 	# This outputs the details of this Transacion Attempt to the console.
 	puts "\n\n\n\n\n"
 	puts "----------------------------------------"
