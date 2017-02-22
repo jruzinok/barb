@@ -20,6 +20,7 @@ end
 config = YAML.load_file(File.dirname(__FILE__) + "/config/rfm.yml")
 
 require_relative 'authorize.rb'
+require_relative 'csv.rb'
 require_relative 'directory.rb'
 require_relative 'dialer_controller.rb'
 require_relative 'dialer_guest.rb'
@@ -201,6 +202,30 @@ class PaymentProcessor < Sinatra::Application
 		@database = "CS"
 		@batch = params[:batch]
 		batch_tokenize_current_student_credit_cards
+
+		# Return the response back to FileMaker.
+		status 200
+		body "Processed"
+	end
+
+	# This was designed to create customer tokens for a batch of CVS of Customer Data.
+	get '/batch-tokenize-csv-customer-files/:batch' do
+		@process = "Batch Tokeninzation of CSV Customer Data"
+		@processType = "Token"
+		@batch = params[:batch]
+		batch_tokenize_csv_customer_data
+
+		# Return the response back to FileMaker.
+		status 200
+		body "Processed"
+	end
+
+	# This was designed to create payments tokens for a batch of CVS of Credit Card Data.
+	get '/batch-tokenize-csv-credit-card-files/:batch' do
+		@process = "Batch Tokeninzation of CSV Credit Card Data"
+		@processType = "Token"
+		@batch = params[:batch]
+		batch_tokenize_csv_credit_card_data
 
 		# Return the response back to FileMaker.
 		status 200
