@@ -46,7 +46,7 @@ end
 
 def load_csv_customer_files
 	@src_dir = "Customer_#{@batch}.csv"
-	@dst_dir = "Customer_#{@batch}Output.csv"	
+	@dst_dir = "Customer_#{@batch}_Output.csv"	
 
 	puts " Reading data from  : #{@src_dir}"
 	puts " Writing data to    : #{@dst_dir}"
@@ -90,8 +90,8 @@ def create_customer_token_by_csv
 	end
 end
 
-def batch_tokenize_csv_payment_data
-	load_csv_card_files
+def batch_tokenize_csv_credit_card_data
+	load_csv_credit_card_files
 
 	# This is used to mark the record's Date Processed.
 	@today = Time.new
@@ -100,7 +100,7 @@ def batch_tokenize_csv_payment_data
 	puts "\n\n\n\n\n"
 	puts "----------------------------------------"
 	puts "[CSV] #{@src_dir}"
-	puts "[PAYMENT TOKINIZATION PROCESS]"
+	puts "[CREDIT CARD TOKINIZATION PROCESS]"
 	puts "[BATCH] #{@batch}"
 	puts "[TIMESTAMP] #{Time.now.utc.iso8601}"
 	puts "----------------------------------------"
@@ -134,8 +134,8 @@ def batch_tokenize_csv_payment_data
 end
 
 def load_csv_credit_card_files
-	@src_dir = "Card_#{@batch}.csv"
-	@dst_dir = "Card_#{@batch}Output.csv"	
+	@src_dir = "Credit_Card_#{@batch}.csv"
+	@dst_dir = "Credit_Card_#{@batch}_Output.csv"	
 
 	puts " Reading data from  : #{@src_dir}"
 	puts " Writing data to    : #{@dst_dir}"
