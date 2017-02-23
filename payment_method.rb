@@ -68,6 +68,7 @@ def find_payment_method
 
 	if @payment_method[0] != nil
 		@payment_method_found = true
+		@payment_method = @payment_method[0] # Load the record from the first position of the array.
 		load_payment_method
 	else
 		@payment_method_found = false
@@ -79,7 +80,6 @@ def find_payment_method
 end
 
 def load_payment_method
-	@payment_method = @payment_method[0]
 	@namefirst = @payment_method["Name_First"]
 	@namelast = @payment_method["Name_Last"]
 	@payment_token = @payment_method["Token_Payment_ID"]
