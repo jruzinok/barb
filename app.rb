@@ -29,6 +29,7 @@ require_relative 'dialer_payment_date.rb'
 require_relative 'dialer_payment_method.rb'
 require_relative 'model.rb'
 require_relative 'payment_method.rb'
+require_relative 'payment_method_tokens.rb'
 require_relative 'payment_date.rb'
 require_relative 'shared.rb'
 require_relative 'transaction_attempt.rb'
@@ -226,6 +227,19 @@ class PaymentProcessor < Sinatra::Application
 		@processType = "Token"
 		@batch = params[:batch]
 		batch_tokenize_csv_credit_card_data
+
+		# Return the response back to FileMaker.
+		status 200
+		body "Processed"
+	end
+
+	# This was designed to create payments tokens for a batch of CVS of Credit Card Data.
+	get '/batch-validate-tokens/:database/:batch' do
+		@process = "Batch Token Validation"
+		@processType = "Token"
+		@database = params[:database]
+		@batch = params[:batch]
+		validate_multiple_tokens
 
 		# Return the response back to FileMaker.
 		status 200
