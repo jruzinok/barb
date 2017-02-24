@@ -75,7 +75,7 @@ def load_payment_date
 	@amount = @payment_date["Amount"].to_f
 
 	if @database == "BC"
-		@bc = @payment_date["T54_DIRECTORY::zzC_Location_ABBR"]
+		@eventAbbr = @payment_date["T54_EVENT::Name_Abbreviation"]
 		set_gl_codes # The GL Code needs to be set for each PaymentDate record.
 	elsif @database == "CS"
 		@classdate = @payment_date["Date_Class"]

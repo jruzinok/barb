@@ -86,7 +86,7 @@ def bc_gl_code
 	year = date.year
 
 	@gl_code = "422"
-	@invoice = "BCOMP#{@bc}#{short_year(year)}"
+	@invoice = "BCOMP#{@eventAbbr}#{short_year(year)}"
 end
 
 def cs_gl_code
@@ -179,5 +179,7 @@ def log_result_to_console
 	puts "[PAYMENTMETHOD] #{@payment_method_id}"
 	puts "[METHOD] #{paymentMethod}"
 	puts "[P or S] #{@process_or_skip}"
+	puts "[GLCODE] #{@gl_code}"
+	puts "[INVOICE] #{@invoice}"
 	puts "\n----------------------------------------"
 end
