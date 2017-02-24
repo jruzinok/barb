@@ -21,6 +21,16 @@ def process_transaction_attempt
 	find_directory
 	find_payment_method
 
+	# CAPTURE additional data needed to determine the GL Codes.
+	if @database == "BC"
+		find_event_attendee_by_directory
+	elsif @database == "CS"
+		load_directory_current_student_id
+		find_and_load_current_student_classdate
+	elsif @database == "PTD"
+		# NOT YET SETUP/ISN'T NEEDED AT THIS TIME. 2/23/2017
+	end
+
 	process_onetime_payment
 end
 

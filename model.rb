@@ -43,6 +43,11 @@ class DATAPaymentProcessorLog < Rfm::Base
 	config :layout => 'T56__PAYMENTPROCESSORLOG'
 end
 
+class DATAEventAttendee < Rfm::Base
+	config :database => 'Data'
+	config :layout => 'T57_WEB_EVENTATTENDEE'
+end
+
 class DIALERPaymentDate < Rfm::Base
 	config :database => 'DialerLeads'
 	config :layout => 'WEB_PAYMENT'
