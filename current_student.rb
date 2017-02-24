@@ -58,6 +58,12 @@ def load_current_student
 	check_customer_token
 end
 
+def find_and_load_current_student_classdate
+	@current_student = CURRENTSTUDENTCurrentStudent.find(:_Serial => @current_student_id)
+	@current_student = @current_student[0] # Load the record from the first position of the array.
+	@classdate = @current_student["__Current_Student | CLASS_ATTENDANCE ~ firstdate::Class_Date"]
+end
+
 def update_current_student
 	if @responseKind == "OK"
 		@current_student[:Token_Profile_ID] = @customer_token

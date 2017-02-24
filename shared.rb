@@ -147,6 +147,9 @@ def log_error_to_console
 	puts "[CODE] #{@responseCode}"
 	puts "[REASON] #{@responseError}"
 	puts "[TIMESTAMP] #{Time.now.utc.iso8601}"
+	puts "[GLCODE] #{@gl_code}"
+	puts "[INVOICE] #{@invoice}"
+	puts "[CLASSDATE] #{@classdate}"
 	puts "----------------------------------------"
 	puts "\n\n\n\n\n"
 end
@@ -181,5 +184,6 @@ def log_result_to_console
 	puts "[P or S] #{@process_or_skip}"
 	puts "[GLCODE] #{@gl_code}"
 	puts "[INVOICE] #{@invoice}"
+	puts "[CLASSDATE] #{@classdate}"
 	puts "\n----------------------------------------"
 end

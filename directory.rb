@@ -60,6 +60,10 @@ def load_directory
 	check_customer_token
 end
 
+def load_directory_current_student_id
+	@current_student_id = @directory["_kF_Current_Student"]
+end
+
 def update_directory
 	if @responseKind == "OK"
 		@directory[:Token_Profile_ID] = @customer_token
