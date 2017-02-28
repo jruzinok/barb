@@ -60,8 +60,9 @@ def load_directory
 	check_customer_token
 end
 
-def load_directory_current_student_id
+def load_directory_current_student_data
 	@current_student_id = @directory["_kF_Current_Student"]
+	@invoice = @directory["Number_Invoice_GL"]
 end
 
 def update_directory
