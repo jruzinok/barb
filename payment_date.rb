@@ -79,6 +79,7 @@ def load_payment_date
 		set_gl_codes # The GL Code needs to be set for each PaymentDate record.
 	elsif @database == "CS"
 		@classdate = @payment_date["Date_Class"]
+		@invoice = @payment_date["T54_DIRECTORY::Number_Invoice_GL"]
 		set_gl_codes # The GL Code needs to be set for each PaymentDate record.
 	end
 
