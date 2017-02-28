@@ -105,7 +105,7 @@ def cs_gl_code
 		@gl_code = "401"
 	end
 
-	@invoice = "CS#{short_year(year)}"
+	# @invoice is set in the load_payment_date method for CS records.
 end
 
 def short_year (yr)
