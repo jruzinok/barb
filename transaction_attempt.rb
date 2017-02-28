@@ -25,7 +25,7 @@ def process_transaction_attempt
 	if @database == "BC"
 		find_event_attendee_by_directory
 	elsif @database == "CS"
-		load_directory_current_student_id
+		load_directory_current_student_data
 		find_and_load_current_student_classdate
 	elsif @database == "PTD"
 		# NOT YET SETUP/ISN'T NEEDED AT THIS TIME. 2/23/2017
