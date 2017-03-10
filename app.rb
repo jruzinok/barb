@@ -105,6 +105,20 @@ class PaymentProcessor < Sinatra::Application
 	end
 
 	# This was designed to be called from the BookingDialer php web app.
+	get '/create-dialer-lead-customer-token/:lead_id' do
+		@process = "Create Dialer Lead Customer Token"
+		@lead_id = params[:lead_id]
+		@processType = "Token"
+		@database = "DL"
+		@recordtype = "DialerLead"
+		create_dialer_lead_customer_token
+
+		# Return the response back to the Dialer.
+		status @status
+		body @body
+	end
+
+	# This was designed to be called from the BookingDialer php web app.
 	post '/create-dialer-lead-payment-method/:lead_id' do
 		@process = "Create Dialer Lead PaymentMethod"
 		@processType = "Token"
