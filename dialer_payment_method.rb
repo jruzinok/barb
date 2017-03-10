@@ -90,8 +90,8 @@ def save_dialer_payment_method
 	@dailer_payment_method[:CreditCard_Number] = @cardnumber
 	@dailer_payment_method[:MMYY] = @carddate
 	@dailer_payment_method[:CVV] = @cardcvv
-	dailer_payment_method[:zzF_Payment_Deposit] = @flag_deposit
-	dailer_payment_method[:zzF_Payment_Recurring] = @flag_recurring
+	@dailer_payment_method[:zzF_Payment_Deposit] = @flag_deposit
+	@dailer_payment_method[:zzF_Payment_Recurring] = @flag_recurring
 
 	if @responseKind == "OK"
 		@dailer_payment_method[:Token_Payment_ID] = @payment_token
