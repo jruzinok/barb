@@ -39,11 +39,13 @@ def parse_create_dialer_payment_method_post
 	@guest_id = params[:guest_id]
 	@payment_method_id = params[:payment_method_id]
 	@request_type = params[:request_type] #Charge or Schedule
+	@flag_deposit = params[:flag_deposit]
+	@flag_recurring = params[:flag_recurring]
 
 	# Grab the values from the POST object.
 	@date = params[:Date]
 	@amount = params[:Amount]
-	
+
 	@namefirstCC = params[:Name_First]
 	@namelastCC = params[:Name_Last]
 	@cardnumber = params[:CreditCard]

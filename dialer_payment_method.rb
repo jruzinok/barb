@@ -90,13 +90,19 @@ def save_dialer_payment_method
 	@dailer_payment_method[:CreditCard_Number] = @cardnumber
 	@dailer_payment_method[:MMYY] = @carddate
 	@dailer_payment_method[:CVV] = @cardcvv
+	dailer_payment_method[:zzF_Payment_Deposit] = @flag_deposit
+	dailer_payment_method[:zzF_Payment_Recurring] = @flag_recurring
 
 	if @responseKind == "OK"
 		@dailer_payment_method[:Token_Payment_ID] = @payment_token
+		@dailer_payment_method[:zzF_Status] = "Active"
+		@dailer_payment_method[:zzF_Type] = "Token"
 	else
 		@dailer_payment_method[:zzPP_Response] = @theResponse
 		@dailer_payment_method[:zzPP_Response_Code] = @responseCode
 		@dailer_payment_method[:zzPP_Response_Error] = @responseError
+		@dailer_payment_method[:zzF_Status] = "Inactive"
+		@dailer_payment_method[:zzF_Type] = "Error"
 	end
 
 	@dailer_payment_method.save
