@@ -143,38 +143,7 @@ def clear_response
 	@responseError = nil
 end
 
-def log_error_to_console
-	puts "\n\n\n\n\n"
-	puts "----------------------------------------"
-	puts "[DATABASE] #{@database}"
-	if @database == "BC" || @database == "CS" || @database == "PTD"
-		puts "[DIRECTORY] #{@directory_id}"
-		puts "[PAYMENTMETHOD] #{@payment_method_id}"
-		puts "[PAYMENTDATE] #{@payment_date_id}"
-	elsif @database == "DL"
-		puts "[LEAD] #{@lead_id}"
-		puts "[GUEST] #{@guest_id}"
-	end
-	puts "#{@statusMessage}"
-	puts "[CODE] #{@responseCode}"
-	puts "[REASON] #{@responseError}"
-	puts "[TIMESTAMP] #{Time.now.utc.iso8601}"
-	puts "[GLCODE] #{@gl_code}"
-	puts "[INVOICE] #{@invoice}"
-	puts "[CLASSDATE] #{@classdate}"
-	puts "----------------------------------------"
-	puts "\n\n\n\n\n"
-end
-
 def log_result_to_console
-
-	# This determines what to output, either the authorization or error data.
-	responseOutput =
-	if @responseKind == "Approved"
-		"Authorization: #{@authorizationCode}"
-	else
-		"Error: #{@responseError}"
-	end
 
 	# This determines what to output, either the card number or customer profile and payment ids.
 	paymentMethod =
@@ -186,16 +155,31 @@ def log_result_to_console
 		"Error"
 	end
 
-	puts "\n[RESPONSE] #{@responseKind}"
-	puts "[MESSAGE] #{responseOutput}"
-	puts "[CODE] #{@responseCode}"
-	puts "[RECORD] #{@serial}"
+	puts "\n----------------------------------------"
+	puts "[TIMESTAMP] #{Time.now}"
+	puts "[DATABASE] #{@database}"
 	puts "[DIRECTORY] #{@directory_id}"
+	puts "[LEAD] #{@lead_id}"
+	puts "[GUEST] #{@guest_id}"
 	puts "[PAYMENTMETHOD] #{@payment_method_id}"
+	puts "[PAYMENTDATE] #{@payment_date_id}"
+	puts "[RECORD] #{@serial}"
+
 	puts "[METHOD] #{paymentMethod}"
 	puts "[P or S] #{@process_or_skip}"
+
+	puts "[RESPONSE] #{@responseKind}"
+	puts "[MESSAGE] #{responseOutput}"
+	puts "[AUTHORIZATION] #{@authorizationCode}"
+	puts "[ERROR] #{@responseError}"
+	puts "[CODE] #{@responseCode}"
+
 	puts "[GLCODE] #{@gl_code}"
 	puts "[INVOICE] #{@invoice}"
 	puts "[CLASSDATE] #{@classdate}"
-	puts "\n----------------------------------------"
+
+	puts "[STATUSCODE] #{@statusCode}"
+	puts "[STATUSMESSAGE] #{@statusMessage}"
+	puts "----------------------------------------"
+	puts "\n\n\n\n\n"
 end
