@@ -111,12 +111,17 @@ def cs_gl_code
 end
 
 def dl_gl_code
-	if @program == "BC"
-		bc_gl_code
-	# elsif @program == "CS"
-		# cs_gl_code # Not yet developed. Not sure how the @invoice variable would be set.
-	elsif @program == "PTD"
-		ptd_gl_code
+	unless @program.nil?
+		if @program == "BC"
+			bc_gl_code
+		# elsif @program == "CS"
+			# cs_gl_code # Not yet developed. Not sure how the @invoice variable would be set.
+		elsif @program == "PTD"
+			ptd_gl_code
+		end
+	else
+		@gl_code = "99"
+		@invoice = "Program Missing"
 	end
 end
 
