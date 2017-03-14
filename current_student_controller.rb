@@ -10,7 +10,7 @@ def batch_tokenize_current_students
 	puts "[DATABASE] #{@database}"
 	puts "[CUSTOMER TOKINIZATION PROCESS]"
 	puts "[BATCH] #{@batch}"
-	puts "[TIMESTAMP] #{Time.now.utc.iso8601}"
+	puts "[TIMESTAMP] #{Time.now}"
 	puts "----------------------------------------"
 
 	@current_students.each do |cs|
@@ -81,7 +81,7 @@ def batch_tokenize_current_student_credit_cards
 	puts "[DATABASE] #{@database}"
 	puts "[PAYMENT TOKINIZATION PROCESS]"
 	puts "[BATCH] #{@batch}"
-	puts "[TIMESTAMP] #{Time.now.utc.iso8601}"
+	puts "[TIMESTAMP] #{Time.now}"
 	puts "----------------------------------------"
 
 	@credit_cards.each do |cc|

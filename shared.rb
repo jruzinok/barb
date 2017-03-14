@@ -155,8 +155,8 @@ def log_result_to_console
 		"Error"
 	end
 
-	puts "\n----------------------------------------"
-	puts "[TIMESTAMP] #{Time.now}"
+	puts "\n\n\n\n\n"
+	puts "----------------------------------------"
 	puts "[DATABASE] #{@database}"
 	puts "[DIRECTORY] #{@directory_id}"
 	puts "[LEAD] #{@lead_id}"
@@ -177,9 +177,10 @@ def log_result_to_console
 	puts "[GLCODE] #{@gl_code}"
 	puts "[INVOICE] #{@invoice}"
 	puts "[CLASSDATE] #{@classdate}"
+	puts "[PROGRAM] #{@program}"
 
 	puts "[STATUSCODE] #{@statusCode}"
 	puts "[STATUSMESSAGE] #{@statusMessage}"
+	puts "[TIMESTAMP] #{Time.now}"
 	puts "----------------------------------------"
-	puts "\n\n\n\n\n"
 end
