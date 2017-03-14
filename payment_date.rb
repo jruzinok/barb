@@ -12,7 +12,7 @@ def process_payment_dates
 	puts "----------------------------------------"
 	puts "[DATABASE] #{@database}"
 	puts "[BATCH] #{@batch}"
-	puts "[TIMESTAMP] #{Time.now.utc.iso8601}"
+	puts "[TIMESTAMP] #{Time.now}"
 	puts "----------------------------------------"
 
 	# SET the GL Codes.

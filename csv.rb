@@ -12,7 +12,7 @@ def batch_tokenize_csv_customer_data
 	puts "[CSV] #{@src_dir}"
 	puts "[CUSTOMER TOKINIZATION PROCESS]"
 	puts "[BATCH] #{@batch}"
-	puts "[TIMESTAMP] #{Time.now.utc.iso8601}"
+	puts "[TIMESTAMP] #{Time.now}"
 	puts "----------------------------------------"
 
 	#create a new file
@@ -102,7 +102,7 @@ def batch_tokenize_csv_credit_card_data
 	puts "[CSV] #{@src_dir}"
 	puts "[CREDIT CARD TOKINIZATION PROCESS]"
 	puts "[BATCH] #{@batch}"
-	puts "[TIMESTAMP] #{Time.now.utc.iso8601}"
+	puts "[TIMESTAMP] #{Time.now}"
 	puts "----------------------------------------"
 
 		#create a new file
