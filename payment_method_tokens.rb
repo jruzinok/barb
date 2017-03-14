@@ -9,7 +9,7 @@ def validate_multiple_tokens
 	puts "[DATABASE] #{@database}"
 	puts "[VALIDATE TOKENS]"
 	puts "[BATCH] #{@batch}"
-	puts "[TIMESTAMP] #{Time.now.utc.iso8601}"
+	puts "[TIMESTAMP] #{Time.now}"
 	puts "----------------------------------------"
 
 	find_payment_methods_by_batch

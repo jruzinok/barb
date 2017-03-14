@@ -15,7 +15,7 @@ def process_transaction_attempt
 	puts "[PAYMENTDATE] #{@payment_date_id}"
 	puts "[DATE] #{@date}"
 	puts "[AMOUNT] #{@amount}"
-	puts "[TIMESTAMP] #{Time.now.utc.iso8601}"
+	puts "[TIMESTAMP] #{Time.now}"
 	puts "----------------------------------------"
 
 	find_directory
