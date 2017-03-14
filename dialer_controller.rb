@@ -70,8 +70,8 @@ def log_post_variables_to_console
 	puts "----------------------------------------"
 	puts "[LEAD] #{@lead_id}"
 	puts "[GUEST] #{@guest_id}"
-	puts "[PM] #{@payment_method_id}"
-	puts "[TYPE] #{@request_type}" #Charge or Schedule
+	puts "[PAYMENTMETHOD] #{@payment_method_id}"
+	puts "[REQUESTTYPE] #{@request_type}" #Charge or Schedule
 
 	# Grab the values from the POST object.
 	puts "[DATE] #{@date}"
@@ -82,6 +82,8 @@ def log_post_variables_to_console
 	puts "[CARD] #{@cardnumber}"
 	puts "[DATE] #{@carddate}"
 	puts "[CVV] #{@cardcvv}"
+	puts "[TIMESTAMP] #{Time.now}"
+	puts "----------------------------------------"
 end
 
 def load_dialer_tokens
