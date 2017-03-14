@@ -174,7 +174,6 @@ def log_result_to_console
 	puts "[P or S] #{@process_or_skip}"
 
 	puts "[RESPONSE] #{@responseKind}"
-	puts "[MESSAGE] #{responseOutput}"
 	puts "[AUTHORIZATION] #{@authorizationCode}"
 	puts "[ERROR] #{@responseError}"
 	puts "[CODE] #{@responseCode}"
