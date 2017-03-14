@@ -33,7 +33,7 @@ def create_current_student_payment_token
 			@responseError = @theResponse.messages.messages[0].text
 			@statusCode = 210
 			@statusMessage = "[ERROR] PaymentTokenNotCreated"
-			log_error_to_console
+			log_result_to_console
 		end
 
 		update_credit_card
@@ -42,7 +42,7 @@ def create_current_student_payment_token
 	elsif @logic == "PaymentTokenAlreadyCreated"
 		@statusCode = 220
 		@statusMessage = "[ERROR] PaymentTokenAlreadyCreated"
-		log_error_to_console
+		log_result_to_console
 	end
 
 	set_response
@@ -73,7 +73,7 @@ def find_credit_card
 		@statusCode = 300
 		@statusMessage = "[ERROR] PaymentMethodRecordNotFound"
 		set_response
-		log_error_to_console
+		log_result_to_console
 	end
 end
 

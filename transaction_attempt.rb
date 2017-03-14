@@ -58,13 +58,13 @@ def capture_response
 		else # Declined, Error, & HeldforReview
 			@statusCode = 205
 			@statusMessage = "[ERROR] Transaction#{@responseKind}"
-			log_error_to_console
+			log_result_to_console
 		end
 
 	else # Transactional Error (issue with CC or Authorize)
 		@statusCode = 210
 		@statusMessage = "[ERROR] #{@responseKind}"
-		log_error_to_console
+		log_result_to_console
 	end	
 end
 
