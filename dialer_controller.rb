@@ -38,7 +38,14 @@ def parse_create_dialer_payment_method_post
 	@lead_id = params[:lead_id]
 	@guest_id = params[:guest_id]
 	@payment_method_id = params[:payment_method_id]
+
 	@request_type = params[:request_type] #Charge or Schedule
+	
+	# GL Codes
+	@program = params[:program] # BC/CS/PTD
+	@eventAbbr = params[:event_abbr] # ATL/DC/FL... [BC ONLY]
+
+	# This is used to flag Payment Method records.
 	@flag_deposit = params[:flag_deposit]
 	@flag_recurring = params[:flag_recurring]
 
@@ -46,6 +53,7 @@ def parse_create_dialer_payment_method_post
 	@date = params[:Date]
 	@amount = params[:Amount]
 
+	# Credit Card
 	@namefirstCC = params[:Name_First]
 	@namelastCC = params[:Name_Last]
 	@cardnumber = params[:CreditCard]
