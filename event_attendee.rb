@@ -10,7 +10,7 @@ def find_event_attendee_by_directory
 		@statusCode = 300
 		@statusMessage = "[ERROR] EventAttendeeRecordNotFound"
 		set_response
-		log_error_to_console
+		log_result_to_console
 	end
 end
 
