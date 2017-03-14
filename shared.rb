@@ -51,12 +51,14 @@ end
 
 # SET the GL Codes.
 def set_gl_codes
-	if @database == "PTD" || @database == "DL"
-		ptd_gl_code
-	elsif @database == "BC"
+	if @database == "BC"
 		bc_gl_code
 	elsif @database == "CS"
 		cs_gl_code
+	elsif @database == "DL"
+		dl_gl_code
+	elsif @database == "PTD"
+		ptd_gl_code
 	end
 end
 
@@ -106,6 +108,16 @@ def cs_gl_code
 	end
 
 	# @invoice is set in the load_payment_date method for CS records.
+end
+
+def dl_gl_code
+	if @program == "BC"
+		bc_gl_code
+	# elsif @program == "CS"
+		# cs_gl_code # Not yet developed. Not sure how the @invoice variable would be set.
+	elsif @program == "PTD"
+		ptd_gl_code
+	end
 end
 
 def short_year (yr)
