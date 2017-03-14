@@ -26,7 +26,7 @@ def create_dialer_payment_token
 			@responseError = @theResponse.messages.messages[0].text
 			@statusCode = 210
 			@statusMessage = "[ERROR] PaymentTokenNotCreated"
-			log_error_to_console
+			log_result_to_console
 		end
 
 		save_dialer_payment_method
@@ -53,7 +53,7 @@ def find_dialer_payment_method
 		@statusCode = 300
 		@statusMessage = "[ERROR] PaymentMethodRecordNotFound"
 		set_response
-		log_error_to_console
+		log_result_to_console
 	end
 end
 
@@ -68,7 +68,7 @@ def find_dialer_payment_method_by_payment_token
 		@statusCode = 300
 		@statusMessage = "[ERROR] PaymentMethodRecordNotFound"
 		set_response
-		log_error_to_console
+		log_result_to_console
 	end
 end
 

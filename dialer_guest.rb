@@ -19,7 +19,7 @@ def create_dialer_guest_customer_token
 			@responseError = @theResponse.messages.messages[0].text
 			@statusCode = 210
 			@statusMessage = "[ERROR] CustomerTokenNotCreated"
-			log_error_to_console
+			log_result_to_console
 		end
 
 		update_dialer_guest
@@ -40,7 +40,7 @@ def find_dialer_guest
 		@statusCode = 300
 		@statusMessage = "[ERROR] DialerLeadRecordNotFound"
 		set_response
-		log_error_to_console
+		log_result_to_console
 	end
 end
 

@@ -19,7 +19,7 @@ def create_current_student_customer_token
 			@responseError = @theResponse.messages.messages[0].text
 			@statusCode = 210
 			@statusMessage = "[ERROR] CustomerTokenNotCreated"
-			log_error_to_console
+			log_result_to_console
 		end
 
 		update_current_student
@@ -43,7 +43,7 @@ def find_current_student
 		@statusCode = 300
 		@statusMessage = "[ERROR] CurrentStudentRecordNotFound"
 		set_response
-		log_error_to_console
+		log_result_to_console
 	end
 end
 
