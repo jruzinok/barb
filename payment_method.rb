@@ -109,36 +109,40 @@ def update_payment_token
 	find_payment_method
 
 	if @directory_found == true && @has_customer_token == true && @payment_method_found == true && @has_payment_token == true
-		request = UpdateCustomerPaymentProfileRequest.new
-		creditcard = CreditCardType.new(@cardnumber,@carddate,@cardcvv)
-		payment = PaymentType.new(creditcard)
-		profile = CustomerPaymentProfileExType.new(nil,nil,payment,nil,nil)
-		request.paymentProfile = profile
-		request.customerProfileId = @customer_token
-		profile.customerPaymentProfileId = @payment_token
+		retrieve_payment_token
 
-		# PASS the transaction request and CAPTURE the transaction response.
-		@theResponse = transaction.update_customer_payment_profile(request)
+		if @payment_token_retrieved == true
+			request = UpdateCustomerPaymentProfileRequest.new
+			creditcard = CreditCardType.new(@masked_card_number,@carddate,@cardcvv) # The credit card number should not be updated per Ashley's decision.
+			payment = PaymentType.new(creditcard)
+			profile = CustomerPaymentProfileExType.new(nil,nil,payment,nil,nil)
+			request.paymentProfile = profile
+			request.customerProfileId = @customer_token
+			profile.customerPaymentProfileId = @payment_token
 
-		if @theResponse.messages.resultCode == MessageTypeEnum::Ok
-			@payment_token_updated = true
-			@responseKind = "OK"
+			# PASS the transaction request and CAPTURE the transaction response.
+			@theResponse = transaction.update_customer_payment_profile(request)
 
-			@statusCode = 200
-			@statusMessage = "[OK] PaymentTokenUpdated"
-			log_result_to_console
-		else
-			@payment_token_updated = false
-			@responseKind = "ERROR"
-			@responseCode = @theResponse.messages.messages[0].code
-			@responseError = @theResponse.messages.messages[0].text
-			@statusCode = 210
-			@statusMessage = "[ERROR] PaymentTokenNotUpdated"
-			log_result_to_console
+			if @theResponse.messages.resultCode == MessageTypeEnum::Ok
+				@payment_token_updated = true
+				@responseKind = "OK"
+
+				@statusCode = 200
+				@statusMessage = "[OK] PaymentTokenUpdated"
+				log_result_to_console
+			else
+				@payment_token_updated = false
+				@responseKind = "ERROR"
+				@responseCode = @theResponse.messages.messages[0].code
+				@responseError = @theResponse.messages.messages[0].text
+				@statusCode = 210
+				@statusMessage = "[ERROR] PaymentTokenNotUpdated"
+				log_result_to_console
+			end
+
+			create_payment_processor_log
 		end
-
-		create_payment_processor_log
-
+				
 	else
 		@statusCode = 230
 		@statusMessage = "[ERROR] PaymentTokenCouldNotBeUpdated"
@@ -147,4 +151,26 @@ def update_payment_token
 
 	set_response
 	clear_response
+end
+
+def retrieve_payment_token
+	request = GetCustomerPaymentProfileRequest.new
+	request.customerProfileId = @customer_token
+	request.customerPaymentProfileId = @payment_token
+
+	@theResponse = transaction.get_customer_payment_profile(request)
+
+	if @theResponse.messages.resultCode == MessageTypeEnum::Ok
+		@payment_token_retrieved = true
+		@responseKind = "OK"
+		@masked_card_number = @theResponse.paymentProfile.payment.creditCard.cardNumber
+	else
+		@payment_token_retrieved = false
+		@responseKind = "ERROR"
+		@responseCode = @theResponse.messages.messages[0].code
+		@responseError = @theResponse.messages.messages[0].text
+		@statusCode = 240
+		@statusMessage = "[ERROR] PaymentTokenCouldNotBeRetrieved"
+		log_result_to_console
+	end
 end
