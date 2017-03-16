@@ -84,6 +84,10 @@ def load_payment_method
 	@namefirst = @payment_method["Name_First"]
 	@namelast = @payment_method["Name_Last"]
 	@payment_token = @payment_method["Token_Payment_ID"]
+	@address = @payment_method["Address_Address"]
+	@city = @payment_method["Address_City"]
+	@state = @payment_method["Address_State"]
+	@zip = @payment_method["Address_Zip"]
 
 	check_payment_token
 end

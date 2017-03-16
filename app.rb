@@ -97,7 +97,7 @@ class PaymentProcessor < Sinatra::Application
 		@update_address = params[:update_address] 
 
 		# Grab the credit card values from the POST object.
-		@cardnumber = params[:CreditCard]
+		# @cardnumber = params[:CreditCard]
 		@carddate = params[:MMYY]
 		@cardcvv = params[:CVV]
 
