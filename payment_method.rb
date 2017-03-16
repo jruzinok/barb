@@ -116,6 +116,15 @@ def update_payment_token
 			creditcard = CreditCardType.new(@masked_card_number,@carddate,@cardcvv) # The credit card number should not be updated per Ashley's decision.
 			payment = PaymentType.new(creditcard)
 			profile = CustomerPaymentProfileExType.new(nil,nil,payment,nil,nil)
+			if @update_address == true
+				profile.billTo = CustomerAddressType.new
+				profile.billTo.firstName = @namefirst
+				profile.billTo.lastName = @namelast
+				profile.billTo.address = @address
+				profile.billTo.city = @city
+				profile.billTo.state = @state
+				profile.billTo.zip = @zip
+			end
 			request.paymentProfile = profile
 			request.customerProfileId = @customer_token
 			profile.customerPaymentProfileId = @payment_token
