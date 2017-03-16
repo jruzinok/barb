@@ -149,17 +149,6 @@ def clear_response
 end
 
 def log_result_to_console
-
-	# This determines what to output, either the card number or customer profile and payment ids.
-	paymentMethod =
-	if @card_or_tokens == "tokens"
-		"Profile: #{@customer_token} Payment: #{@payment_token}"
-	elsif @card_or_tokens == "card"
-		"Card: #{@cardnumber}"
-	else
-		"Error"
-	end
-
 	puts "\n\n\n\n\n"
 	puts "----------------------------------------"
 	puts "[DATABASE] #{@database}"
@@ -169,20 +158,20 @@ def log_result_to_console
 	puts "[PAYMENTMETHOD] #{@payment_method_id}"
 	puts "[PAYMENTDATE] #{@payment_date_id}"
 	puts "[RECORD] #{@serial}"
-
-	puts "[METHOD] #{paymentMethod}"
-	puts "[P or S] #{@process_or_skip}"
-
+	puts "[CUSTOMERTOKEN] #{@customer_token}"
+	puts "[PAYMENTTOKEN] #{@payment_token}"
+	puts "\n"
 	puts "[RESPONSE] #{@responseKind}"
 	puts "[AUTHORIZATION] #{@authorizationCode}"
-	puts "[ERROR] #{@responseError}"
 	puts "[CODE] #{@responseCode}"
-
+	puts "[ERROR] #{@responseError}"
+	puts "[P or S] #{@process_or_skip}"
+	puts "\n"
 	puts "[GLCODE] #{@gl_code}"
 	puts "[INVOICE] #{@invoice}"
 	puts "[CLASSDATE] #{@classdate}"
 	puts "[PROGRAM] #{@program}"
-
+	puts "\n"
 	puts "[STATUSCODE] #{@statusCode}"
 	puts "[STATUSMESSAGE] #{@statusMessage}"
 	puts "[TIMESTAMP] #{Time.now}"
