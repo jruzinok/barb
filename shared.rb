@@ -149,7 +149,11 @@ def clear_response
 end
 
 def to_boolean (string)
-	string.downcase == 'true' || string == '1'
+	unless string.nil?
+		string.downcase == 'true' || string == '1'
+	else
+		false	
+	end
 end
 
 def log_result_to_console
