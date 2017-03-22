@@ -45,6 +45,15 @@ def create_payment_processor_log
 		@payment_processor_log[:zzPP_Response_Message] = @statusMessage
 		@payment_processor_log[:zzPP_Response_Error] = @responseError
 
+		# Only applicable to the update_payment_token method WHEN the user selected to update the billing address (avs).
+		if @update_address == true
+			@payment_processor_log[:zzF_Update_Address] = "Yes"
+			@payment_processor_log[:Address_Address] = @address
+			@payment_processor_log[:Address_City] = @city
+			@payment_processor_log[:Address_State] = @state
+			@payment_processor_log[:Address_Zip] = @zip
+		end
+
 	elsif @processType == "Payment"
 
 		if @resultCode == "OK"
