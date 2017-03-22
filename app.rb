@@ -94,7 +94,8 @@ class PaymentProcessor < Sinatra::Application
 		@payment_method_id = params[:payment_method_id]
 
 		# This optional bool allows the address associated to a payment token to be updated for AVS purposes.
-		@update_address = params[:update_address] 
+		@update_address_string = params[:update_address]
+		@update_address = to_boolean(@update_address_string)
 
 		# Grab the credit card values from the POST object.
 		# @cardnumber = params[:CreditCard]

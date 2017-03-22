@@ -148,6 +148,10 @@ def clear_response
 	@responseError = nil
 end
 
+def to_boolean (string)
+	string.downcase == 'true' || string == '1'
+end
+
 def log_result_to_console
 	puts "\n\n\n\n\n"
 	puts "----------------------------------------"
