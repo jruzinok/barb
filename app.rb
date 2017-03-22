@@ -52,6 +52,7 @@ class PaymentProcessor < Sinatra::Application
 		@processType = "Payment"
 		@database = params[:database]
 		@batch = params[:batch]
+
 		process_payment_dates
 
 		# Return the response back to FileMaker.
@@ -64,7 +65,12 @@ class PaymentProcessor < Sinatra::Application
 		@processType = "Token"
 		@database = params[:database]
 		@directory_id = params[:directory_id]
+
 		create_customer_token
+
+		# Return the response back to FileMaker.
+		status @status
+		body @body
 	end
 
 	post '/create-payment-token/:database/:directory_id/:payment_method_id' do
@@ -134,6 +140,7 @@ class PaymentProcessor < Sinatra::Application
 		@processType = "Token"
 		@database = "DL"
 		@recordtype = "DialerLead"
+
 		create_dialer_lead_customer_token
 
 		# Return the response back to the Dialer.
@@ -147,6 +154,7 @@ class PaymentProcessor < Sinatra::Application
 		@processType = "Token"
 		@database = "DL"
 		@recordtype = "DialerLead"
+
 		process_create_dialer_payment_method_request
 
 		# Return the response back to the Dialer.
@@ -161,6 +169,7 @@ class PaymentProcessor < Sinatra::Application
 		@processType = "Token"
 		@database = "DL"
 		@recordtype = "DialerLead"
+
 		process_create_dialer_payment_method_request_v2
 
 		# Return the response back to the Dialer.
@@ -174,6 +183,7 @@ class PaymentProcessor < Sinatra::Application
 		@processType = "Payment"
 		@database = "DL"
 		@recordtype = "DialerLead"
+
 		process_create_dialer_payment_date_request
 
 		# Return the response back to the Dialer.
@@ -187,6 +197,7 @@ class PaymentProcessor < Sinatra::Application
 		@processType = "Token"
 		@database = "DL"
 		@recordtype = "DialerGuest"
+
 		process_create_dialer_payment_method_request
 
 		# Return the response back to the Dialer.
@@ -201,6 +212,7 @@ class PaymentProcessor < Sinatra::Application
 		@processType = "Token"
 		@database = "DL"
 		@recordtype = "DialerGuest"
+
 		process_create_dialer_payment_method_request_v2
 
 		# Return the response back to the Dialer.
@@ -214,6 +226,7 @@ class PaymentProcessor < Sinatra::Application
 		@processType = "Payment"
 		@database = "DL"
 		@recordtype = "DialerGuest"
+
 		process_create_dialer_payment_date_request
 
 		# Return the response back to the Dialer.
@@ -227,6 +240,7 @@ class PaymentProcessor < Sinatra::Application
 		@processType = "Token"
 		@database = "CS"
 		@batch = params[:batch]
+
 		batch_tokenize_current_students
 
 		# Return the response back to FileMaker.
@@ -240,6 +254,7 @@ class PaymentProcessor < Sinatra::Application
 		@processType = "Token"
 		@database = "CS"
 		@batch = params[:batch]
+
 		batch_tokenize_current_student_credit_cards
 
 		# Return the response back to FileMaker.
@@ -252,6 +267,7 @@ class PaymentProcessor < Sinatra::Application
 		@process = "Batch Tokeninzation of CSV Customer Data"
 		@processType = "Token"
 		@batch = params[:batch]
+
 		batch_tokenize_csv_customer_data
 
 		# Return the response back to FileMaker.
@@ -264,6 +280,7 @@ class PaymentProcessor < Sinatra::Application
 		@process = "Batch Tokeninzation of CSV Credit Card Data"
 		@processType = "Token"
 		@batch = params[:batch]
+
 		batch_tokenize_csv_credit_card_data
 
 		# Return the response back to FileMaker.
@@ -277,6 +294,7 @@ class PaymentProcessor < Sinatra::Application
 		@processType = "Token"
 		@database = params[:database]
 		@batch = params[:batch]
+
 		validate_multiple_tokens
 
 		# Return the response back to FileMaker.
