@@ -1,5 +1,28 @@
-def create_customer_token
+def create_customer_token_logic
 	find_directory
+
+	if @directory_found == true && @has_customer_token == false
+		@skip_find_directory = true # This prevents the find routine from hitting the database again (to speed the process up and make it less db intensive).
+		create_customer_token
+
+		if @responseKind == "OK"
+			@customer_token_ready = true
+		end
+
+	elsif @directory_found == true && @has_customer_token == true
+		@customer_token_ready = true
+		@statusCode = 220
+		@statusMessage = "[OK] CustomerTokenAlreadyExists"
+		@skip_find_directory = true
+	end
+
+	set_response
+end
+
+def create_customer_token
+	unless @skip_find_directory == true
+		find_directory
+	end
 
 	if @directory_found == true && @has_customer_token == false
 		request = CreateCustomerProfileRequest.new
@@ -11,21 +34,21 @@ def create_customer_token
 		if @theResponse.messages.resultCode == MessageTypeEnum::Ok
 			@responseKind = "OK"
 			@customer_token = @theResponse.customerProfileId
+			@has_customer_token = true
 			@statusCode = 200
 			@statusMessage = "[OK] CustomerTokenCreated"
 		else
 			@responseKind = "ERROR"
 			@responseCode = @theResponse.messages.messages[0].code
 			@responseError = @theResponse.messages.messages[0].text
-			@statusCode = 210
-			@statusMessage = "[ERROR] CustomerTokenNotCreated"
+			@statusCode = 199 # Most likely caused by a '@customer' id issue.
+			@statusMessage = "[ERROR] TokenIssue (Contact Admin)"
 			log_result_to_console
 		end
 
 		update_directory
 		create_payment_processor_log
 		set_response
-		clear_response
 	end
 end
 
