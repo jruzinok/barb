@@ -66,7 +66,7 @@ class PaymentProcessor < Sinatra::Application
 		@database = params[:database]
 		@directory_id = params[:directory_id]
 
-		create_customer_token
+		create_customer_token_logic
 
 		# Return the response back to FileMaker.
 		status @status
@@ -85,7 +85,7 @@ class PaymentProcessor < Sinatra::Application
 		@carddate = params[:MMYY]
 		@cardcvv = params[:CVV]
 
-		create_payment_token
+		create_payment_token_logic
 
 		# Return the response back to FileMaker.
 		status @status
