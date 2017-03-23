@@ -1,14 +1,33 @@
-def create_payment_token
-	find_directory
-	find_payment_method
-	create_payment_token_logic
- 
-	if @logic == "CreateCustomerToken"
-		@preventloop = true
-		create_customer_token
-		create_payment_token
+def create_payment_token_logic
+	create_customer_token_logic
 
-	elsif @logic == "CreatePaymentToken"
+	if @customer_token_ready == true
+		find_payment_method
+
+		if @payment_method_found == true && @has_payment_token == false
+			@skip_find_payment_method = true # This prevents the find routine from hitting the database again (to speed the process up and make it less db intensive).
+			create_payment_token
+
+		elsif @payment_method_found == true && @has_payment_token == true
+			@statusCode = 220
+			@statusMessage = "[ERROR] PaymentTokenAlreadyExists"
+			log_result_to_console
+		end
+	end
+
+	set_response
+end
+
+def create_payment_token
+	unless @skip_find_directory == true
+		find_directory
+	end
+
+	unless @skip_find_payment_method == true
+		find_payment_method
+	end
+
+	if @directory_found == true && @has_customer_token == true && @payment_method_found == true && @has_payment_token == false
 		request = CreateCustomerPaymentProfileRequest.new
 		creditcard = CreditCardType.new(@cardnumber,@carddate,@cardcvv)
 		payment = PaymentType.new(creditcard)
@@ -25,6 +44,7 @@ def create_payment_token
 		if @theResponse.messages.resultCode == MessageTypeEnum::Ok
 			@responseKind = "OK"
 			@payment_token = @theResponse.customerPaymentProfileId
+			@has_payment_token = true
 			@statusCode = 200
 			@statusMessage = "[OK] PaymentTokenCreated"
 			log_result_to_console
@@ -39,24 +59,7 @@ def create_payment_token
 
 		update_payment_method
 		create_payment_processor_log
-
-	elsif @logic == "PaymentTokenAlreadyCreated"
-		@statusCode = 220
-		@statusMessage = "[ERROR] PaymentTokenAlreadyCreated"
-		log_result_to_console
-	end
-
-	set_response
-	clear_response
-end
-
-def create_payment_token_logic
-	if @directory_found == true && @has_customer_token == false && @preventloop != true
-		@logic = "CreateCustomerToken"
-	elsif @directory_found == true && @has_customer_token == true && @payment_method_found == true && @has_payment_token == false
-		@logic = "CreatePaymentToken"
-	elsif @directory_found == true && @has_customer_token == true && @payment_method_found == true && @has_payment_token == true
-		@logic = "PaymentTokenAlreadyCreated"
+		set_response
 	end
 end
 
