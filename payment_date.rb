@@ -76,6 +76,8 @@ def load_payment_date
 
 	if @database == "BC"
 		@eventAbbr = @payment_date["T54_EVENT::Name_Abbreviation"]
+		@gl_override_flag	= to_boolean(@payment_date["zzF_GL_Code_Override"])
+		@gl_override_code	= @payment_date["GL_Code_Override"]
 		set_gl_codes # The GL Code needs to be set for each PaymentDate record.
 	elsif @database == "CS"
 		@classdate = @payment_date["Date_Class"]
