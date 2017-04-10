@@ -87,7 +87,12 @@ def bc_gl_code
 	date = Time.now
 	year = date.year
 
-	@gl_code = "422"
+	if @gl_override_flag == true && @gl_override_code != nil
+		@gl_code = @gl_override_code
+	else
+		@gl_code = "422"
+	end
+	
 	@invoice = "BCOMP#{@eventAbbr}#{short_year(year)}"
 end
 
