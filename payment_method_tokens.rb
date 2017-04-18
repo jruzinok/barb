@@ -25,7 +25,7 @@ def validate_multiple_tokens
 end
 
 def find_payment_methods_by_batch
-	if @database == "BC" || @database == "CS"
+	if @database == "DATA" || @database == "BC" || @database == "CS"
 		@payment_methods = DATAPaymentMethod.find(:zzF_Batch => @batch)
 	elsif @database == "PTD"
 		@payment_methods = PTDPaymentMethod.find(:zzF_Batch => @batch)
