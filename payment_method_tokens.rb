@@ -1,8 +1,4 @@
 def validate_multiple_tokens
-	# This is used to mark the record's Date Processed.
-	# It's also used to determine the GL Code for Current Student Payment Dates.
-	@today = Time.new
-
 	# This outputs the batch id. It's used to display acts as the header or beginning of the process
 	puts "\n\n\n\n\n"
 	puts "----------------------------------------"
@@ -14,8 +10,8 @@ def validate_multiple_tokens
 
 	find_payment_methods_by_batch
 
-	@payment_methods.each do |pd|
-		@payment_method = pd
+	@payment_methods.each do |pm|
+		@payment_method = pm
 
 		@step1 = load_payment_method
 		@step2 = capture_related_directory_id
@@ -32,8 +28,7 @@ def find_payment_methods_by_batch
 	if @database == "BC" || @database == "CS"
 		@payment_methods = DATAPaymentMethod.find(:zzF_Batch => @batch)
 	elsif @database == "PTD"
-		# The PTD PaymentMethod Layout needs to be updated to support this functionality.
-		# @payment_methods = PTDPaymentMethod.find(:zzF_Batch => @batch)
+		@payment_methods = PTDPaymentMethod.find(:zzF_Batch => @batch)
 	end
 	
 end
