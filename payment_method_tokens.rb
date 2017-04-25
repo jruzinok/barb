@@ -57,7 +57,7 @@ def save_payment_method_token_validation_result
 	else
 		@payment_method[:zzPP_Response] = @theResponse
 		@payment_method[:zzPP_Response_Code] = @responseCode
-		@payment_method[:zzPP_Response_Error] = @responseError.sub! "(TESTMODE) ", ""
+		@payment_method[:zzPP_Response_Error] = @responseError.sub "(TESTMODE) ", ""
 		@payment_method[:zzF_Validated] = "NotValid"
 		@payment_method[:zzF_Status] = "Inactive"
 		@payment_method[:zzF_Type] = "Error"
