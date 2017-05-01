@@ -19,6 +19,9 @@ def validate_tokens
 	# PASS the transaction request and CAPTURE the transaction response.
 	response = transaction.validate_customer_payment_profile(request)
 
+	# Ensure that a response was received before proceeding.
+	if response.messages != nil
+
 	if response.messages.resultCode == MessageTypeEnum::Ok
 		@valid_tokens = true
 	else
@@ -31,6 +34,15 @@ def validate_tokens
 		@responseKind = "TokenError"
 		@responseCode = response.messages.messages[0].code
 		@responseError = response.messages.messages[0].text
+	end
+
+		# A transactional FAILURE occurred. [NIL]
+	else
+		@valid_tokens = false
+		@resultCode = "ERROR"
+
+		@responseKind = "TransactionFailure"
+		@responseError = "A transactional FAILURE occurred."
 	end
 end
 
