@@ -161,6 +161,18 @@ def to_boolean (string)
 	end
 end
 
+def mask_card_date
+	unless @update_card_date == true
+		@carddate = 'XXXX'
+	end
+end
+
+def nil_card_cvv
+	unless @update_card_cvv == true
+		@cardcvv = nil
+	end
+end
+
 def log_result_to_console
 	puts "\n\n\n\n\n"
 	puts "----------------------------------------"
