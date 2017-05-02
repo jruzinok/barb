@@ -120,10 +120,17 @@ def update_payment_token
 
 		if @payment_token_retrieved == true
 			request = UpdateCustomerPaymentProfileRequest.new
-			creditcard = CreditCardType.new(@masked_card_number,@carddate,@cardcvv) # The credit card number should not be updated per Ashley's decision.
+
+			# Set the @carddate = 'XXXX' and @cardcvv = nil if the user didn't enter any values.
+			mask_card_date
+			nil_card_cvv
+
+			# The credit card number should not be updated per Ashley's decision. Hence the use of the @masked_card_number variable.
+			creditcard = CreditCardType.new(@masked_card_number,@carddate,@cardcvv)
+
 			payment = PaymentType.new(creditcard)
 			profile = CustomerPaymentProfileExType.new(nil,nil,payment,nil,nil)
-			if @update_address == true
+			if @update_card_address == true
 				profile.billTo = CustomerAddressType.new
 				profile.billTo.firstName = @namefirst
 				profile.billTo.lastName = @namelast
