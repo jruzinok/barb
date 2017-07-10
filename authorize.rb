@@ -22,30 +22,30 @@ def validate_tokens
 
 	# Ensure that a response was received before proceeding.
 	begin
-	if response.messages != nil
+		if response.messages != nil
 
-	if response.messages.resultCode == MessageTypeEnum::Ok
-		@valid_tokens = true
-	else
-		@valid_tokens = false
+		if response.messages.resultCode == MessageTypeEnum::Ok
+			@valid_tokens = true
+		else
+			@valid_tokens = false
 
-		# Capture the complete response and set the ResultCode (logic variable) to Error.
-		@theResponse = response
-		@resultCode = "ERROR"
+			# Capture the complete response and set the ResultCode (logic variable) to Error.
+			@theResponse = response
+			@resultCode = "ERROR"
 
-		@responseKind = "TokenError"
-		@responseCode = response.messages.messages[0].code
-		@responseError = response.messages.messages[0].text
-	end
+			@responseKind = "TokenError"
+			@responseCode = response.messages.messages[0].code
+			@responseError = response.messages.messages[0].text
+		end
 
-		# A transactional FAILURE occurred. [NIL]
-	else
-		@valid_tokens = false
-		@resultCode = "ERROR"
+			# A transactional FAILURE occurred. [NIL]
+		else
+			@valid_tokens = false
+			@resultCode = "ERROR"
 
-		@responseKind = "TransactionFailure"
-		@responseError = "A transactional FAILURE occurred."
-	end
+			@responseKind = "TransactionFailure"
+			@responseError = "A transactional FAILURE occurred."
+		end
 
 	rescue Errno::ETIMEDOUT => e
 		@resultCode = "ERROR"
@@ -80,59 +80,59 @@ def process_payment
 	response = transaction.create_transaction(request)
 
 	begin
-	if response.transactionResponse != nil
+		if response.transactionResponse != nil
 
-		# Capture the response variables for all transactions.
-		@theResponse = response
-		@avsCode = response.transactionResponse.avsResultCode
-		@cvvCode = response.transactionResponse.cvvResultCode
+			# Capture the response variables for all transactions.
+			@theResponse = response
+			@avsCode = response.transactionResponse.avsResultCode
+			@cvvCode = response.transactionResponse.cvvResultCode
 
-		# The transaction has a response.
-		if response.messages.resultCode == MessageTypeEnum::Ok
-			@resultCode = "OK"
+			# The transaction has a response.
+			if response.messages.resultCode == MessageTypeEnum::Ok
+				@resultCode = "OK"
 
-			# CAPTURE the transaction details.
-			@transactionID = response.transactionResponse.transId
-			@transactionResponseCode = response.transactionResponse.responseCode
+				# CAPTURE the transaction details.
+				@transactionID = response.transactionResponse.transId
+				@transactionResponseCode = response.transactionResponse.responseCode
 
-			if @transactionResponseCode == "1"
-				@responseKind = "Approved"
-				@authorizationCode = response.transactionResponse.authCode
-				@responseCode = response.messages.messages[0].code
-				@responseMessage = response.messages.messages[0].text
+				if @transactionResponseCode == "1"
+					@responseKind = "Approved"
+					@authorizationCode = response.transactionResponse.authCode
+					@responseCode = response.messages.messages[0].code
+					@responseMessage = response.messages.messages[0].text
 
-			elsif @transactionResponseCode == "2"
-				@responseKind = "Declined"
-				@responseCode = response.transactionResponse.errors.errors[0].errorCode
-				@responseError = response.transactionResponse.errors.errors[0].errorText
+				elsif @transactionResponseCode == "2"
+					@responseKind = "Declined"
+					@responseCode = response.transactionResponse.errors.errors[0].errorCode
+					@responseError = response.transactionResponse.errors.errors[0].errorText
 
-			elsif @transactionResponseCode == "3"
-				@responseKind = "Error"
-				@responseCode = response.transactionResponse.errors.errors[0].errorCode
-				@responseError = response.transactionResponse.errors.errors[0].errorText
+				elsif @transactionResponseCode == "3"
+					@responseKind = "Error"
+					@responseCode = response.transactionResponse.errors.errors[0].errorCode
+					@responseError = response.transactionResponse.errors.errors[0].errorText
 
-			elsif @transactionResponseCode == "4"
-				@responseKind = "HeldforReview"
+				elsif @transactionResponseCode == "4"
+					@responseKind = "HeldforReview"
+					@responseCode = response.transactionResponse.errors.errors[0].errorCode
+					@responseError = response.transactionResponse.errors.errors[0].errorText
+				end
+
+			# A transactional ERROR occurred.
+			elsif response.messages.resultCode == MessageTypeEnum::Error
+				@resultCode = "ERROR"
+
+				@responseKind = "TransactionError"
 				@responseCode = response.transactionResponse.errors.errors[0].errorCode
 				@responseError = response.transactionResponse.errors.errors[0].errorText
 			end
 
-		# A transactional ERROR occurred.
-		elsif response.messages.resultCode == MessageTypeEnum::Error
+		# A transactional FAILURE occurred. [NIL]
+		else
 			@resultCode = "ERROR"
 
-			@responseKind = "TransactionError"
-			@responseCode = response.transactionResponse.errors.errors[0].errorCode
-			@responseError = response.transactionResponse.errors.errors[0].errorText
+			@responseKind = "TransactionFailure"
+			@responseError = "A transactional FAILURE occurred."
 		end
-
-	# A transactional FAILURE occurred. [NIL]
-	else
-		@resultCode = "ERROR"
-
-		@responseKind = "TransactionFailure"
-		@responseError = "A transactional FAILURE occurred."
-	end
 
 	rescue Errno::ETIMEDOUT => e
 		@resultCode = "ERROR"
