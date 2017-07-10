@@ -6,6 +6,7 @@ def transaction
 
 	# CREATE the transaction.
 	transaction = Transaction.new(credentials['api_login_id'], credentials['api_transaction_key'], :gateway => :production)
+	# transaction = Transaction.new(credentials['api_login_id'], credentials['api_transaction_key'], {:gateway => :sandbox, :verify_ssl => true})
 end
 
 def validate_tokens
@@ -20,6 +21,7 @@ def validate_tokens
 	response = transaction.validate_customer_payment_profile(request)
 
 	# Ensure that a response was received before proceeding.
+	begin
 	if response.messages != nil
 
 	if response.messages.resultCode == MessageTypeEnum::Ok
@@ -43,6 +45,13 @@ def validate_tokens
 
 		@responseKind = "TransactionFailure"
 		@responseError = "A transactional FAILURE occurred."
+	end
+
+	rescue Errno::ETIMEDOUT => e
+		@resultCode = "ERROR"
+
+		@responseKind = "TransactionFailure"
+		@responseError = "Authorize.net isn't available."
 	end
 end
 
@@ -70,6 +79,7 @@ def process_payment
 	# PASS the transaction request and CAPTURE the transaction response.
 	response = transaction.create_transaction(request)
 
+	begin
 	if response.transactionResponse != nil
 
 		# Capture the response variables for all transactions.
@@ -122,5 +132,12 @@ def process_payment
 
 		@responseKind = "TransactionFailure"
 		@responseError = "A transactional FAILURE occurred."
+	end
+
+	rescue Errno::ETIMEDOUT => e
+		@resultCode = "ERROR"
+
+		@responseKind = "TransactionFailure"
+		@responseError = "Authorize.net isn't available."
 	end
 end
