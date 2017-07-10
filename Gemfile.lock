@@ -7,7 +7,8 @@ GEM
       minitest (~> 5.1)
       thread_safe (~> 0.3, >= 0.3.4)
       tzinfo (~> 1.1)
-    authorizenet (1.8.9.1)
+    authorizenet (1.9.3)
+      activesupport (= 4.2.6)
       nokogiri (~> 1.6, >= 1.6.4)
       roxml (= 3.3.1)
     backports (3.6.8)
@@ -16,11 +17,11 @@ GEM
     diff-lcs (1.2.5)
     eventmachine (1.2.0.1)
     ginjo-rfm (3.0.11)
-    i18n (0.7.0)
-    json (1.8.3)
+    i18n (0.8.5)
+    json (1.8.6)
     method_source (0.8.2)
     mini_portile2 (2.0.0)
-    minitest (5.8.4)
+    minitest (5.10.2)
     multi_json (1.11.2)
     nokogiri (1.6.7.2)
       mini_portile2 (~> 2.0.0.rc2)
@@ -62,16 +63,16 @@ GEM
       daemons (~> 1.0, >= 1.0.9)
       eventmachine (~> 1.0, >= 1.0.4)
       rack (~> 1.0)
-    thread_safe (0.3.5)
+    thread_safe (0.3.6)
     tilt (2.0.2)
-    tzinfo (1.2.2)
+    tzinfo (1.2.3)
       thread_safe (~> 0.1)
 
 PLATFORMS
   ruby
 
 DEPENDENCIES
-  authorizenet (~> 1.8.9)
+  authorizenet (~> 1.9.3)
   ginjo-rfm (~> 3.0, >= 3.0.11)
   pry
   rack
