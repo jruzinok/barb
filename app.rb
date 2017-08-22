@@ -238,6 +238,34 @@ class PaymentProcessor < Sinatra::Application
 		body @body
 	end
 
+	# This was designed to create customer tokens for a batch of either PTD or BC records.
+	get '/batch-tokenize-directory/:database/:batch' do
+		@process = "Batch Tokeninzation of #{:database} Directory records."
+		@processType = "Token"
+		@database = params[:database]
+		@batch = params[:batch]
+
+		batch_tokenize_directory_records
+
+		# Return the response back to FileMaker.
+		status 200
+		body "Processed"
+	end
+
+	# This was designed to create customer tokens for a batch of either PTD or BC records.
+	get '/batch-tokenize-payment-methods/:database/:batch' do
+		@process = "Batch Tokeninzation of #{:database} Payment Method records."
+		@processType = "Token"
+		@database = params[:database]
+		@batch = params[:batch]
+
+		batch_tokenize_payment_methods
+
+		# Return the response back to FileMaker.
+		status 200
+		body "Processed"
+	end
+
 	# This was designed to create customer tokens for a batch of Current Student records.
 	get '/batch-tokenize-current-students/:batch' do
 		@process = "Batch Tokeninzation of Current Students"

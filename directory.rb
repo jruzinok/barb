@@ -99,3 +99,155 @@ def update_directory
 
 	@directory.save
 end
+
+
+
+def batch_tokenize_directory_records
+	find_directory_records_by_batch
+
+	# This is used to mark the record's Date Processed.
+	@today = Time.new
+
+	# This outputs the batch id. It's used to display acts as the header or beginning of the process
+	puts "\n\n\n\n\n"
+	puts "----------------------------------------"
+	puts "[DATABASE] #{@database}"
+	puts "[CUSTOMER TOKINIZATION PROCESS]"
+	puts "[BATCH] #{@batch}"
+	puts "[TIMESTAMP] #{Time.now}"
+	puts "----------------------------------------"
+
+	@directories.each do |directory|
+		@directory = directory
+		# These "steps" are for clarity sake.
+		# Later, these objects could be saved somewhere to log the steps of each batch when it's run.
+		@step1 = load_directory
+		@step2 = create_customer_token_by_batch
+		@step3 = log_result_to_console_for_batch_tokenization
+
+		# This prevents the record from being updated if a token wasn't created/attempted.
+		if @flag_update_directory == true
+			@step4 = update_directory
+		end
+
+		@step5 = clear_response
+		@step6 = clear_batch_tokenization_variables
+	end
+
+end
+
+def find_directory_records_by_batch
+	if @database == "DATA" || @database == "BC"
+		@directories = DATADirectory.find(:zzD_Batch => @batch)
+	elsif @database == "PTD"
+		@directories = PTDDirectory.find(:zzD_Batch => @batch)
+	end
+end
+
+def create_customer_token_by_batch
+	if @has_customer_token == false
+		request = CreateCustomerProfileRequest.new
+		request.profile = CustomerProfileType.new(@customer,@namefull,nil,nil,nil) #(merchantCustomerId,description,email,paymentProfiles,shipToList)
+
+		@theResponse = transaction.create_customer_profile(request)
+
+		# The transaction has a response.
+		if @theResponse.messages.resultCode == MessageTypeEnum::Ok
+			@responseKind = "OK"
+			@customer_token = @theResponse.customerProfileId
+			@statusCode = 200
+			@statusMessage = "[OK] CustomerTokenCreated"
+		else
+			@responseKind = "ERROR"
+			@responseCode = @theResponse.messages.messages[0].code
+			@responseError = @theResponse.messages.messages[0].text
+			@statusCode = 210
+			@statusMessage = "[ERROR] CustomerTokenNotCreated"
+		end
+
+		@flag_update_directory = true
+
+	else
+		@flag_update_directory = false
+
+	end
+end
+
+
+
+def batch_tokenize_payment_methods
+	find_payment_methods_by_batch
+
+	# This is used to mark the record's Date Processed.
+	@today = Time.new
+
+	# This outputs the batch id. It's used to display acts as the header or beginning of the process
+	puts "\n\n\n\n\n"
+	puts "----------------------------------------"
+	puts "[DATABASE] #{@database}"
+	puts "[PAYMENT TOKINIZATION PROCESS]"
+	puts "[BATCH] #{@batch}"
+	puts "[TIMESTAMP] #{Time.now}"
+	puts "----------------------------------------"
+
+	@payment_methods.each do |pm|
+		@payment_method = pm
+		# These "steps" are for clarity sake.
+		# Later, these objects could be saved somewhere to log the steps of each batch when it's run.
+		@step1 = load_payment_method
+		@step2 = create_payment_token_by_batch
+		@step3 = log_result_to_console_for_batch_tokenization
+
+		# This prevents the record from being updated if a token wasn't created/attempted.
+		if @flag_update_payment_method == true
+			@step4 = update_payment_method
+		end
+
+		@step5 = clear_response
+		@step6 = clear_batch_tokenization_variables
+	end
+
+end
+
+def find_payment_methods_by_batch
+	if @database == "DATA" || @database == "BC"
+		@payment_methods = DATAPaymentMethod.find(:zzD_Batch => @batch)
+	elsif @database == "PTD"
+		@payment_methods = PTDPaymentMethod.find(:zzD_Batch => @batch)
+	end
+end
+
+def create_payment_token_by_batch
+	if @has_customer_token == true && @has_payment_token == false
+		request = CreateCustomerPaymentProfileRequest.new
+		creditcard = CreditCardType.new(@cardnumber,@carddate,@cardcvv)
+		payment = PaymentType.new(creditcard)
+		profile = CustomerPaymentProfileType.new(nil,nil,payment,nil,nil)
+		profile.billTo = CustomerAddressType.new
+		profile.billTo.firstName = @namefirst
+		profile.billTo.lastName = @namelast
+		request.customerProfileId = @customer_token
+		request.paymentProfile = profile
+
+		@theResponse = transaction.create_customer_payment_profile(request)
+
+		# The transaction has a response.
+		if @theResponse.messages.resultCode == MessageTypeEnum::Ok
+			@responseKind = "OK"
+			@payment_token = @theResponse.customerPaymentProfileId
+			@statusCode = 200
+			@statusMessage = "[OK] PaymentTokenCreated"
+		else
+			@responseKind = "ERROR"
+			@responseCode = @theResponse.messages.messages[0].code
+			@responseError = @theResponse.messages.messages[0].text
+			@statusCode = 210
+			@statusMessage = "[ERROR] PaymentTokenNotCreated"
+		end
+
+		@flag_update_payment_method = true
+
+	else
+		@flag_update_payment_method = false
+
+	end
