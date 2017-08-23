@@ -199,7 +199,7 @@ def retrieve_payment_token
 end
 
 def batch_tokenize_payment_methods
-	find_payment_methods_by_batch
+	find_payment_methods_to_tokenize_by_batch
 
 	# This is used to mark the record's Date Processed.
 	@today = Time.new
@@ -232,8 +232,8 @@ def batch_tokenize_payment_methods
 
 end
 
-def find_payment_methods_by_batch
-	if @database == "DATA" || @database == "BC"
+def find_payment_methods_to_tokenize_by_batch
+	if @database == "BC"
 		@payment_methods = DATAPaymentMethod.find(:zzD_Batch => @batch)
 	elsif @database == "PTD"
 		@payment_methods = PTDPaymentMethod.find(:zzD_Batch => @batch)
@@ -274,4 +274,4 @@ def create_payment_token_by_batch
 		@flag_update_payment_method = false
 
 	end
-	
+end
