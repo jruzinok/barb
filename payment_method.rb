@@ -83,6 +83,23 @@ def find_payment_method
 	end
 end
 
+def load_payment_method_by_batch
+	@namefirst = @payment_method["Name_First"]
+	@namelast = @payment_method["Name_Last"]
+	@customer_token = @payment_method["T55_DIRECTORY::Token_Profile_ID"]
+	@payment_token = @payment_method["Token_Payment_ID"]
+	@cardnumber = @payment_method["CreditCard_Number"]
+	@carddate = @payment_method["MMYY"]
+	@cardcvv = @payment_method["CVV"]
+	@address = @payment_method["Address_Address"]
+	@city = @payment_method["Address_City"]
+	@state = @payment_method["Address_State"]
+	@zip = @payment_method["Address_Zip"]
+
+	check_customer_token
+	check_payment_token
+end
+
 def load_payment_method
 	@namefirst = @payment_method["Name_First"]
 	@namelast = @payment_method["Name_Last"]
@@ -217,7 +234,7 @@ def batch_tokenize_payment_methods
 		@payment_method = pm
 		# These "steps" are for clarity sake.
 		# Later, these objects could be saved somewhere to log the steps of each batch when it's run.
-		@step1 = load_payment_method
+		@step1 = load_payment_method_by_batch
 		@step2 = create_payment_token_by_batch
 		@step3 = log_result_to_console_for_batch_tokenization
 
@@ -234,9 +251,9 @@ end
 
 def find_payment_methods_to_tokenize_by_batch
 	if @database == "BC"
-		@payment_methods = DATAPaymentMethod.find(:zzD_Batch => @batch)
+		@payment_methods = DATAPaymentMethod.find(:zzF_Batch => @batch)
 	elsif @database == "PTD"
-		@payment_methods = PTDPaymentMethod.find(:zzD_Batch => @batch)
+		@payment_methods = PTDPaymentMethod.find(:zzF_Batch => @batch)
 	end
 end
 
