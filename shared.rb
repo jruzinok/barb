@@ -87,7 +87,12 @@ def bc_gl_code
 	date = Time.now
 	year = date.year
 
-	@gl_code = "422"
+	if @gl_override_flag == true && @gl_override_code != nil
+		@gl_code = @gl_override_code
+	else
+		@gl_code = "422"
+	end
+
 	@invoice = "BCOMP#{@eventAbbr}#{short_year(year)}"
 end
 
@@ -153,6 +158,18 @@ def to_boolean (string)
 		string.downcase == 'true' || string == '1'
 	else
 		false	
+	end
+end
+
+def mask_card_date
+	unless @update_card_date == true
+		@carddate = 'XXXX'
+	end
+end
+
+def nil_card_cvv
+	unless @update_card_cvv == true
+		@cardcvv = nil
 	end
 end
 
