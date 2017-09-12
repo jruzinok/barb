@@ -247,6 +247,132 @@ class PaymentProcessor < Sinatra::Application
 
 		batch_tokenize_current_students
 
+		# Return the response back to the Dialer.
+		status @status
+		body @body
+	end
+
+	# This was designed to be called from the BookingDialer php web app.
+	post '/create-dialer-lead-payment/:lead_id/:payment_method_id' do
+		@process = "Create Dialer Lead PaymentDate"
+		@processType = "Payment"
+		@database = "DL"
+		@recordtype = "DialerLead"
+
+		process_create_dialer_payment_date_request
+
+		# Return the response back to the Dialer.
+		status @status
+		body @body
+	end
+
+	# This was designed to be called from the BookingDialer php web app.
+	post '/create-dialer-guest-payment-method/:lead_id/:guest_id' do
+		@process = "Create Dialer Guest PaymentMethod"
+		@processType = "Token"
+		@database = "DL"
+		@recordtype = "DialerGuest"
+
+		process_create_dialer_payment_method_request
+
+		# Return the response back to the Dialer.
+		status @status
+		body @body
+	end
+
+	# This was designed to be called from the BookingDialer php web app.
+	# This new version ONLY creates tokens.
+	post '/create-dialer-guest-payment-method-v2/:lead_id/:guest_id' do
+		@process = "Create Dialer Guest PaymentMethod"
+		@processType = "Token"
+		@database = "DL"
+		@recordtype = "DialerGuest"
+
+		process_create_dialer_payment_method_request_v2
+
+		# Return the response back to the Dialer.
+		status @status
+		body @body
+	end
+
+	# This was designed to be called from the BookingDialer php web app.
+	post '/create-dialer-guest-payment/:lead_id/:guest_id/:payment_method_id' do
+		@process = "Create Dialer Guest PaymentDate"
+		@processType = "Payment"
+		@database = "DL"
+		@recordtype = "DialerGuest"
+
+		process_create_dialer_payment_date_request
+
+		# Return the response back to the Dialer.
+		status @status
+		body @body
+	end
+
+	# This was designed to create customer tokens for a batch of either PTD or BC records.
+	get '/batch-tokenize-directory/:database/:batch' do
+		@process = "Batch Tokeninzation of #{:database} Directory records."
+		@processType = "Token"
+		@database = params[:database]
+		@batch = params[:batch]
+
+		batch_tokenize_directory_records
+
+		# Return the response back to FileMaker.
+		status 200
+		body "Processed"
+	end
+
+	# This was designed to create customer tokens for a batch of either PTD or BC records.
+	get '/batch-tokenize-payment-methods/:database/:batch' do
+		@process = "Batch Tokeninzation of #{:database} Payment Method records."
+		@processType = "Token"
+		@database = params[:database]
+		@batch = params[:batch]
+
+		batch_tokenize_payment_methods
+
+		# Return the response back to FileMaker.
+		status 200
+		body "Processed"
+	end
+
+	# This was designed to create customer tokens for a batch of Current Student records.
+	get '/batch-tokenize-current-students/:batch' do
+		@process = "Batch Tokeninzation of Current Students"
+		@processType = "Token"
+		@database = "CS"
+		@batch = params[:batch]
+
+		batch_tokenize_current_students
+
+		# Return the response back to FileMaker.
+		status 200
+		body "Processed"
+	end
+
+	# This was designed to create payment tokens for a batch of Current Student's Credit Card records.
+	get '/batch-tokenize-current-student-credit-cards/:batch' do
+		@process = "Batch Tokeninzation of Current Students' Credit Cards"
+		@processType = "Token"
+		@database = "CS"
+		@batch = params[:batch]
+
+		batch_tokenize_current_student_credit_cards
+
+		# Return the response back to FileMaker.
+		status 200
+		body "Processed"
+	end
+
+	# This was designed to create customer tokens for a batch of CVS of Customer Data.
+	get '/batch-tokenize-csv-customer-files/:batch' do
+		@process = "Batch Tokeninzation of CSV Customer Data"
+		@processType = "Token"
+		@batch = params[:batch]
+
+		batch_tokenize_csv_customer_data
+
 		# Return the response back to FileMaker.
 		status 200
 		body "Processed"
