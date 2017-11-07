@@ -74,6 +74,7 @@ PLATFORMS
 DEPENDENCIES
   authorizenet (~> 1.9.3)
   ginjo-rfm (~> 3.0, >= 3.0.11)
+  json
   pry
   rack
   rack-cors

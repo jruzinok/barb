@@ -19,6 +19,9 @@ gem 'pry'
 # Server related gems.
 gem 'thin'
 
+# To communicate between OE and Sinatra.
+gem 'json'
+
 # Authentication
 # gem 'warden'
 # gem 'bcrypt'
