@@ -1,13 +1,13 @@
 def create_oe_customer_token_logic
 	if check_required_ct_params
-	prepare_oe_customer_variables
-	@check_by_merchant_id = true
-	check_for_customer_profile
-
-	if @has_profile == false && @resultCode == "OK"
 		prepare_oe_customer_variables
-		create_oe_customer_token
-	end
+		@check_by_merchant_id = true
+		check_for_customer_profile
+
+		if @has_profile == false && @resultCode == "OK"
+			prepare_oe_customer_variables
+			create_oe_customer_token
+		end
 
 	else
 		@responseKind = "ERROR"
@@ -19,18 +19,18 @@ end
 
 def create_oe_payment_token_logic
 	if check_required_pt_params
-	prepare_oe_payment_variables
-	@check_by_customer_token = true
-	check_for_customer_profile
+		prepare_oe_payment_variables
+		@check_by_customer_token = true
+		check_for_customer_profile
 
-	if @has_profile == true && @resultCode == "OK"
-		create_oe_payment_token
-	else
-		@responseKind = "ERROR"
-		@statusCode = 195
-		@statusMessage = "[ERROR] CustomerTokenDoesntExist"
-		@return_json_package = JSON.generate ["responseKind"=>@responseKind,"statusCode"=>@statusCode,"statusMessage"=>@statusMessage]
-	end
+		if @has_profile == true && @resultCode == "OK"
+			create_oe_payment_token
+		else
+			@responseKind = "ERROR"
+			@statusCode = 195
+			@statusMessage = "[ERROR] CustomerTokenDoesntExist"
+			@return_json_package = JSON.generate ["responseKind"=>@responseKind,"statusCode"=>@statusCode,"statusMessage"=>@statusMessage]
+		end
 
 	else
 		@responseKind = "ERROR"
