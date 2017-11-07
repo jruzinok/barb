@@ -1,4 +1,5 @@
 def create_oe_customer_token_logic
+	if check_required_ct_params
 	prepare_oe_customer_variables
 	@check_by_merchant_id = true
 	check_for_customer_profile
@@ -8,9 +9,16 @@ def create_oe_customer_token_logic
 		create_oe_customer_token
 	end
 
+	else
+		@responseKind = "ERROR"
+		@statusCode = 194
+		@statusMessage = "[ERROR] Missing required JSON variables."
+		@return_json_package = JSON.generate ["responseKind"=>@responseKind,"statusCode"=>@statusCode,"statusMessage"=>@statusMessage]
+	end
 end
 
 def create_oe_payment_token_logic
+	if check_required_pt_params
 	prepare_oe_payment_variables
 	@check_by_customer_token = true
 	check_for_customer_profile
@@ -24,6 +32,12 @@ def create_oe_payment_token_logic
 		@return_json_package = JSON.generate ["responseKind"=>@responseKind,"statusCode"=>@statusCode,"statusMessage"=>@statusMessage]
 	end
 
+	else
+		@responseKind = "ERROR"
+		@statusCode = 193
+		@statusMessage = "[ERROR] Missing required JSON variables."
+		@return_json_package = JSON.generate ["responseKind"=>@responseKind,"statusCode"=>@statusCode,"statusMessage"=>@statusMessage]
+	end
 end
 
 def check_for_customer_profile
@@ -75,6 +89,22 @@ def check_for_customer_profile
 		@statusCode = 197
 		@statusMessage = "[ERROR] Authorize.net isn't available."
 		@return_json_package = JSON.generate ["responseKind"=>@responseKind,"statusCode"=>@statusCode,"statusMessage"=>@statusMessage]
+	end
+end
+
+def check_required_ct_params
+	if @json[:program] && @json[:filemaker_id] && @json[:name_first] && @json[:name_last]
+		true
+	else
+		false
+	end
+end
+
+def check_required_pt_params
+	if @json[:customer_token] && @json[:name_first] && @json[:name_last] && @json[:card_number] && @json[:card_mmyy] && @json[:card_cvv]
+		true
+	else
+		false
 	end
 end
 
