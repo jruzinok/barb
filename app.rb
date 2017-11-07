@@ -6,6 +6,7 @@ require 'authorizenet'
 require 'rack/cors'
 require 'sinatra'
 require 'openssl'
+require 'json'
 
 set :environment, :production
 
@@ -38,6 +39,7 @@ require_relative 'payment_processor_log.rb'
 require_relative 'current_student.rb'
 require_relative 'current_student_controller.rb'
 require_relative 'current_student_credit_card.rb'
+require_relative 'online_enrollment.rb'
 
 class PaymentProcessor < Sinatra::Application
 
@@ -71,6 +73,20 @@ class PaymentProcessor < Sinatra::Application
 		# Return the response back to FileMaker.
 		status @status
 		body @body
+	end
+
+	# This process doesn't rely on FileMaker.
+	get '/create-oe-customer-token/:program/:filemaker_id' do
+		@process = "Create Customer Token"
+		@processType = "Token"
+		@program = params[:program]
+		@filemaker_id = params[:filemaker_id]
+		# @json = JSON.parse(request.body.read).symbolize_keys unless params[:path]
+
+		create_oe_customer_token_logic
+
+		# Return the response back to the requesting application.
+		@return_json_package
 	end
 
 	post '/create-payment-token/:database/:directory_id/:payment_method_id' do
