@@ -1,21 +1,39 @@
 def create_oe_customer_token_logic
-	prepare_oe_variables
+	prepare_oe_customer_variables
+	@check_by_merchant_id = true
 	check_for_customer_profile
 
 	if @has_profile == false && @resultCode == "OK"
-		prepare_oe_variables
+		prepare_oe_customer_variables
 		create_oe_customer_token
 	end
 
 end
 
-def check_for_customer_profile
-	# @customer_token = '1898613915'
-	# @filemaker_id = 'DL8748015'
+def create_oe_payment_token_logic
+	prepare_oe_payment_variables
+	@check_by_customer_token = true
+	check_for_customer_profile
 
+	if @has_profile == true && @resultCode == "OK"
+		create_oe_payment_token
+	else
+		@responseKind = "ERROR"
+		@statusCode = 195
+		@statusMessage = "[ERROR] CustomerTokenDoesntExist"
+		@return_json_package = JSON.generate ["responseKind"=>@responseKind,"statusCode"=>@statusCode,"statusMessage"=>@statusMessage]
+	end
+
+end
+
+def check_for_customer_profile
 	request = GetCustomerProfileRequest.new
-	# request.customerProfileId = @customer_token
-	request.merchantCustomerId = @customer
+
+	if @check_by_merchant_id == true
+		request.merchantCustomerId = @customer
+	elsif @check_by_customer_token == true
+		request.customerProfileId = @customer_token
+	end
 
 	response = transaction.get_customer_profile(request)
 
@@ -24,6 +42,7 @@ def check_for_customer_profile
 		if response.messages != nil
 
 			if response.messages.resultCode == MessageTypeEnum::Ok
+				# This is the expected result when the OE webapp requested to create a PT.
 				@has_profile = true
 				@resultCode = "OK"
 
@@ -34,7 +53,7 @@ def check_for_customer_profile
 				@return_json_package = JSON.generate ["responseKind"=>@responseKind,"statusCode"=>@statusCode,"statusMessage"=>@statusMessage,"customer_token"=>@customer_token,"payment_tokens"=>@payment_tokens]
 
 			else
-				# This is the expected result; the OE webapp requested a CT be created.
+				# This is the expected result when the OE webapp requested to create a CT.
 				@has_profile = false
 				@resultCode = "OK"
 			end
@@ -59,10 +78,19 @@ def check_for_customer_profile
 	end
 end
 
-def prepare_oe_variables
+def prepare_oe_customer_variables
 	@customer = "#{@program}#{@filemaker_id}" # The "ID" used to create a customer profile.
-	# @namefull = "#{@json[:Name_First]} #{@json[:Name_Last]}"
-	@namefull = "Dono Korb"
+	@namefull = "#{@json[:Name_First]} #{@json[:Name_Last]}"
+	# @namefull = "Dono Korb"
+end
+
+def prepare_oe_payment_variables
+	@customer_token = @json[:customer_token]
+	@namefirst = @json[:Name_First]
+	@namelast = @json[:Name_Last]
+	@cardnumber = @json[:Card_Number]
+	@carddate = @json[:Card_MMYY]
+	@cardcvv = @json[:Card_CVV]
 end
 
 def create_oe_customer_token
@@ -84,6 +112,38 @@ def create_oe_customer_token
 		@responseError = response.messages.messages[0].text
 		@statusCode = 199 # Most likely caused by a '@customer' id issue.
 		@statusMessage = "[ERROR] TokenIssue (Contact Admin)"
-		@return_json_package = JSON.generate ["responseKind"=>@responseKind,"statusCode"=>@statusCode,"statusMessage"=>@statusMessage]
+		@return_json_package = JSON.generate ["responseKind"=>@responseKind,"statusCode"=>@statusCode,"statusMessage"=>@statusMessage,"responseCode"=>@responseCode,"responseError"=>@responseError]
 	end
+end
+
+def create_oe_payment_token
+	request = CreateCustomerPaymentProfileRequest.new
+	creditcard = CreditCardType.new(@cardnumber,@carddate,@cardcvv)
+	payment = PaymentType.new(creditcard)
+	profile = CustomerPaymentProfileType.new(nil,nil,payment,nil,nil)
+	profile.billTo = CustomerAddressType.new
+	profile.billTo.firstName = @namefirst
+	profile.billTo.lastName = @namelast
+	request.customerProfileId = @customer_token
+	request.paymentProfile = profile
+
+	response = transaction.create_customer_payment_profile(request)
+
+	# The transaction has a response.
+	if response.messages.resultCode == MessageTypeEnum::Ok
+		@responseKind = "OK"
+		@payment_token = response.customerPaymentProfileId
+		@statusCode = 200
+		@statusMessage = "[OK] PaymentTokenCreated"
+		@maskedCardNumber = @cardnumber.split(//).last(4).join
+		@return_json_package = JSON.generate ["responseKind"=>@responseKind,"statusCode"=>@statusCode,"statusMessage"=>@statusMessage,"payment_token"=>@payment_token,"cardnumber"=>@maskedCardNumber]
+	else
+		@responseKind = "ERROR"
+		@responseCode = response.messages.messages[0].code
+		@responseError = response.messages.messages[0].text
+		@statusCode = 196
+		@statusMessage = "[ERROR] PaymentTokenNotCreated"
+		@return_json_package = JSON.generate ["responseKind"=>@responseKind,"statusCode"=>@statusCode,"statusMessage"=>@statusMessage,"responseCode"=>@responseCode,"responseError"=>@responseError]
+	end
+
 end
