@@ -79,8 +79,6 @@ class PaymentProcessor < Sinatra::Application
 	post '/create-oe-customer-token' do
 		@process = "Create Customer Token"
 		@processType = "Token"
-		@program = params[:program]
-		@filemaker_id = params[:filemaker_id]
 		@json = JSON.parse(request.body.read).symbolize_keys unless params[:path]
 
 		create_oe_customer_token_logic
@@ -91,10 +89,8 @@ class PaymentProcessor < Sinatra::Application
 
 	# This process doesn't rely on FileMaker.
 	post '/create-oe-payment-token' do
-		@process = "Create Customer Token"
+		@process = "Create Payment Token"
 		@processType = "Token"
-		@program = params[:program]
-		@filemaker_id = params[:filemaker_id]
 		@json = JSON.parse(request.body.read).symbolize_keys unless params[:path]
 
 		create_oe_payment_token_logic

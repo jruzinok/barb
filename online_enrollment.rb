@@ -79,18 +79,17 @@ def check_for_customer_profile
 end
 
 def prepare_oe_customer_variables
-	@customer = "#{@program}#{@filemaker_id}" # The "ID" used to create a customer profile.
-	@namefull = "#{@json[:Name_First]} #{@json[:Name_Last]}"
-	# @namefull = "Dono Korb"
+	@customer = "#{@json[:program]}#{@json[:filemaker_id]}" # The "ID" used to create a customer profile.
+	@namefull = "#{@json[:name_first]} #{@json[:name_last]}"
 end
 
 def prepare_oe_payment_variables
 	@customer_token = @json[:customer_token]
-	@namefirst = @json[:Name_First]
-	@namelast = @json[:Name_Last]
-	@cardnumber = @json[:Card_Number]
-	@carddate = @json[:Card_MMYY]
-	@cardcvv = @json[:Card_CVV]
+	@namefirst = @json[:name_first]
+	@namelast = @json[:name_last]
+	@cardnumber = @json[:card_number]
+	@carddate = @json[:card_mmyy]
+	@cardcvv = @json[:card_cvv]
 end
 
 def create_oe_customer_token
