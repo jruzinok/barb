@@ -1,12 +1,14 @@
 include AuthorizeNet::API
 
 def transaction
-	# LOAD the Authorize.net api credentials.
-	credentials = YAML.load_file(File.dirname(__FILE__) + "/config/credentials.yml")
+	# # LOAD the Authorize.net api credentials.
+	# credentials = YAML.load_file(File.dirname(__FILE__) + "/config/credentials.yml")
 
-	# CREATE the transaction.
-	transaction = Transaction.new(credentials['api_login_id'], credentials['api_transaction_key'], :gateway => :production)
-	# transaction = Transaction.new(credentials['api_login_id'], credentials['api_transaction_key'], {:gateway => :sandbox, :verify_ssl => true})
+	# # CREATE the transaction.
+	# transaction = Transaction.new(credentials['api_login_id'], credentials['api_transaction_key'], :gateway => :production)
+	# # transaction = Transaction.new(credentials['api_login_id'], credentials['api_transaction_key'], {:gateway => :sandbox, :verify_ssl => true})
+
+	transaction = Transaction.new(ENV['AUTHORIZE_API_ID'], ENV['AUTHORIZE_API_KEY'], :gateway => ENV['AUTHORIZE_API_ENDPOINT'].to_sym)
 end
 
 def validate_tokens
