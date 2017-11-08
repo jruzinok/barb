@@ -40,6 +40,31 @@ def create_oe_payment_token_logic
 	end
 end
 
+def list_oe_payment_token_logic
+	if check_required_list_params
+		prepare_oe_list_payment_variables
+		@check_by_customer_token = true
+		check_for_customer_profile
+
+		if @has_profile == true && @resultCode == "OK"
+			@statusCode = 210
+			@statusMessage = "[OK] PaymentTokensRetrieved"
+			@return_json_package = JSON.generate ["responseKind"=>@responseKind,"statusCode"=>@statusCode,"statusMessage"=>@statusMessage,"customer_token"=>@customer_token,"payment_tokens"=>@tokens,"cards"=>@cards]
+		else
+			@responseKind = "ERROR"
+			@statusCode = 194
+			@statusMessage = "[ERROR] CustomerTokenDoesntExist"
+			@return_json_package = JSON.generate ["responseKind"=>@responseKind,"statusCode"=>@statusCode,"statusMessage"=>@statusMessage]
+		end
+
+	else
+		@responseKind = "ERROR"
+		@statusCode = 192
+		@statusMessage = "[ERROR] Missing required JSON variables."
+		@return_json_package = JSON.generate ["responseKind"=>@responseKind,"statusCode"=>@statusCode,"statusMessage"=>@statusMessage]
+	end
+end
+
 def check_for_customer_profile
 	request = GetCustomerProfileRequest.new
 
@@ -59,12 +84,22 @@ def check_for_customer_profile
 				# This is the expected result when the OE webapp requested to create a PT.
 				@has_profile = true
 				@resultCode = "OK"
-
+				
 				@customer_token = response.profile.customerProfileId
 				@payment_tokens = response.profile.paymentProfiles
-				@statusCode = 220
-				@statusMessage = "[OK] CustomerTokenAlreadyExists"
-				@return_json_package = JSON.generate ["responseKind"=>@responseKind,"statusCode"=>@statusCode,"statusMessage"=>@statusMessage,"customer_token"=>@customer_token,"payment_tokens"=>@payment_tokens]
+
+				if @payment_tokens.length >= 1
+					@tokens = Array.new
+					@cards = Array.new
+					@i = 0
+
+					@payment_tokens.each do |p|
+						@tokens[@i] = p.customerPaymentProfileId
+						@cards[@i] = p.payment.creditCard.cardNumber
+						@i += 1
+					end
+
+				end
 
 			else
 				# This is the expected result when the OE webapp requested to create a CT.
@@ -108,9 +143,21 @@ def check_required_pt_params
 	end
 end
 
+def check_required_list_params
+	if @json[:customer_token]
+		true
+	else
+		false
+	end
+end
+
 def prepare_oe_customer_variables
 	@customer = "#{@json[:program]}#{@json[:filemaker_id]}" # The "ID" used to create a customer profile.
 	@namefull = "#{@json[:name_first]} #{@json[:name_last]}"
+end
+
+def prepare_oe_list_payment_variables
+	@customer_token = @json[:customer_token]
 end
 
 def prepare_oe_payment_variables
