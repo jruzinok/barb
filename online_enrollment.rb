@@ -118,8 +118,13 @@ def prepare_oe_payment_variables
 	@namefirst = @json[:name_first]
 	@namelast = @json[:name_last]
 	@cardnumber = @json[:card_number]
-	@carddate = @json[:card_mmyy]
+	@cardmmyy = @json[:card_mmyy]
 	@cardcvv = @json[:card_cvv]
+	@phone = @json[:phone_number]
+	@address = @json[:address_street]
+	@city = @json[:address_city]
+	@state = @json[:address_state]
+	@zip = @json[:address_zip]
 end
 
 def create_oe_customer_token
@@ -146,15 +151,33 @@ def create_oe_customer_token
 end
 
 def create_oe_payment_token
+	# Build the payment object
+	payment = PaymentType.new(CreditCardType.new)
+	payment.creditCard.cardNumber = @cardnumber
+	payment.creditCard.expirationDate = @cardmmyy
+	payment.creditCard.cardCode = @cardcvv
+
+	# Build an address object
+	billTo = CustomerAddressType.new
+	billTo.firstName = @namefirst
+	billTo.lastName = @namelast
+	billTo.address = @address
+	billTo.city = @city
+	billTo.state = @state
+	billTo.zip = @zip
+	billTo.phoneNumber = @phone
+
+	# Use the previously defined payment and billTo objects to
+	# build a payment profile to send with the request
+	paymentProfile = CustomerPaymentProfileType.new
+	paymentProfile.payment = payment
+	paymentProfile.billTo = billTo
+	paymentProfile.defaultPaymentProfile = true
+
+	# Build the request object
 	request = CreateCustomerPaymentProfileRequest.new
-	creditcard = CreditCardType.new(@cardnumber,@carddate,@cardcvv)
-	payment = PaymentType.new(creditcard)
-	profile = CustomerPaymentProfileType.new(nil,nil,payment,nil,nil)
-	profile.billTo = CustomerAddressType.new
-	profile.billTo.firstName = @namefirst
-	profile.billTo.lastName = @namelast
+	request.paymentProfile = paymentProfile
 	request.customerProfileId = @customer_token
-	request.paymentProfile = profile
 
 	response = transaction.create_customer_payment_profile(request)
 
