@@ -55,7 +55,7 @@ def list_oe_payment_token_logic
 			@responseKind = "OK"
 			@statusCode = 210
 			@statusMessage = "[OK] PaymentTokensRetrieved"
-			@return_json_package = JSON.generate ["responseKind"=>@responseKind,"statusCode"=>@statusCode,"statusMessage"=>@statusMessage,"customer_token"=>@customer_token,"payment_tokens"=>@tokens,"cards"=>@cards][0]
+			@return_json_package = JSON.generate ["responseKind"=>@responseKind,"statusCode"=>@statusCode,"statusMessage"=>@statusMessage,"customer_token"=>@customer_token,"payment_tokens"=>@tokens][0]
 		else
 			@responseKind = "ERROR"
 			@statusCode = 194
@@ -96,12 +96,10 @@ def check_for_customer_profile
 
 				if @payment_tokens.length >= 1
 					@tokens = Array.new
-					@cards = Array.new
 					@i = 0
 
 					@payment_tokens.each do |p|
-						@tokens[@i] = p.customerPaymentProfileId
-						@cards[@i] = p.payment.creditCard.cardNumber
+						@tokens[@i] = {'payment_token' => p.customerPaymentProfileId, 'cardnumber'=> p.payment.creditCard.cardNumber}
 						@i += 1
 					end
 
