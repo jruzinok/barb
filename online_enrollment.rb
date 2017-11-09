@@ -7,6 +7,11 @@ def create_oe_customer_token_logic
 		if @has_profile == false && @resultCode == "OK"
 			prepare_oe_customer_variables
 			create_oe_customer_token
+		elsif @has_profile == true && @resultCode == "OK"
+			@responseKind = "OK"
+			@statusCode = 230
+			@statusMessage = "[OK] CustomerTokenAlreadyExisted"
+			@return_json_package = JSON.generate ["responseKind"=>@responseKind,"statusCode"=>@statusCode,"statusMessage"=>@statusMessage,"customer_token"=>@customer_token][0]
 		end
 
 	else
@@ -47,6 +52,7 @@ def list_oe_payment_token_logic
 		check_for_customer_profile
 
 		if @has_profile == true && @resultCode == "OK"
+			@responseKind = "OK"
 			@statusCode = 210
 			@statusMessage = "[OK] PaymentTokensRetrieved"
 			@return_json_package = JSON.generate ["responseKind"=>@responseKind,"statusCode"=>@statusCode,"statusMessage"=>@statusMessage,"customer_token"=>@customer_token,"payment_tokens"=>@tokens,"cards"=>@cards][0]
