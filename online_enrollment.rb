@@ -13,7 +13,7 @@ def create_oe_customer_token_logic
 		@responseKind = "ERROR"
 		@statusCode = 194
 		@statusMessage = "[ERROR] Missing required JSON variables."
-		@return_json_package = JSON.generate ["responseKind"=>@responseKind,"statusCode"=>@statusCode,"statusMessage"=>@statusMessage]
+		@return_json_package = JSON.generate ["responseKind"=>@responseKind,"statusCode"=>@statusCode,"statusMessage"=>@statusMessage][0]
 	end
 end
 
@@ -29,14 +29,14 @@ def create_oe_payment_token_logic
 			@responseKind = "ERROR"
 			@statusCode = 195
 			@statusMessage = "[ERROR] CustomerTokenDoesntExist"
-			@return_json_package = JSON.generate ["responseKind"=>@responseKind,"statusCode"=>@statusCode,"statusMessage"=>@statusMessage]
+			@return_json_package = JSON.generate ["responseKind"=>@responseKind,"statusCode"=>@statusCode,"statusMessage"=>@statusMessage][0]
 		end
 
 	else
 		@responseKind = "ERROR"
 		@statusCode = 193
 		@statusMessage = "[ERROR] Missing required JSON variables."
-		@return_json_package = JSON.generate ["responseKind"=>@responseKind,"statusCode"=>@statusCode,"statusMessage"=>@statusMessage]
+		@return_json_package = JSON.generate ["responseKind"=>@responseKind,"statusCode"=>@statusCode,"statusMessage"=>@statusMessage][0]
 	end
 end
 
@@ -49,19 +49,19 @@ def list_oe_payment_token_logic
 		if @has_profile == true && @resultCode == "OK"
 			@statusCode = 210
 			@statusMessage = "[OK] PaymentTokensRetrieved"
-			@return_json_package = JSON.generate ["responseKind"=>@responseKind,"statusCode"=>@statusCode,"statusMessage"=>@statusMessage,"customer_token"=>@customer_token,"payment_tokens"=>@tokens,"cards"=>@cards]
+			@return_json_package = JSON.generate ["responseKind"=>@responseKind,"statusCode"=>@statusCode,"statusMessage"=>@statusMessage,"customer_token"=>@customer_token,"payment_tokens"=>@tokens,"cards"=>@cards][0]
 		else
 			@responseKind = "ERROR"
 			@statusCode = 194
 			@statusMessage = "[ERROR] CustomerTokenDoesntExist"
-			@return_json_package = JSON.generate ["responseKind"=>@responseKind,"statusCode"=>@statusCode,"statusMessage"=>@statusMessage]
+			@return_json_package = JSON.generate ["responseKind"=>@responseKind,"statusCode"=>@statusCode,"statusMessage"=>@statusMessage][0]
 		end
 
 	else
 		@responseKind = "ERROR"
 		@statusCode = 192
 		@statusMessage = "[ERROR] Missing required JSON variables."
-		@return_json_package = JSON.generate ["responseKind"=>@responseKind,"statusCode"=>@statusCode,"statusMessage"=>@statusMessage]
+		@return_json_package = JSON.generate ["responseKind"=>@responseKind,"statusCode"=>@statusCode,"statusMessage"=>@statusMessage][0]
 	end
 end
 
@@ -114,7 +114,7 @@ def check_for_customer_profile
 			@responseKind = "TransactionFailure"
 			@statusCode = 198
 			@statusMessage = "[ERROR] A transactional FAILURE occurred."
-			@return_json_package = JSON.generate ["responseKind"=>@responseKind,"statusCode"=>@statusCode,"statusMessage"=>@statusMessage]
+			@return_json_package = JSON.generate ["responseKind"=>@responseKind,"statusCode"=>@statusCode,"statusMessage"=>@statusMessage][0]
 		end
 
 	rescue Errno::ETIMEDOUT => e
@@ -123,7 +123,7 @@ def check_for_customer_profile
 		@responseKind = "TransactionFailure"
 		@statusCode = 197
 		@statusMessage = "[ERROR] Authorize.net isn't available."
-		@return_json_package = JSON.generate ["responseKind"=>@responseKind,"statusCode"=>@statusCode,"statusMessage"=>@statusMessage]
+		@return_json_package = JSON.generate ["responseKind"=>@responseKind,"statusCode"=>@statusCode,"statusMessage"=>@statusMessage][0]
 	end
 end
 
@@ -186,14 +186,14 @@ def create_oe_customer_token
 		@customer_token = response.customerProfileId
 		@statusCode = 200
 		@statusMessage = "[OK] CustomerTokenCreated"
-		@return_json_package = JSON.generate ["responseKind"=>@responseKind,"statusCode"=>@statusCode,"statusMessage"=>@statusMessage,"customer_token"=>@customer_token]
+		@return_json_package = JSON.generate ["responseKind"=>@responseKind,"statusCode"=>@statusCode,"statusMessage"=>@statusMessage,"customer_token"=>@customer_token][0]
 	else
 		@responseKind = "ERROR"
 		@responseCode = response.messages.messages[0].code
 		@responseError = response.messages.messages[0].text
 		@statusCode = 199 # Most likely caused by a '@customer' id issue.
 		@statusMessage = "[ERROR] TokenIssue (Contact Admin)"
-		@return_json_package = JSON.generate ["responseKind"=>@responseKind,"statusCode"=>@statusCode,"statusMessage"=>@statusMessage,"responseCode"=>@responseCode,"responseError"=>@responseError]
+		@return_json_package = JSON.generate ["responseKind"=>@responseKind,"statusCode"=>@statusCode,"statusMessage"=>@statusMessage,"responseCode"=>@responseCode,"responseError"=>@responseError][0]
 	end
 end
 
@@ -235,14 +235,14 @@ def create_oe_payment_token
 		@statusCode = 200
 		@statusMessage = "[OK] PaymentTokenCreated"
 		@maskedCardNumber = @cardnumber.split(//).last(4).join
-		@return_json_package = JSON.generate ["responseKind"=>@responseKind,"statusCode"=>@statusCode,"statusMessage"=>@statusMessage,"payment_token"=>@payment_token,"cardnumber"=>@maskedCardNumber]
+		@return_json_package = JSON.generate ["responseKind"=>@responseKind,"statusCode"=>@statusCode,"statusMessage"=>@statusMessage,"payment_token"=>@payment_token,"cardnumber"=>@maskedCardNumber][0]
 	else
 		@responseKind = "ERROR"
 		@responseCode = response.messages.messages[0].code
 		@responseError = response.messages.messages[0].text
 		@statusCode = 196
 		@statusMessage = "[ERROR] PaymentTokenNotCreated"
-		@return_json_package = JSON.generate ["responseKind"=>@responseKind,"statusCode"=>@statusCode,"statusMessage"=>@statusMessage,"responseCode"=>@responseCode,"responseError"=>@responseError]
+		@return_json_package = JSON.generate ["responseKind"=>@responseKind,"statusCode"=>@statusCode,"statusMessage"=>@statusMessage,"responseCode"=>@responseCode,"responseError"=>@responseError][0]
 	end
 
 end
