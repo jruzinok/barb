@@ -130,6 +130,20 @@ class PaymentProcessor < Sinatra::Application
 		body @body
 	end
 
+	get '/delete-payment-token/:database/:directory_id/:payment_method_id' do
+		@process = "Delete Payment Token"
+		@processType = "Token"
+		@database = params[:database]
+		@directory_id = params[:directory_id]
+		@payment_method_id = params[:payment_method_id]
+
+		delete_payment_token
+
+		# Return the response back to FileMaker.
+		status @status
+		body @body
+	end
+
 	post '/update-payment-token/:database/:directory_id/:payment_method_id' do
 		@process = "Update Payment Token"
 		@processType = "Token"

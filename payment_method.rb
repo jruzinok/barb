@@ -63,6 +63,43 @@ def create_payment_token
 	end
 end
 
+def delete_payment_token
+	unless @skip_find_directory == true
+		find_directory
+	end
+
+	unless @skip_find_payment_method == true
+		find_payment_method
+	end
+
+	if @directory_found == true && @has_customer_token == true && @payment_method_found == true && @has_payment_token == true
+		request = DeleteCustomerPaymentProfileRequest.new
+		request.customerProfileId = @customer_token
+		request.customerPaymentProfileId = @payment_token
+
+		response = transaction.delete_customer_payment_profile(request)
+
+		# The transaction has a response.
+		if response.messages.resultCode == MessageTypeEnum::Ok
+			@responseKind = "OK"
+			@statusCode = 200
+			@statusMessage = "[OK] PaymentTokenDeleted"
+			log_result_to_console
+		else
+			@responseKind = "ERROR"
+			@responseCode = response.messages.messages[0].code
+			@responseError = response.messages.messages[0].text
+			@statusCode = 210
+			@statusMessage = "[ERROR] PaymentTokenNotDeleted"
+			log_result_to_console
+		end
+
+		update_payment_method_after_payment_token_is_deleted
+		create_payment_processor_log
+		set_response
+	end
+end
+
 def find_payment_method
 	if @database == "BC" || @database == "CS"
 		@payment_method = DATAPaymentMethod.find(:__kP_PaymentMethod => @payment_method_id)
@@ -116,6 +153,22 @@ def update_payment_method
 	if @responseKind == "OK"
 		@payment_method[:Token_Payment_ID] = @payment_token
 		@payment_method[:zzF_Status] = "Active"
+		@payment_method[:zzF_Type] = "Token"
+	else
+		@payment_method[:zzPP_Response] = @theResponse
+		@payment_method[:zzPP_Response_Code] = @responseCode
+		@payment_method[:zzPP_Response_Error] = @responseError
+		@payment_method[:zzF_Status] = "Inactive"
+		@payment_method[:zzF_Type] = "Error"
+	end
+
+	@payment_method.save
+end
+
+def update_payment_method_after_payment_token_is_deleted
+	if @responseKind == "OK"
+		@payment_method[:Token_Payment_ID] = ""
+		@payment_method[:zzF_Status] = "Deleted"
 		@payment_method[:zzF_Type] = "Token"
 	else
 		@payment_method[:zzPP_Response] = @theResponse
