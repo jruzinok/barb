@@ -1,5 +1,5 @@
 source "http://rubygems.org"
-ruby '2.2.1'
+ruby '2.4.2'
 
 gem "sinatra"
 gem "rack"
@@ -18,6 +18,9 @@ gem 'pry'
 
 # Server related gems.
 gem 'thin'
+
+# To communicate between OE and Sinatra.
+gem 'json'
 
 # Authentication
 # gem 'warden'

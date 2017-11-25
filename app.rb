@@ -6,6 +6,7 @@ require 'authorizenet'
 require 'rack/cors'
 require 'sinatra'
 require 'openssl'
+require 'json'
 
 set :environment, :production
 
@@ -38,6 +39,7 @@ require_relative 'payment_processor_log.rb'
 require_relative 'current_student.rb'
 require_relative 'current_student_controller.rb'
 require_relative 'current_student_credit_card.rb'
+require_relative 'online_enrollment.rb'
 
 class PaymentProcessor < Sinatra::Application
 
@@ -73,6 +75,42 @@ class PaymentProcessor < Sinatra::Application
 		body @body
 	end
 
+	# This process doesn't rely on FileMaker.
+	post '/create-oe-customer-token' do
+		@process = "Create Customer Token"
+		@processType = "Token"
+		@json = JSON.parse(request.body.read).symbolize_keys unless params[:path]
+
+		create_oe_customer_token_logic
+
+		# Return the response back to the requesting application.
+		@return_json_package
+	end
+
+	# This process doesn't rely on FileMaker.
+	post '/create-oe-payment-token' do
+		@process = "Create Payment Token"
+		@processType = "Token"
+		@json = JSON.parse(request.body.read).symbolize_keys unless params[:path]
+
+		create_oe_payment_token_logic
+
+		# Return the response back to the requesting application.
+		@return_json_package
+	end
+
+	# This process doesn't rely on FileMaker.
+	post '/list-oe-payment-tokens' do
+		@process = "List Payment Tokens"
+		@processType = "Token"
+		@json = JSON.parse(request.body.read).symbolize_keys unless params[:path]
+
+		list_oe_payment_token_logic
+
+		# Return the response back to the requesting application.
+		@return_json_package
+	end
+
 	post '/create-payment-token/:database/:directory_id/:payment_method_id' do
 		@process = "Create Payment Token"
 		@processType = "Token"
@@ -86,6 +124,20 @@ class PaymentProcessor < Sinatra::Application
 		@cardcvv = params[:CVV]
 
 		create_payment_token_logic
+
+		# Return the response back to FileMaker.
+		status @status
+		body @body
+	end
+
+	get '/delete-payment-token/:database/:directory_id/:payment_method_id' do
+		@process = "Delete Payment Token"
+		@processType = "Token"
+		@database = params[:database]
+		@directory_id = params[:directory_id]
+		@payment_method_id = params[:payment_method_id]
+
+		delete_payment_token
 
 		# Return the response back to FileMaker.
 		status @status
