@@ -1,10 +1,10 @@
 class PTDPaymentDate < Rfm::Base
-	config :database => 'PTD17'
+	config :database => 'PTD'
 	config :layout => 'T54_WEB_PAYMENTDATE'
 end
 
 class PTDTransactionAttempt < Rfm::Base
-	config :database => 'PTD17'
+	config :database => 'PTD'
 	config :layout => 'T56_WEB_TRANSACTIONATTEMPT'
 end
 
@@ -19,7 +19,7 @@ class DATAPaymentDate < Rfm::Base
 end
 
 class PTDPaymentMethod < Rfm::Base
-	config :database => 'PTD17'
+	config :database => 'PTD'
 	config :layout => 'T55_WEB_PAYMENTMETHOD'
 end
 
@@ -29,7 +29,7 @@ class DATAPaymentMethod < Rfm::Base
 end
 
 class PTDDirectory < Rfm::Base
-	config :database => 'PTD17'
+	config :database => 'PTD'
 	config :layout => 'T55_WEB_DIRECTORY'
 end
 
