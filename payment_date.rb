@@ -58,14 +58,37 @@ def find_by_batch
 	end
 end
 
+def find_payment_date
+	if @database == "DATA" || @database == "BC" || @database == "CS"
+		@payment_date = DATAPaymentDate.find(:__kP_PaymentDate => @payment_date_id)
+	elsif @database == "PTD"
+		@payment_date = PTDPaymentDate.find(:__kP_PaymentDate => @payment_date_id)
+	end
+
+	if @payment_date[0] != nil
+		@payment_date_found = true
+		@payment_date = @payment_date[0] # Load the record from the first position of the array.
+		load_payment_date
+	else
+		@payment_date_found = false
+		@statusCode = 300
+		@statusMessage = "[ERROR] PaymentDateRecordNotFound"
+		set_response
+		log_result_to_console
+	end
+end
+
 def load_payment_date
 	@payment_date_id = @payment_date["__kP_PaymentDate"]
 	@serial = @payment_date["_Serial"].to_i
 	@directory_id = @payment_date["_kF_Directory"]
 	@payment_method_id = @payment_date["_kF_PaymentMethod"]
+	@merchant_id = @payment_date["T54_DIRECTORY::_kF_Merchant"]
 
 	@customer_token = @payment_date["T54_DIRECTORY::Token_Profile_ID"]
 	@payment_token = @payment_date["T54_PAYMENTMETHOD::Token_Payment_ID"]
+	@api_login_id = @payment_date["T54_Directory | MERCHANT::API_Login_ID"]
+	@api_transaction_key = @payment_date["T54_Directory | MERCHANT::API_Transaction_Key"]
 
 	# Credit Card values.
 	@cardnumber = @payment_date["T54_PAYMENTMETHOD::CreditCard_Number"]

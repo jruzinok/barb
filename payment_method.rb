@@ -140,7 +140,10 @@ end
 def load_payment_method
 	@namefirst = @payment_method["Name_First"]
 	@namelast = @payment_method["Name_Last"]
+	@pm_merchant_id = @payment_method["_kF_Merchant"]
 	@payment_token = @payment_method["Token_Payment_ID"]
+	@pm_api_login_id = @payment_method["T55_MERCHANT::API_Login_ID"]
+	@pm_api_transaction_key = @payment_method["T55_MERCHANT::API_Transaction_Key"]
 	@address = @payment_method["Address_Address"]
 	@city = @payment_method["Address_City"]
 	@state = @payment_method["Address_State"]

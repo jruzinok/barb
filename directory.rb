@@ -78,7 +78,10 @@ def load_directory
 	@customer = "#{@database}#{@serial}" # The "ID" used to create a customer profile.
 	@namelast = @directory["Name_Last"]
 	@namefull = "#{@namefirst} #{@namelast}"
+	@d_merchant_id = @directory["_kF_Merchant"]
 	@customer_token = @directory["Token_Profile_ID"]
+	@d_api_login_id = @directory["T55_Directory | MERCHANT::API_Login_ID"]
+	@d_api_transaction_key = @directory["T55_Directory | MERCHANT::API_Transaction_Key"]
 
 	check_customer_token
 end
