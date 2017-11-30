@@ -27,7 +27,7 @@ def create_payment_token
 		find_payment_method
 	end
 
-	if @directory_found == true && @has_customer_token == true && @payment_method_found == true && @has_payment_token == false
+	if @create_payment_token_requirements_met == true
 		request = CreateCustomerPaymentProfileRequest.new
 		creditcard = CreditCardType.new(@cardnumber,@carddate,@cardcvv)
 		payment = PaymentType.new(creditcard)
@@ -56,10 +56,22 @@ def create_payment_token
 			@statusMessage = "[ERROR] PaymentTokenNotCreated"
 			log_result_to_console
 		end
-
-		update_payment_method
+		
+		save_payment_method
 		create_payment_processor_log
 		set_response
+	end
+end
+
+def create_payment_token_requirements_met
+	if @directory_found == true && @has_customer_token == true && @payment_method_found == true && @has_payment_token == false
+		@create_payment_token_requirements_met = true
+		@save_payment_method = "Update"
+	elsif @directory_found == true && @has_customer_token == true && @payment_method_to_be_created == true
+		@create_payment_token_requirements_met = true
+		@save_payment_method = "Create"
+	else
+		@create_payment_token_requirements_met = false
 	end
 end
 
@@ -150,6 +162,33 @@ def load_payment_method
 	@zip = @payment_method["Address_Zip"]
 
 	check_payment_token
+end
+
+def save_payment_method
+	if @save_payment_method == "Update"
+		update_payment_method
+	elsif @save_payment_method == "Create"
+		create_payment_method
+		update_payment_method
+	end
+end
+
+def create_payment_method
+	if @target_database == "DATA"
+		@payment_method = DATAPaymentMethod.new
+	elsif @target_database == "PTD"
+		@payment_method = PTDPaymentMethod.new
+	end
+
+	@payment_method[:_kF_Directory] = @directory_id
+	@payment_method[:_kF_Merchant] = @d_merchant_id #The Merchant that was assigned to the Directory record.
+	@payment_method[:Name_First] = @namefirst
+	@payment_method[:Name_Last] = @namelast
+	@payment_method[:CreditCard] = @cardnumber
+	@payment_method[:MMYY] = @carddate
+	@payment_method[:CVV] = @cardcvv
+
+	# I am purposely NOT saving the record here. Instead, it'll be saved in the update_payment_token method.
 end
 
 def update_payment_method
