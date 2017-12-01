@@ -34,7 +34,7 @@ def create_dialer_payment_token
 	end
 
 	# This sends the PaymentMethodID back to the Dialer php web app in the response body.
-	if @responseKind == "OK" && @payment_method_found == true
+	if @responseKind == "OK" && @dailer_payment_method_found == true
 		@statusMessage = @payment_method_id.to_s
 	end
 
@@ -43,13 +43,13 @@ def create_dialer_payment_token
 end
 
 def find_dialer_payment_method
-	@payment_method = DIALERPaymentMethod.find(:__kP_PaymentMethod => @payment_method_id)
+	@dailer_payment_method = DIALERPaymentMethod.find(:__kP_PaymentMethod => @payment_method_id)
 
-	if @payment_method[0] != nil
-		@payment_method_found = true
+	if @dailer_payment_method[0] != nil
+		@dailer_payment_method_found = true
 		load_dialer_payment_method
 	else
-		@payment_method_found = false
+		@dailer_payment_method_found = false
 		@statusCode = 300
 		@statusMessage = "[ERROR] PaymentMethodRecordNotFound"
 		set_response
@@ -58,13 +58,13 @@ def find_dialer_payment_method
 end
 
 def find_dialer_payment_method_by_payment_token
-	@payment_method = DIALERPaymentMethod.find(:Token_Payment_ID => @payment_token)
+	@dailer_payment_method = DIALERPaymentMethod.find(:Token_Payment_ID => @payment_token)
 
-	if @payment_method[0] != nil
-		@payment_method_found = true
+	if @dailer_payment_method[0] != nil
+		@dailer_payment_method_found = true
 		load_dialer_payment_method
 	else
-		@payment_method_found = false
+		@dailer_payment_method_found = false
 		@statusCode = 300
 		@statusMessage = "[ERROR] PaymentMethodRecordNotFound"
 		set_response
@@ -73,9 +73,9 @@ def find_dialer_payment_method_by_payment_token
 end
 
 def load_dialer_payment_method
-	@payment_method = @payment_method[0] # Load the record from the first position of the array.
-	@payment_method_id = @payment_method["__kP_PaymentMethod"]
-	@payment_token = @payment_method["Token_Payment_ID"]
+	@dailer_payment_method = @dailer_payment_method[0] # Load the record from the first position of the array.
+	@payment_method_id = @dailer_payment_method["__kP_PaymentMethod"]
+	@payment_token = @dailer_payment_method["Token_Payment_ID"]
 
 	check_payment_token
 end
@@ -92,6 +92,7 @@ def save_dialer_payment_method
 	@dailer_payment_method[:CVV] = @cardcvv
 	@dailer_payment_method[:zzF_Payment_Deposit] = @flag_deposit
 	@dailer_payment_method[:zzF_Payment_Recurring] = @flag_recurring
+	@dailer_payment_method[:zzF_Merchant] = @merchant
 
 	if @responseKind == "OK"
 		@dailer_payment_method[:Token_Payment_ID] = @payment_token
@@ -111,4 +112,31 @@ def save_dialer_payment_method
 	if @responseKind == "OK"
 		find_dialer_payment_method_by_payment_token
 	end
+end
+
+def set_stash_to_id
+	@payment_method_id_stash = @payment_method_id
+end
+
+def set_link_to_stash
+	@payment_method_id_link = @payment_method_id_stash
+end
+
+def set_id_to_link
+	@payment_method_id = @payment_method_id_link
+end
+
+def link_dialer_payment_methods
+	set_link_to_stash
+	link_dialer_payment_method
+	set_stash_to_id
+	set_id_to_link
+	find_dialer_payment_method
+	set_link_to_stash
+	link_dialer_payment_method
+end
+
+def link_dialer_payment_method
+	@dailer_payment_method[:_kF_PaymentMethod_DL] = @payment_method_id_link
+	@dailer_payment_method.save
 end

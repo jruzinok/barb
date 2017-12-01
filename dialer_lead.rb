@@ -52,14 +52,32 @@ def load_dialer_lead
 	@customer = "#{@database}#{@lead_id}" # The "ID" used to create a customer profile.
 	@namelast = @dialer_lead["Last Name"]
 	@namefull = "#{@namefirst} #{@namelast}"
-	@customer_token = @dialer_lead["Token_Profile_ID"]
+	@customer_token_bc = @dialer_lead["Token_Profile_ID"]
+	@customer_token_ptd = @dialer_lead["Token_Profile_ID_PTD"]
+
+	check_customer_tokens
+end
+
+def check_customer_tokens
+	@has_customer_token = nil
+
+	if @merchant == "BC"
+		@customer_token = @customer_token_bc
+	elsif @merchant == "PTD"
+		@customer_token = @customer_token_ptd
+	end
 
 	check_customer_token
 end
 
 def update_dialer_lead
 	if @responseKind == "OK"
-		@dialer_lead[:Token_Profile_ID] = @customer_token
+		if @merchant == "BC"
+			@dialer_lead[:Token_Profile_ID] = @customer_token
+		elsif @merchant == "PTD"
+			@dialer_lead[:Token_Profile_ID_PTD] = @customer_token
+		end
+
 	else
 		@dialer_lead[:zzPP_Response] = @theResponse
 		@dialer_lead[:zzPP_Response_Code] = @responseCode
