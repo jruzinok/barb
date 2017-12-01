@@ -21,8 +21,10 @@ end
 config = YAML.load_file(File.dirname(__FILE__) + "/config/rfm.yml")
 
 require_relative 'authorize.rb'
+require_relative 'authorize_helper.rb'
 require_relative 'csv.rb'
 require_relative 'directory.rb'
+require_relative 'directory_ubiquitous.rb'
 require_relative 'dialer_controller.rb'
 require_relative 'dialer_guest.rb'
 require_relative 'dialer_lead.rb'
@@ -205,6 +207,27 @@ class PaymentProcessor < Sinatra::Application
 	end
 
 	# This was designed to be called from the BookingDialer php web app.
+	get '/create-dialer-lead-customer-token-ptd/:lead_id' do
+		@process = "Create Dialer Lead Customer Token"
+		@lead_id = params[:lead_id]
+		@processType = "Token"
+		@database = "DL"
+		@recordtype = "DialerLead"
+
+		@merchant = "PTD"
+		load_merchant_vars
+		create_dialer_lead_customer_token
+
+		@merchant = "BC"
+		load_merchant_vars
+		create_dialer_lead_customer_token
+
+		# Return the response back to the Dialer.
+		status @status
+		body @body
+	end
+
+	# This was designed to be called from the BookingDialer php web app.
 	post '/create-dialer-lead-payment-method/:lead_id' do
 		@process = "Create Dialer Lead PaymentMethod"
 		@processType = "Token"
@@ -227,6 +250,33 @@ class PaymentProcessor < Sinatra::Application
 		@recordtype = "DialerLead"
 
 		process_create_dialer_payment_method_request_v2
+
+		# Return the response back to the Dialer.
+		status @status
+		body @body
+	end
+
+	# This was designed to be called from the BookingDialer php web app.
+	# This new version ONLY creates tokens.
+	post '/create-dialer-lead-payment-method-ptd/:lead_id' do
+		@process = "Create Dialer Lead PaymentMethod"
+		@processType = "Token"
+		@database = "DL"
+		@recordtype = "DialerLead"
+
+		@merchant = "PTD"
+		load_merchant_vars
+		process_create_dialer_payment_method_request_v2
+
+		# Stash the newly created PaymentMethod's ID.
+		set_stash_to_id
+
+		@merchant = "BC"
+		load_merchant_vars
+		process_create_dialer_payment_method_request_v2
+
+		# Link both payment methods to each other.
+		link_dialer_payment_methods
 
 		# Return the response back to the Dialer.
 		status @status
