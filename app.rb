@@ -266,14 +266,14 @@ class PaymentProcessor < Sinatra::Application
 
 		@merchant = "PTD"
 		load_merchant_vars
-		process_create_dialer_payment_method_request_v2
+		process_create_dialer_payment_method_request # This version processes/schedules payments.
 
 		# Stash the newly created PaymentMethod's ID.
 		set_stash_to_id
 
 		@merchant = "BC"
 		load_merchant_vars
-		process_create_dialer_payment_method_request_v2
+		process_create_dialer_payment_method_request_v2 # This version only creates tokens.
 
 		# Link both payment methods to each other.
 		link_dialer_payment_methods
@@ -290,7 +290,14 @@ class PaymentProcessor < Sinatra::Application
 		@database = "DL"
 		@recordtype = "DialerLead"
 
-		process_create_dialer_payment_date_request
+		@merchant = params[:merchant] #BC or PTD
+
+		if @merchant == "BC" || @merchant == "PTD"
+			process_create_dialer_payment_date_request
+		else
+			@status = 301
+			@body = "[ERROR] Merchant not specified."
+		end
 
 		# Return the response back to the Dialer.
 		status @status
@@ -327,13 +334,47 @@ class PaymentProcessor < Sinatra::Application
 	end
 
 	# This was designed to be called from the BookingDialer php web app.
+	# This new version ONLY creates tokens.
+	post '/create-dialer-guest-payment-method-ptd/:lead_id/:guest_id' do
+		@process = "Create Dialer Guest PaymentMethod"
+		@processType = "Token"
+		@database = "DL"
+		@recordtype = "DialerGuest"
+
+		@merchant = "PTD"
+		load_merchant_vars
+		process_create_dialer_payment_method_request # This version processes/schedules payments.
+
+		# Stash the newly created PaymentMethod's ID.
+		set_stash_to_id
+
+		@merchant = "BC"
+		load_merchant_vars
+		process_create_dialer_payment_method_request_v2 # This version only creates tokens.
+
+		# Link both payment methods to each other.
+		link_dialer_payment_methods
+
+		# Return the response back to the Dialer.
+		status @status
+		body @body
+	end
+
+	# This was designed to be called from the BookingDialer php web app.
 	post '/create-dialer-guest-payment/:lead_id/:guest_id/:payment_method_id' do
 		@process = "Create Dialer Guest PaymentDate"
 		@processType = "Payment"
 		@database = "DL"
 		@recordtype = "DialerGuest"
 
-		process_create_dialer_payment_date_request
+		@merchant = params[:merchant] #BC or PTD
+
+		if @merchant == "BC" || @merchant == "PTD"
+			process_create_dialer_payment_date_request
+		else
+			@status = 301
+			@body = "[ERROR] Merchant not specified."
+		end
 
 		# Return the response back to the Dialer.
 		status @status
