@@ -243,21 +243,6 @@ class PaymentProcessor < Sinatra::Application
 
 	# This was designed to be called from the BookingDialer php web app.
 	# This new version ONLY creates tokens.
-	post '/create-dialer-lead-payment-method-v2/:lead_id' do
-		@process = "Create Dialer Lead PaymentMethod"
-		@processType = "Token"
-		@database = "DL"
-		@recordtype = "DialerLead"
-
-		process_create_dialer_payment_method_request_v2
-
-		# Return the response back to the Dialer.
-		status @status
-		body @body
-	end
-
-	# This was designed to be called from the BookingDialer php web app.
-	# This new version ONLY creates tokens.
 	post '/create-dialer-lead-payment-method-ptd/:lead_id' do
 		@process = "Create Dialer Lead PaymentMethod"
 		@processType = "Token"
@@ -320,21 +305,6 @@ class PaymentProcessor < Sinatra::Application
 
 	# This was designed to be called from the BookingDialer php web app.
 	# This new version ONLY creates tokens.
-	post '/create-dialer-guest-payment-method-v2/:lead_id/:guest_id' do
-		@process = "Create Dialer Guest PaymentMethod"
-		@processType = "Token"
-		@database = "DL"
-		@recordtype = "DialerGuest"
-
-		process_create_dialer_payment_method_request_v2
-
-		# Return the response back to the Dialer.
-		status @status
-		body @body
-	end
-
-	# This was designed to be called from the BookingDialer php web app.
-	# This new version ONLY creates tokens.
 	post '/create-dialer-guest-payment-method-ptd/:lead_id/:guest_id' do
 		@process = "Create Dialer Guest PaymentMethod"
 		@processType = "Token"
@@ -389,63 +359,6 @@ class PaymentProcessor < Sinatra::Application
 		@batch = params[:batch]
 
 		batch_tokenize_current_students
-
-		# Return the response back to the Dialer.
-		status @status
-		body @body
-	end
-
-	# This was designed to be called from the BookingDialer php web app.
-	post '/create-dialer-lead-payment/:lead_id/:payment_method_id' do
-		@process = "Create Dialer Lead PaymentDate"
-		@processType = "Payment"
-		@database = "DL"
-		@recordtype = "DialerLead"
-
-		process_create_dialer_payment_date_request
-
-		# Return the response back to the Dialer.
-		status @status
-		body @body
-	end
-
-	# This was designed to be called from the BookingDialer php web app.
-	post '/create-dialer-guest-payment-method/:lead_id/:guest_id' do
-		@process = "Create Dialer Guest PaymentMethod"
-		@processType = "Token"
-		@database = "DL"
-		@recordtype = "DialerGuest"
-
-		process_create_dialer_payment_method_request
-
-		# Return the response back to the Dialer.
-		status @status
-		body @body
-	end
-
-	# This was designed to be called from the BookingDialer php web app.
-	# This new version ONLY creates tokens.
-	post '/create-dialer-guest-payment-method-v2/:lead_id/:guest_id' do
-		@process = "Create Dialer Guest PaymentMethod"
-		@processType = "Token"
-		@database = "DL"
-		@recordtype = "DialerGuest"
-
-		process_create_dialer_payment_method_request_v2
-
-		# Return the response back to the Dialer.
-		status @status
-		body @body
-	end
-
-	# This was designed to be called from the BookingDialer php web app.
-	post '/create-dialer-guest-payment/:lead_id/:guest_id/:payment_method_id' do
-		@process = "Create Dialer Guest PaymentDate"
-		@processType = "Payment"
-		@database = "DL"
-		@recordtype = "DialerGuest"
-
-		process_create_dialer_payment_date_request
 
 		# Return the response back to the Dialer.
 		status @status
