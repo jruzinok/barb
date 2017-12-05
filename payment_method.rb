@@ -1,7 +1,7 @@
 def create_payment_token_logic
-	create_customer_token_logic
+	create_directory_customer_token
 
-	if @customer_token_ready == true
+	if @has_customer_token == true
 		find_payment_method
 
 		if @payment_method_found == true && @has_payment_token == false

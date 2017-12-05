@@ -179,7 +179,7 @@ def prepare_oe_payment_variables
 end
 
 def create_oe_customer_token
-	create_customer_token_request
+	create_customer_token
 end
 
 def create_oe_payment_token

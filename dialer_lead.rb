@@ -2,7 +2,7 @@ def create_dialer_lead_customer_token
 	find_dialer_lead
 
 	if @dialer_lead_found == true && @has_customer_token == false
-		create_customer_token_request
+		create_customer_token
 		update_dialer_lead
 		create_payment_processor_log
 		set_response

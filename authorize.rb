@@ -11,7 +11,7 @@ def transaction
 	end
 end
 
-def create_customer_token_request
+def create_customer_token
 	request = CreateCustomerProfileRequest.new
 	request.profile = CustomerProfileType.new(@customer,@name_full,nil,nil,nil) #(merchantCustomerId,description,email,paymentProfiles,shipToList)
 

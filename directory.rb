@@ -1,35 +1,24 @@
-def create_customer_token_logic
+def create_directory_customer_token
 	find_directory
 
 	if @directory_found == true && @has_customer_token == false
 		@skip_find_directory = true # This prevents the find routine from hitting the database again (to speed the process up and make it less db intensive).
 		create_customer_token
+		update_directory
+		create_payment_processor_log
 
 		if @response_kind == "OK"
-			@customer_token_ready = true
+			@has_customer_token = true
 		end
 
 	elsif @directory_found == true && @has_customer_token == true
-		@customer_token_ready = true
+		@has_customer_token = true
 		@status_code = 220
 		@status_message = "[OK] CustomerTokenAlreadyExists"
 		@skip_find_directory = true
 	end
 
 	set_response
-end
-
-def create_customer_token
-	unless @skip_find_directory == true
-		find_directory
-	end
-
-	if @directory_found == true && @has_customer_token == false
-		create_customer_token_request
-		update_directory
-		create_payment_processor_log
-		set_response
-	end
 end
 
 def find_directory

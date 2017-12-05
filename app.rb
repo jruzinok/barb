@@ -70,7 +70,7 @@ class PaymentProcessor < Sinatra::Application
 		@database = params[:database]
 		@directory_id = params[:directory_id]
 
-		create_customer_token_logic
+		create_directory_customer_token
 
 		# Return the response back to FileMaker.
 		status @status

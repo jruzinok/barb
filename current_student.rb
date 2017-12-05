@@ -2,7 +2,7 @@ def create_current_student_customer_token
 	find_current_student
 
 	if @current_student_found == true && @has_customer_token == false
-		create_customer_token_request
+		create_customer_token
 		update_current_student
 		create_payment_processor_log
 		set_response

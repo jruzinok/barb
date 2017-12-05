@@ -2,7 +2,7 @@ def create_dialer_guest_customer_token
 	find_dialer_guest
 
 	if @dialer_guest_found == true && @has_customer_token == false
-		create_customer_token_request
+		create_customer_token
 		update_dialer_guest
 		create_payment_processor_log
 		set_response
