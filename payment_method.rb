@@ -9,8 +9,8 @@ def create_payment_token_logic
 			create_payment_token
 
 		elsif @payment_method_found == true && @has_payment_token == true
-			@statusCode = 220
-			@statusMessage = "[ERROR] PaymentTokenAlreadyExists"
+			@status_code = 220
+			@status_message = "[ERROR] PaymentTokenAlreadyExists"
 			log_result_to_console
 		end
 	end
@@ -29,31 +29,27 @@ def create_payment_token
 
 	if @create_payment_token_requirements_met == true
 		request = CreateCustomerPaymentProfileRequest.new
-		creditcard = CreditCardType.new(@cardnumber,@carddate,@cardcvv)
+		creditcard = CreditCardType.new(@card_number,@card_mmyy,@card_cvv)
 		payment = PaymentType.new(creditcard)
 		profile = CustomerPaymentProfileType.new(nil,nil,payment,nil,nil)
 		profile.billTo = CustomerAddressType.new
-		profile.billTo.firstName = @namefirst
-		profile.billTo.lastName = @namelast
+		profile.billTo.firstName = @name_first
+		profile.billTo.lastName = @name_last
 		request.customerProfileId = @customer_token
 		request.paymentProfile = profile
 
-		@theResponse = transaction.create_customer_payment_profile(request)
+		@response = transaction.create_customer_payment_profile(request)
 
 		# The transaction has a response.
-		if @theResponse.messages.resultCode == MessageTypeEnum::Ok
-			@responseKind = "OK"
-			@payment_token = @theResponse.customerPaymentProfileId
+		if transaction_ok
+			@payment_token = @response.customerPaymentProfileId
 			@has_payment_token = true
-			@statusCode = 200
-			@statusMessage = "[OK] PaymentTokenCreated"
+			@status_code = 200
+			@status_message = "[OK] PaymentTokenCreated"
 			log_result_to_console
 		else
-			@responseKind = "ERROR"
-			@responseCode = @theResponse.messages.messages[0].code
-			@responseError = @theResponse.messages.messages[0].text
-			@statusCode = 210
-			@statusMessage = "[ERROR] PaymentTokenNotCreated"
+			@status_code = 210
+			@status_message = "[ERROR] PaymentTokenNotCreated"
 			log_result_to_console
 		end
 		
@@ -89,20 +85,16 @@ def delete_payment_token
 		request.customerProfileId = @customer_token
 		request.customerPaymentProfileId = @payment_token
 
-		response = transaction.delete_customer_payment_profile(request)
+		@response = transaction.delete_customer_payment_profile(request)
 
 		# The transaction has a response.
-		if response.messages.resultCode == MessageTypeEnum::Ok
-			@responseKind = "OK"
-			@statusCode = 200
-			@statusMessage = "[OK] PaymentTokenDeleted"
+		if transaction_ok
+			@status_code = 200
+			@status_message = "[OK] PaymentTokenDeleted"
 			log_result_to_console
 		else
-			@responseKind = "ERROR"
-			@responseCode = response.messages.messages[0].code
-			@responseError = response.messages.messages[0].text
-			@statusCode = 210
-			@statusMessage = "[ERROR] PaymentTokenNotDeleted"
+			@status_code = 210
+			@status_message = "[ERROR] PaymentTokenNotDeleted"
 			log_result_to_console
 		end
 
@@ -125,21 +117,21 @@ def find_payment_method
 		load_payment_method
 	else
 		@payment_method_found = false
-		@statusCode = 300
-		@statusMessage = "[ERROR] PaymentMethodRecordNotFound"
+		@status_code = 300
+		@status_message = "[ERROR] PaymentMethodRecordNotFound"
 		set_response
 		log_result_to_console
 	end
 end
 
 def load_payment_method_by_batch
-	@namefirst = @payment_method["Name_First"]
-	@namelast = @payment_method["Name_Last"]
+	@name_first = @payment_method["Name_First"]
+	@name_last = @payment_method["Name_Last"]
 	@customer_token = @payment_method["T55_DIRECTORY::Token_Profile_ID"]
 	@payment_token = @payment_method["Token_Payment_ID"]
-	@cardnumber = @payment_method["CreditCard_Number"]
-	@carddate = @payment_method["MMYY"]
-	@cardcvv = @payment_method["CVV"]
+	@card_number = @payment_method["CreditCard_Number"]
+	@card_mmyy = @payment_method["MMYY"]
+	@card_cvv = @payment_method["CVV"]
 	@address = @payment_method["Address_Address"]
 	@city = @payment_method["Address_City"]
 	@state = @payment_method["Address_State"]
@@ -150,8 +142,8 @@ def load_payment_method_by_batch
 end
 
 def load_payment_method
-	@namefirst = @payment_method["Name_First"]
-	@namelast = @payment_method["Name_Last"]
+	@name_first = @payment_method["Name_First"]
+	@name_last = @payment_method["Name_Last"]
 	@merchant_payment_method = @payment_method["zzF_Merchant"] # Not currently being used.
 	@payment_token = @payment_method["Token_Payment_ID"]
 	@address = @payment_method["Address_Address"]
@@ -179,25 +171,25 @@ def create_payment_method
 	end
 
 	@payment_method[:_kF_Directory] = @directory_id
-	@payment_method[:Name_First] = @namefirst
-	@payment_method[:Name_Last] = @namelast
-	@payment_method[:CreditCard] = @cardnumber
-	@payment_method[:MMYY] = @carddate
-	@payment_method[:CVV] = @cardcvv
+	@payment_method[:Name_First] = @name_first
+	@payment_method[:Name_Last] = @name_last
+	@payment_method[:CreditCard] = @card_number
+	@payment_method[:MMYY] = @card_mmyy
+	@payment_method[:CVV] = @card_cvv
 
 	# I am purposely NOT saving the record here. Instead, it'll be saved in the update_payment_token method.
 end
 
 def update_payment_method
-	if @responseKind == "OK"
+	if @response_kind == "OK"
 		@payment_method[:Token_Payment_ID] = @payment_token
 		@payment_method[:zzF_Merchant] = @merchant
 		@payment_method[:zzF_Status] = "Active"
 		@payment_method[:zzF_Type] = "Token"
 	else
-		@payment_method[:zzPP_Response] = @theResponse
-		@payment_method[:zzPP_Response_Code] = @responseCode
-		@payment_method[:zzPP_Response_Error] = @responseError
+		@payment_method[:zzPP_Response] = @response
+		@payment_method[:zzPP_Response_Code] = @response_code
+		@payment_method[:zzPP_Response_Error] = @response_error
 		@payment_method[:zzF_Status] = "Inactive"
 		@payment_method[:zzF_Type] = "Error"
 	end
@@ -206,14 +198,14 @@ def update_payment_method
 end
 
 def update_payment_method_after_payment_token_is_deleted
-	if @responseKind == "OK"
+	if @response_kind == "OK"
 		@payment_method[:Token_Payment_ID] = ""
 		@payment_method[:zzF_Status] = "Deleted"
 		@payment_method[:zzF_Type] = "Token"
 	else
-		@payment_method[:zzPP_Response] = @theResponse
-		@payment_method[:zzPP_Response_Code] = @responseCode
-		@payment_method[:zzPP_Response_Error] = @responseError
+		@payment_method[:zzPP_Response] = @response
+		@payment_method[:zzPP_Response_Code] = @response_code
+		@payment_method[:zzPP_Response_Error] = @response_error
 		@payment_method[:zzF_Status] = "Inactive"
 		@payment_method[:zzF_Type] = "Error"
 	end
@@ -231,19 +223,19 @@ def update_payment_token
 		if @payment_token_retrieved == true
 			request = UpdateCustomerPaymentProfileRequest.new
 
-			# Set the @carddate = 'XXXX' and @cardcvv = nil if the user didn't enter any values.
+			# Set the @card_mmyy = 'XXXX' and @card_cvv = nil if the user didn't enter any values.
 			mask_card_date
 			nil_card_cvv
 
 			# The credit card number should not be updated per Ashley's decision. Hence the use of the @masked_card_number variable.
-			creditcard = CreditCardType.new(@masked_card_number,@carddate,@cardcvv)
+			creditcard = CreditCardType.new(@masked_card_number,@card_mmyy,@card_cvv)
 
 			payment = PaymentType.new(creditcard)
 			profile = CustomerPaymentProfileExType.new(nil,nil,payment,nil,nil)
 			if @update_card_address == true
 				profile.billTo = CustomerAddressType.new
-				profile.billTo.firstName = @namefirst
-				profile.billTo.lastName = @namelast
+				profile.billTo.firstName = @name_first
+				profile.billTo.lastName = @name_last
 				profile.billTo.address = @address
 				profile.billTo.city = @city
 				profile.billTo.state = @state
@@ -254,22 +246,18 @@ def update_payment_token
 			profile.customerPaymentProfileId = @payment_token
 
 			# PASS the transaction request and CAPTURE the transaction response.
-			@theResponse = transaction.update_customer_payment_profile(request)
+			@response = transaction.update_customer_payment_profile(request)
 
-			if @theResponse.messages.resultCode == MessageTypeEnum::Ok
+			if transaction_ok
 				@payment_token_updated = true
-				@responseKind = "OK"
 
-				@statusCode = 200
-				@statusMessage = "[OK] PaymentTokenUpdated"
+				@status_code = 200
+				@status_message = "[OK] PaymentTokenUpdated"
 				log_result_to_console
 			else
 				@payment_token_updated = false
-				@responseKind = "ERROR"
-				@responseCode = @theResponse.messages.messages[0].code
-				@responseError = @theResponse.messages.messages[0].text
-				@statusCode = 210
-				@statusMessage = "[ERROR] PaymentTokenNotUpdated"
+				@status_code = 210
+				@status_message = "[ERROR] PaymentTokenNotUpdated"
 				log_result_to_console
 			end
 
@@ -277,8 +265,8 @@ def update_payment_token
 		end
 				
 	else
-		@statusCode = 230
-		@statusMessage = "[ERROR] PaymentTokenCouldNotBeUpdated"
+		@status_code = 230
+		@status_message = "[ERROR] PaymentTokenCouldNotBeUpdated"
 		log_result_to_console
 	end
 
@@ -291,19 +279,15 @@ def retrieve_payment_token
 	request.customerProfileId = @customer_token
 	request.customerPaymentProfileId = @payment_token
 
-	@theResponse = transaction.get_customer_payment_profile(request)
+	@response = transaction.get_customer_payment_profile(request)
 
-	if @theResponse.messages.resultCode == MessageTypeEnum::Ok
+	if transaction_ok
 		@payment_token_retrieved = true
-		@responseKind = "OK"
-		@masked_card_number = @theResponse.paymentProfile.payment.creditCard.cardNumber
+		@masked_card_number = @response.paymentProfile.payment.creditCard.cardNumber
 	else
 		@payment_token_retrieved = false
-		@responseKind = "ERROR"
-		@responseCode = @theResponse.messages.messages[0].code
-		@responseError = @theResponse.messages.messages[0].text
-		@statusCode = 240
-		@statusMessage = "[ERROR] PaymentTokenCouldNotBeRetrieved"
+		@status_code = 240
+		@status_message = "[ERROR] PaymentTokenCouldNotBeRetrieved"
 		log_result_to_console
 	end
 end
@@ -353,29 +337,25 @@ end
 def create_payment_token_by_batch
 	if @has_customer_token == true && @has_payment_token == false
 		request = CreateCustomerPaymentProfileRequest.new
-		creditcard = CreditCardType.new(@cardnumber,@carddate,@cardcvv)
+		creditcard = CreditCardType.new(@card_number,@card_mmyy,@card_cvv)
 		payment = PaymentType.new(creditcard)
 		profile = CustomerPaymentProfileType.new(nil,nil,payment,nil,nil)
 		profile.billTo = CustomerAddressType.new
-		profile.billTo.firstName = @namefirst
-		profile.billTo.lastName = @namelast
+		profile.billTo.firstName = @name_first
+		profile.billTo.lastName = @name_last
 		request.customerProfileId = @customer_token
 		request.paymentProfile = profile
 
-		@theResponse = transaction.create_customer_payment_profile(request)
+		@response = transaction.create_customer_payment_profile(request)
 
 		# The transaction has a response.
-		if @theResponse.messages.resultCode == MessageTypeEnum::Ok
-			@responseKind = "OK"
-			@payment_token = @theResponse.customerPaymentProfileId
-			@statusCode = 200
-			@statusMessage = "[OK] PaymentTokenCreated"
+		if transaction_ok
+			@payment_token = @response.customerPaymentProfileId
+			@status_code = 200
+			@status_message = "[OK] PaymentTokenCreated"
 		else
-			@responseKind = "ERROR"
-			@responseCode = @theResponse.messages.messages[0].code
-			@responseError = @theResponse.messages.messages[0].text
-			@statusCode = 210
-			@statusMessage = "[ERROR] PaymentTokenNotCreated"
+			@status_code = 210
+			@status_message = "[ERROR] PaymentTokenNotCreated"
 		end
 
 		@flag_update_payment_method = true

@@ -3,11 +3,11 @@ def create_payment_processor_log
 	@payment_processor_log = DATAPaymentProcessorLog.new
 
 	# Authorize Details
-	@payment_processor_log[:zzPP_Transaction] = @transactionID
-	@payment_processor_log[:zzPP_Response] = @theResponse
-	@payment_processor_log[:zzPP_Response_AVS_Code] = @avsCode
-	@payment_processor_log[:zzPP_Response_CVV_Code] = @cvvCode
-	@payment_processor_log[:zzPP_Response_Code] = @responseCode
+	@payment_processor_log[:zzPP_Transaction] = @transaction_id
+	@payment_processor_log[:zzPP_Response] = @response
+	@payment_processor_log[:zzPP_Response_AVS_Code] = @avs_code
+	@payment_processor_log[:zzPP_Response_CVV_Code] = @cvv_code
+	@payment_processor_log[:zzPP_Response_Code] = @response_code
 
 	# Keys
 	@payment_processor_log[:_kF_PaymentBatch] = @batch
@@ -23,13 +23,13 @@ def create_payment_processor_log
 	@payment_processor_log[:Date_Processed] = @date
 
 	# Name
-	@payment_processor_log[:Name_First] = @namefirst
-	@payment_processor_log[:Name_Last] = @namelast
+	@payment_processor_log[:Name_First] = @name_first
+	@payment_processor_log[:Name_Last] = @name_last
 
 	# Credit Card
-	@payment_processor_log[:CreditCard_Number] = @cardnumber
-	@payment_processor_log[:CreditCard_MMYY] = @carddate
-	@payment_processor_log[:CreditCard_CVV] = @cardcvv
+	@payment_processor_log[:CreditCard_Number] = @card_number
+	@payment_processor_log[:CreditCard_MMYY] = @card_mmyy
+	@payment_processor_log[:CreditCard_CVV] = @card_cvv
 
 	# Tokens
 	@payment_processor_log[:Token_Profile_ID] = @customer_token
@@ -42,8 +42,8 @@ def create_payment_processor_log
 
 	if @processType == "Token"
 
-		@payment_processor_log[:zzPP_Response_Message] = @statusMessage
-		@payment_processor_log[:zzPP_Response_Error] = @responseError
+		@payment_processor_log[:zzPP_Response_Message] = @status_message
+		@payment_processor_log[:zzPP_Response_Error] = @response_error
 
 		# Only applicable to the update_payment_token method WHEN the user selected to update the billing address (avs).
 		if @update_card_address == true
@@ -56,46 +56,46 @@ def create_payment_processor_log
 
 	elsif @processType == "Payment"
 
-		if @resultCode == "OK"
+		if @result_code == "OK"
 
-			if @responseKind == "Approved"
+			if @response_kind == "Approved"
 				@payment_processor_log[:zzF_Status] = "Approved"
-				@payment_processor_log[:zzPP_Authorization_Code] = @authorizationCode
-				@payment_processor_log[:zzPP_Response_Message]  = @responseMessage
+				@payment_processor_log[:zzPP_Authorization_Code] = @authorization_code
+				@payment_processor_log[:zzPP_Response_Message]  = @response_message
 
-			elsif @responseKind == "Declined"
+			elsif @response_kind == "Declined"
 				@payment_processor_log[:zzF_Status] = "Declined"
-				@payment_processor_log[:zzPP_Response_Error] = @responseError
+				@payment_processor_log[:zzPP_Response_Error] = @response_error
 
-			elsif @responseKind == "Error"
+			elsif @response_kind == "Error"
 				@payment_processor_log[:zzF_Status] = "Error"
-				@payment_processor_log[:zzPP_Response_Error] = @responseError
+				@payment_processor_log[:zzPP_Response_Error] = @response_error
 
-			elsif @responseKind == "HeldforReview"
+			elsif @response_kind == "HeldforReview"
 				@payment_processor_log[:zzF_Status] = "HeldForReview"
-				@payment_processor_log[:zzPP_Response_Error] = @responseError
+				@payment_processor_log[:zzPP_Response_Error] = @response_error
 			end
 
 		# These payments were NOT processes.
-		elsif @resultCode == "ERROR"
+		elsif @result_code == "ERROR"
 
-			if @responseKind == "TransactionError"
+			if @response_kind == "TransactionError"
 				@payment_processor_log[:zzF_Status] = "TransactionError"
-				@payment_processor_log[:zzPP_Transaction] = @transactionID
+				@payment_processor_log[:zzPP_Transaction] = @transaction_id
 
-				@payment_processor_log[:zzPP_Response] = @theResponse
-				@payment_processor_log[:zzPP_Response_Code] = @responseCode
-				@payment_processor_log[:zzPP_Response_Error] = @responseError
+				@payment_processor_log[:zzPP_Response] = @response
+				@payment_processor_log[:zzPP_Response_Code] = @response_code
+				@payment_processor_log[:zzPP_Response_Error] = @response_error
 
-			elsif @responseKind == "TokenError"
+			elsif @response_kind == "TokenError"
 				@payment_processor_log[:zzF_Status] = "TokenError"
-				@payment_processor_log[:zzPP_Response] = @theResponse
-				@payment_processor_log[:zzPP_Response_Code] = @responseCode
-				@payment_processor_log[:zzPP_Response_Error] = @responseError
+				@payment_processor_log[:zzPP_Response] = @response
+				@payment_processor_log[:zzPP_Response_Code] = @response_code
+				@payment_processor_log[:zzPP_Response_Error] = @response_error
 
-			elsif @responseKind == "TransactionFailure"
+			elsif @response_kind == "TransactionFailure"
 				@payment_processor_log[:zzF_Status] = "TransactionFailure"
-				@payment_processor_log[:zzPP_Response_Error] = @responseError
+				@payment_processor_log[:zzPP_Response_Error] = @response_error
 			end
 		end
 	end

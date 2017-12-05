@@ -10,29 +10,25 @@ def create_current_student_payment_token
 
 	elsif @logic == "CreatePaymentToken"
 		request = CreateCustomerPaymentProfileRequest.new
-		creditcard = CreditCardType.new(@cardnumber,@carddate,@cardcvv)
+		creditcard = CreditCardType.new(@card_number,@card_mmyy,@card_cvv)
 		payment = PaymentType.new(creditcard)
 		profile = CustomerPaymentProfileType.new(nil,nil,payment,nil,nil)
 		profile.billTo = CustomerAddressType.new
-		profile.billTo.firstName = @namefirst
-		profile.billTo.lastName = @namelast
+		profile.billTo.firstName = @name_first
+		profile.billTo.lastName = @name_last
 		request.customerProfileId = @customer_token
 		request.paymentProfile = profile
 
-		@theResponse = transaction.create_customer_payment_profile(request)
+		@response = transaction.create_customer_payment_profile(request)
 
 		# The transaction has a response.
-		if @theResponse.messages.resultCode == MessageTypeEnum::Ok
-			@responseKind = "OK"
-			@payment_token = @theResponse.customerPaymentProfileId
-			@statusCode = 200
-			@statusMessage = "[OK] PaymentTokenCreated"
+		if transaction_ok
+			@payment_token = @response.customerPaymentProfileId
+			@status_code = 200
+			@status_message = "[OK] PaymentTokenCreated"
 		else
-			@responseKind = "ERROR"
-			@responseCode = @theResponse.messages.messages[0].code
-			@responseError = @theResponse.messages.messages[0].text
-			@statusCode = 210
-			@statusMessage = "[ERROR] PaymentTokenNotCreated"
+			@status_code = 210
+			@status_message = "[ERROR] PaymentTokenNotCreated"
 			log_result_to_console
 		end
 
@@ -40,8 +36,8 @@ def create_current_student_payment_token
 		create_payment_processor_log
 
 	elsif @logic == "PaymentTokenAlreadyCreated"
-		@statusCode = 220
-		@statusMessage = "[ERROR] PaymentTokenAlreadyCreated"
+		@status_code = 220
+		@status_message = "[ERROR] PaymentTokenAlreadyCreated"
 		log_result_to_console
 	end
 
@@ -70,30 +66,30 @@ def find_credit_card
 		load_credit_card
 	else
 		@credit_card_found = false
-		@statusCode = 300
-		@statusMessage = "[ERROR] PaymentMethodRecordNotFound"
+		@status_code = 300
+		@status_message = "[ERROR] PaymentMethodRecordNotFound"
 		set_response
 		log_result_to_console
 	end
 end
 
 def load_credit_card
-	@namefirst = @credit_card["__CURRENT_STUDENTS::FIRST NAME"]
-	@namelast = @credit_card["__CURRENT_STUDENTS::LAST NAME"]
-	@cardnumber = @credit_card["zzC_CreditCard_Number"]
-	@carddate = @credit_card["zzC_MMYY"]
-	@cardcvv = @credit_card["cvc"]
+	@name_first = @credit_card["__CURRENT_STUDENTS::FIRST NAME"]
+	@name_last = @credit_card["__CURRENT_STUDENTS::LAST NAME"]
+	@card_number = @credit_card["zzC_CreditCard_Number"]
+	@card_mmyy = @credit_card["zzC_MMYY"]
+	@card_cvv = @credit_card["cvc"]
 	@payment_token = @credit_card["Token_Payment_ID"]
 
 	check_payment_token
 end
 
 def load_credit_card_by_batch
-	@namefirst = @credit_card["__CURRENT_STUDENTS::FIRST NAME"]
-	@namelast = @credit_card["__CURRENT_STUDENTS::LAST NAME"]
-	@cardnumber = @credit_card["zzC_CreditCard_Number"]
-	@carddate = @credit_card["zzC_MMYY"]
-	@cardcvv = @credit_card["cvc"]
+	@name_first = @credit_card["__CURRENT_STUDENTS::FIRST NAME"]
+	@name_last = @credit_card["__CURRENT_STUDENTS::LAST NAME"]
+	@card_number = @credit_card["zzC_CreditCard_Number"]
+	@card_mmyy = @credit_card["zzC_MMYY"]
+	@card_cvv = @credit_card["cvc"]
 	@customer_token = @credit_card["__CURRENT_STUDENTS::Token_Profile_ID"]
 	@payment_token = @credit_card["Token_Payment_ID"]
 
@@ -102,14 +98,14 @@ def load_credit_card_by_batch
 end
 
 def update_credit_card
-	if @responseKind == "OK"
+	if @response_kind == "OK"
 		@credit_card[:Token_Payment_ID] = @payment_token
 		@credit_card[:zzF_Status] = "Active"
 		@credit_card[:zzF_Type] = "Token"
 	else
-		@credit_card[:zzPP_Response] = @theResponse
-		@credit_card[:zzPP_Response_Code] = @responseCode
-		@credit_card[:zzPP_Response_Error] = @responseError
+		@credit_card[:zzPP_Response] = @response
+		@credit_card[:zzPP_Response_Code] = @response_code
+		@credit_card[:zzPP_Response_Error] = @response_error
 		@credit_card[:zzF_Status] = "Inactive"
 		@credit_card[:zzF_Type] = "Error"
 	end

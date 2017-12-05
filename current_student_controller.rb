@@ -39,22 +39,18 @@ end
 def create_current_student_customer_token_by_batch
 	if @has_customer_token == false
 		request = CreateCustomerProfileRequest.new
-		request.profile = CustomerProfileType.new(@customer,@namefull,nil,nil,nil) #(merchantCustomerId,description,email,paymentProfiles,shipToList)
+		request.profile = CustomerProfileType.new(@customer,@name_full,nil,nil,nil) #(merchantCustomerId,description,email,paymentProfiles,shipToList)
 
-		@theResponse = transaction.create_customer_profile(request)
+		@response = transaction.create_customer_profile(request)
 
 		# The transaction has a response.
-		if @theResponse.messages.resultCode == MessageTypeEnum::Ok
-			@responseKind = "OK"
-			@customer_token = @theResponse.customerProfileId
-			@statusCode = 200
-			@statusMessage = "[OK] CustomerTokenCreated"
+		if transaction_ok
+			@customer_token = @response.customerProfileId
+			@status_code = 200
+			@status_message = "[OK] CustomerTokenCreated"
 		else
-			@responseKind = "ERROR"
-			@responseCode = @theResponse.messages.messages[0].code
-			@responseError = @theResponse.messages.messages[0].text
-			@statusCode = 210
-			@statusMessage = "[ERROR] CustomerTokenNotCreated"
+			@status_code = 210
+			@status_message = "[ERROR] CustomerTokenNotCreated"
 		end
 
 		@flag_update_current_student = true
@@ -110,29 +106,25 @@ end
 def create_current_student_payment_token_by_batch
 	if @has_customer_token == true && @has_payment_token == false
 		request = CreateCustomerPaymentProfileRequest.new
-		creditcard = CreditCardType.new(@cardnumber,@carddate,@cardcvv)
+		creditcard = CreditCardType.new(@card_number,@card_mmyy,@card_cvv)
 		payment = PaymentType.new(creditcard)
 		profile = CustomerPaymentProfileType.new(nil,nil,payment,nil,nil)
 		profile.billTo = CustomerAddressType.new
-		profile.billTo.firstName = @namefirst
-		profile.billTo.lastName = @namelast
+		profile.billTo.firstName = @name_first
+		profile.billTo.lastName = @name_last
 		request.customerProfileId = @customer_token
 		request.paymentProfile = profile
 
-		@theResponse = transaction.create_customer_payment_profile(request)
+		@response = transaction.create_customer_payment_profile(request)
 
 		# The transaction has a response.
-		if @theResponse.messages.resultCode == MessageTypeEnum::Ok
-			@responseKind = "OK"
-			@payment_token = @theResponse.customerPaymentProfileId
-			@statusCode = 200
-			@statusMessage = "[OK] PaymentTokenCreated"
+		if transaction_ok
+			@payment_token = @response.customerPaymentProfileId
+			@status_code = 200
+			@status_message = "[OK] PaymentTokenCreated"
 		else
-			@responseKind = "ERROR"
-			@responseCode = @theResponse.messages.messages[0].code
-			@responseError = @theResponse.messages.messages[0].text
-			@statusCode = 210
-			@statusMessage = "[ERROR] PaymentTokenNotCreated"
+			@status_code = 210
+			@status_message = "[ERROR] PaymentTokenNotCreated"
 		end
 
 		@flag_update_credit_card = true
@@ -145,21 +137,21 @@ def create_current_student_payment_token_by_batch
 end
 
 def log_result_to_console_for_batch_tokenization
-	puts "\n[RESPONSE] #{@responseKind}"
+	puts "\n[RESPONSE] #{@response_kind}"
 	puts "[CUSTOMER TOKEN] #{@customer_token}"
 	puts "[PAYMENT TOKEN] #{@payment_token}"
-	puts "[MESSAGE] #{@statusMessage}"
-	puts "[ERROR] #{@responseError}"
-	puts "[CODE] #{@responseCode}"
+	puts "[MESSAGE] #{@status_message}"
+	puts "[ERROR] #{@response_error}"
+	puts "[CODE] #{@response_code}"
 	puts "[RECORD] #{@serial}"
 	puts "\n----------------------------------------"
 end
 
 def clear_batch_tokenization_variables
 	@serial = nil
-	@namefirst = nil
-	@namelast = nil
-	@namefull = nil
+	@name_first = nil
+	@name_last = nil
+	@name_full = nil
 	@customer = nil
 	@customer_token = nil
 	@payment_token = nil

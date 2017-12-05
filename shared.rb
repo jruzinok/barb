@@ -106,17 +106,17 @@ def bc_gl_code
 		@gl_code = "422"
 	end
 	
-	@invoice = "BCOMP#{@eventAbbr}#{short_year(year)}"
+	@invoice = "BCOMP#{@event_abbr}#{short_year(year)}"
 end
 
 def cs_gl_code
 	date = Time.now
 	year = date.year
 
-	unless @classdate.nil?
-		if @today < @classdate
+	unless @class_date.nil?
+		if @today < @class_date
 			@gl_code = "403"
-		elsif @today < @classdate + 7
+		elsif @today < @class_date + 7
 			@gl_code = "402"
 		else
 			@gl_code = "401"
@@ -148,22 +148,22 @@ def short_year (yr)
 end
 
 def set_response
-	@status = @statusCode
-	@body = @statusMessage
+	@status = @status_code
+	@body = @status_message
 end
 
 def clear_response
-	@theResponse = nil
-	@responseKind = nil
-	@responseCode = nil
-	@responseError = nil
-	@resultCode = nil
-	@avsCode = nil
-	@cvvCode = nil
-	@transactionID = nil
-	@authorizationCode = nil
-	@responseMessage = nil
-	@responseError = nil
+	@response = nil
+	@response_kind = nil
+	@response_code = nil
+	@response_error = nil
+	@result_code = nil
+	@avs_code = nil
+	@cvv_code = nil
+	@transaction_id = nil
+	@authorization_code = nil
+	@response_message = nil
+	@response_error = nil
 end
 
 def to_boolean (string)
@@ -176,13 +176,13 @@ end
 
 def mask_card_date
 	unless @update_card_date == true
-		@carddate = 'XXXX'
+		@card_mmyy = 'XXXX'
 	end
 end
 
 def nil_card_cvv
 	unless @update_card_cvv == true
-		@cardcvv = nil
+		@card_cvv = nil
 	end
 end
 
@@ -199,19 +199,19 @@ def log_result_to_console
 	puts "[CUSTOMERTOKEN] #{@customer_token}"
 	puts "[PAYMENTTOKEN] #{@payment_token}"
 	puts "\n"
-	puts "[RESPONSE] #{@responseKind}"
-	puts "[AUTHORIZATION] #{@authorizationCode}"
-	puts "[CODE] #{@responseCode}"
-	puts "[ERROR] #{@responseError}"
+	puts "[RESPONSE] #{@response_kind}"
+	puts "[AUTHORIZATION] #{@authorization_code}"
+	puts "[CODE] #{@response_code}"
+	puts "[ERROR] #{@response_error}"
 	puts "[P or S] #{@process_or_skip}"
 	puts "\n"
 	puts "[GLCODE] #{@gl_code}"
 	puts "[INVOICE] #{@invoice}"
-	puts "[CLASSDATE] #{@classdate}"
+	puts "[CLASSDATE] #{@class_date}"
 	puts "[PROGRAM] #{@program}"
 	puts "\n"
-	puts "[STATUSCODE] #{@statusCode}"
-	puts "[STATUSMESSAGE] #{@statusMessage}"
+	puts "[STATUSCODE] #{@status_code}"
+	puts "[STATUSMESSAGE] #{@status_message}"
 	puts "[TIMESTAMP] #{Time.now}"
 	puts "----------------------------------------"
 end

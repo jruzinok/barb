@@ -1,7 +1,14 @@
 include AuthorizeNet::API
 
 def transaction
-	transaction = Transaction.new(@api_login_id, @api_transaction_key, gateway)
+	if transaction_ready
+		transaction = Transaction.new(@api_login_id, @api_transaction_key, gateway)
+	else
+		@result_code = "ERROR"
+
+		@response_kind = "TransactionNotAttempted"
+		@response_error = "Merchant variables are missing."
+	end
 end
 
 def validate_tokens
@@ -13,40 +20,37 @@ def validate_tokens
 	request.validationMode = ValidationModeEnum::TestMode
 
 	# PASS the transaction request and CAPTURE the transaction response.
-	response = transaction.validate_customer_payment_profile(request)
+	@response = transaction.validate_customer_payment_profile(request)
 
 	# Ensure that a response was received before proceeding.
 	begin
-		if response.messages != nil
+		if @response.messages != nil
 
-		if response.messages.resultCode == MessageTypeEnum::Ok
+		if transaction_ok
 			@valid_tokens = true
 		else
 			@valid_tokens = false
 
 			# Capture the complete response and set the ResultCode (logic variable) to Error.
-			@theResponse = response
-			@resultCode = "ERROR"
+			@result_code = "ERROR"
 
-			@responseKind = "TokenError"
-			@responseCode = response.messages.messages[0].code
-			@responseError = response.messages.messages[0].text
+			@response_kind = "TokenError"
 		end
 
 			# A transactional FAILURE occurred. [NIL]
 		else
 			@valid_tokens = false
-			@resultCode = "ERROR"
+			@result_code = "ERROR"
 
-			@responseKind = "TransactionFailure"
-			@responseError = "A transactional FAILURE occurred."
+			@response_kind = "TransactionFailure"
+			@response_error = "A transactional FAILURE occurred."
 		end
 
 	rescue Errno::ETIMEDOUT => e
-		@resultCode = "ERROR"
+		@result_code = "ERROR"
 
-		@responseKind = "TransactionFailure"
-		@responseError = "Authorize.net isn't available."
+		@response_kind = "TransactionFailure"
+		@response_error = "Authorize.net isn't available."
 	end
 end
 
@@ -63,7 +67,7 @@ def process_payment
 		request.transactionRequest.profile.paymentProfile = PaymentProfile.new(@payment_token)	
 	elsif @card_or_tokens == "card"
 		request.transactionRequest.payment = PaymentType.new
-		request.transactionRequest.payment.creditCard = CreditCardType.new(@cardnumber, @carddate, @cardcvv)
+		request.transactionRequest.payment.creditCard = CreditCardType.new(@card_number, @card_mmyy, @card_cvv)
 	end
 
 	# The @gl_code and @invoice were set dynamically in the set_gl_code method located in the shared.rb file.
@@ -72,67 +76,66 @@ def process_payment
 	request.transactionRequest.order.description = @gl_code
 	
 	# PASS the transaction request and CAPTURE the transaction response.
-	response = transaction.create_transaction(request)
+	@response = transaction.create_transaction(request)
 
 	begin
-		if response.transactionResponse != nil
+		if @response.transactionResponse != nil
 
 			# Capture the response variables for all transactions.
-			@theResponse = response
-			@avsCode = response.transactionResponse.avsResultCode
-			@cvvCode = response.transactionResponse.cvvResultCode
+			@avs_code = response.transactionResponse.avsResultCode
+			@cvv_code = response.transactionResponse.cvvResultCode
 
 			# The transaction has a response.
-			if response.messages.resultCode == MessageTypeEnum::Ok
-				@resultCode = "OK"
+			if transaction_ok
+				@result_code = "OK"
 
 				# CAPTURE the transaction details.
-				@transactionID = response.transactionResponse.transId
-				@transactionResponseCode = response.transactionResponse.responseCode
+				@transaction_id = @response.transactionResponse.transId
+				@transaction_response_code = @response.transactionResponse.responseCode
 
-				if @transactionResponseCode == "1"
-					@responseKind = "Approved"
-					@authorizationCode = response.transactionResponse.authCode
-					@responseCode = response.messages.messages[0].code
-					@responseMessage = response.messages.messages[0].text
+				if @transaction_response_code == "1"
+					@response_kind = "Approved"
+					@authorization_code = @response.transactionResponse.authCode
+					@response_code = @response.messages.messages[0].code
+					@response_message = @response.messages.messages[0].text
 
-				elsif @transactionResponseCode == "2"
-					@responseKind = "Declined"
-					@responseCode = response.transactionResponse.errors.errors[0].errorCode
-					@responseError = response.transactionResponse.errors.errors[0].errorText
+				elsif @transaction_response_code == "2"
+					@response_kind = "Declined"
+					@response_code = @response.transactionResponse.errors.errors[0].errorCode
+					@response_error = @response.transactionResponse.errors.errors[0].errorText
 
-				elsif @transactionResponseCode == "3"
-					@responseKind = "Error"
-					@responseCode = response.transactionResponse.errors.errors[0].errorCode
-					@responseError = response.transactionResponse.errors.errors[0].errorText
+				elsif @transaction_response_code == "3"
+					@response_kind = "Error"
+					@response_code = @response.transactionResponse.errors.errors[0].errorCode
+					@response_error = @response.transactionResponse.errors.errors[0].errorText
 
-				elsif @transactionResponseCode == "4"
-					@responseKind = "HeldforReview"
-					@responseCode = response.transactionResponse.errors.errors[0].errorCode
-					@responseError = response.transactionResponse.errors.errors[0].errorText
+				elsif @transaction_response_code == "4"
+					@response_kind = "HeldforReview"
+					@response_code = @response.transactionResponse.errors.errors[0].errorCode
+					@response_error = @@response.transactionResponse.errors.errors[0].errorText
 				end
 
 			# A transactional ERROR occurred.
-			elsif response.messages.resultCode == MessageTypeEnum::Error
-				@resultCode = "ERROR"
+			elsif @response.messages.resultCode == MessageTypeEnum::Error
+				@result_code = "ERROR"
 
-				@responseKind = "TransactionError"
-				@responseCode = response.transactionResponse.errors.errors[0].errorCode
-				@responseError = response.transactionResponse.errors.errors[0].errorText
+				@response_kind = "TransactionError"
+				@response_code = @response.transactionResponse.errors.errors[0].errorCode
+				@response_error = @response.transactionResponse.errors.errors[0].errorText
 			end
 
 		# A transactional FAILURE occurred. [NIL]
 		else
-			@resultCode = "ERROR"
+			@result_code = "ERROR"
 
-			@responseKind = "TransactionFailure"
-			@responseError = "A transactional FAILURE occurred."
+			@response_kind = "TransactionFailure"
+			@response_error = "A transactional FAILURE occurred."
 		end
 
 	rescue Errno::ETIMEDOUT => e
-		@resultCode = "ERROR"
+		@result_code = "ERROR"
 
-		@responseKind = "TransactionFailure"
-		@responseError = "Authorize.net isn't available."
+		@response_kind = "TransactionFailure"
+		@response_error = "Authorize.net isn't available."
 	end
 end

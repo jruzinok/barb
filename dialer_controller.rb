@@ -2,12 +2,12 @@ def process_create_dialer_payment_method_request
 	parse_create_dialer_payment_method_post
 	if @request_type == "Charge"
 		create_dialer_tokens
-		if @responseKind == "OK"
+		if @response_kind == "OK"
 			process_dialer_payment_date
 		end
 	elsif @request_type == "Schedule"
 		create_dialer_tokens
-		if @responseKind == "OK"
+		if @response_kind == "OK"
 			save_scheduled_dailer_payment_date
 			create_payment_processor_log
 		end
@@ -43,7 +43,7 @@ def parse_create_dialer_payment_method_post
 	
 	# GL Codes
 	@program = params[:program] # BC/CS/PTD
-	@eventAbbr = params[:event_abbr] # ATL/DC/FL... [BC ONLY]
+	@event_abbr = params[:event_abbr] # ATL/DC/FL... [BC ONLY]
 
 	# This is used to flag Payment Method records.
 	@flag_deposit = params[:flag_deposit]
@@ -54,11 +54,11 @@ def parse_create_dialer_payment_method_post
 	@amount = params[:Amount]
 
 	# Credit Card
-	@namefirstCC = params[:Name_First]
-	@namelastCC = params[:Name_Last]
-	@cardnumber = params[:CreditCard]
-	@carddate = params[:MMYY]
-	@cardcvv = params[:CVV]
+	@card_name_first = params[:Name_First]
+	@card_name_last = params[:Name_Last]
+	@card_number = params[:CreditCard]
+	@card_mmyy = params[:MMYY]
+	@card_cvv = params[:CVV]
 
 	log_post_variables_to_console
 end
@@ -77,11 +77,11 @@ def log_post_variables_to_console
 	puts "[DATE] #{@date}"
 	puts "[AMOUNT] #{@amount}"
 	
-	puts "[FIRST] #{@namefirstCC}"
-	puts "[LAST] #{@namelastCC}"
-	puts "[CARD] #{@cardnumber}"
-	puts "[DATE] #{@carddate}"
-	puts "[CVV] #{@cardcvv}"
+	puts "[FIRST] #{@card_name_first}"
+	puts "[LAST] #{@card_name_last}"
+	puts "[CARD] #{@card_number}"
+	puts "[DATE] #{@card_mmyy}"
+	puts "[CVV] #{@card_cvv}"
 	puts "[TIMESTAMP] #{Time.now}"
 	puts "----------------------------------------"
 end
@@ -98,7 +98,7 @@ end
 
 def create_dialer_tokens
 	create_dialer_lead_customer_token
-	if @responseKind == "OK"
+	if @response_kind == "OK"
 		create_dialer_payment_token
 	elsif @dialer_lead_found == true && @has_customer_token == true
 		create_dialer_payment_token

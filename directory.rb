@@ -5,14 +5,14 @@ def create_customer_token_logic
 		@skip_find_directory = true # This prevents the find routine from hitting the database again (to speed the process up and make it less db intensive).
 		create_customer_token
 
-		if @responseKind == "OK"
+		if @response_kind == "OK"
 			@customer_token_ready = true
 		end
 
 	elsif @directory_found == true && @has_customer_token == true
 		@customer_token_ready = true
-		@statusCode = 220
-		@statusMessage = "[OK] CustomerTokenAlreadyExists"
+		@status_code = 220
+		@status_message = "[OK] CustomerTokenAlreadyExists"
 		@skip_find_directory = true
 	end
 
@@ -26,23 +26,19 @@ def create_customer_token
 
 	if @directory_found == true && @has_customer_token == false
 		request = CreateCustomerProfileRequest.new
-		request.profile = CustomerProfileType.new(@customer,@namefull,nil,nil,nil) #(merchantCustomerId,description,email,paymentProfiles,shipToList)
+		request.profile = CustomerProfileType.new(@customer,@name_full,nil,nil,nil) #(merchantCustomerId,description,email,paymentProfiles,shipToList)
 
-		@theResponse = transaction.create_customer_profile(request)
+		@response = transaction.create_customer_profile(request)
 
 		# The transaction has a response.
-		if @theResponse.messages.resultCode == MessageTypeEnum::Ok
-			@responseKind = "OK"
-			@customer_token = @theResponse.customerProfileId
+		if transaction_ok
+			@customer_token = @response.customerProfileId
 			@has_customer_token = true
-			@statusCode = 200
-			@statusMessage = "[OK] CustomerTokenCreated"
+			@status_code = 200
+			@status_message = "[OK] CustomerTokenCreated"
 		else
-			@responseKind = "ERROR"
-			@responseCode = @theResponse.messages.messages[0].code
-			@responseError = @theResponse.messages.messages[0].text
-			@statusCode = 199 # Most likely caused by a '@customer' id issue.
-			@statusMessage = "[ERROR] TokenIssue (Contact Admin)"
+			@status_code = 199 # Most likely caused by a '@customer' id issue.
+			@status_message = "[ERROR] TokenIssue (Contact Admin)"
 			log_result_to_console
 		end
 
@@ -65,19 +61,19 @@ def find_directory
 		load_directory
 	else
 		@directory_found = false
-		@statusCode = 300
-		@statusMessage = "[ERROR] DirectoryRecordNotFound"
+		@status_code = 300
+		@status_message = "[ERROR] DirectoryRecordNotFound"
 		set_response
 		log_result_to_console
 	end
 end
 
 def load_directory
-	@namefirst = @directory["Name_First"]
+	@name_first = @directory["Name_First"]
 	@serial = @directory["_Serial"].to_i
 	@customer = "#{@database}#{@serial}" # The "ID" used to create a customer profile.
-	@namelast = @directory["Name_Last"]
-	@namefull = "#{@namefirst} #{@namelast}"
+	@name_last = @directory["Name_Last"]
+	@name_full = "#{@name_first} #{@name_last}"
 	@merchant_directory = @directory["zzF_Merchant"]
 	@customer_token = @directory["Token_Profile_ID"]
 
@@ -91,13 +87,13 @@ def load_directory_current_student_data
 end
 
 def update_directory
-	if @responseKind == "OK"
+	if @response_kind == "OK"
 		@directory[:Token_Profile_ID] = @customer_token
 		@directory[:zzF_Merchant] = @merchant
 	else
-		@directory[:zzPP_Response] = @theResponse
-		@directory[:zzPP_Response_Code] = @responseCode
-		@directory[:zzPP_Response_Error] = @responseError
+		@directory[:zzPP_Response] = @response
+		@directory[:zzPP_Response_Code] = @response_code
+		@directory[:zzPP_Response_Error] = @response_error
 	end
 
 	@directory.save
@@ -148,22 +144,18 @@ end
 def create_customer_token_by_batch
 	if @has_customer_token == false
 		request = CreateCustomerProfileRequest.new
-		request.profile = CustomerProfileType.new(@customer,@namefull,nil,nil,nil) #(merchantCustomerId,description,email,paymentProfiles,shipToList)
+		request.profile = CustomerProfileType.new(@customer,@name_full,nil,nil,nil) #(merchantCustomerId,description,email,paymentProfiles,shipToList)
 
-		@theResponse = transaction.create_customer_profile(request)
+		@response = transaction.create_customer_profile(request)
 
 		# The transaction has a response.
-		if @theResponse.messages.resultCode == MessageTypeEnum::Ok
-			@responseKind = "OK"
-			@customer_token = @theResponse.customerProfileId
-			@statusCode = 200
-			@statusMessage = "[OK] CustomerTokenCreated"
+		if transaction_ok
+			@customer_token = @response.customerProfileId
+			@status_code = 200
+			@status_message = "[OK] CustomerTokenCreated"
 		else
-			@responseKind = "ERROR"
-			@responseCode = @theResponse.messages.messages[0].code
-			@responseError = @theResponse.messages.messages[0].text
-			@statusCode = 210
-			@statusMessage = "[ERROR] CustomerTokenNotCreated"
+			@status_code = 210
+			@status_message = "[ERROR] CustomerTokenNotCreated"
 		end
 
 		@flag_update_directory = true

@@ -3,22 +3,18 @@ def create_dialer_lead_customer_token
 
 	if @dialer_lead_found == true && @has_customer_token == false
 		request = CreateCustomerProfileRequest.new
-		request.profile = CustomerProfileType.new(@customer,@namefull,nil,nil,nil) #(merchantCustomerId,description,email,paymentProfiles,shipToList)
+		request.profile = CustomerProfileType.new(@customer,@name_full,nil,nil,nil) #(merchantCustomerId,description,email,paymentProfiles,shipToList)
 
-		@theResponse = transaction.create_customer_profile(request)
+		@response = transaction.create_customer_profile(request)
 
 		# The transaction has a response.
-		if @theResponse.messages.resultCode == MessageTypeEnum::Ok
-			@responseKind = "OK"
-			@customer_token = @theResponse.customerProfileId
-			@statusCode = 200
-			@statusMessage = "[OK] CustomerTokenCreated"
+		if transaction_ok
+			@customer_token = @response.customerProfileId
+			@status_code = 200
+			@status_message = "[OK] CustomerTokenCreated"
 		else
-			@responseKind = "ERROR"
-			@responseCode = @theResponse.messages.messages[0].code
-			@responseError = @theResponse.messages.messages[0].text
-			@statusCode = 210
-			@statusMessage = "[ERROR] CustomerTokenNotCreated"
+			@status_code = 210
+			@status_message = "[ERROR] CustomerTokenNotCreated"
 			log_result_to_console
 		end
 
@@ -38,8 +34,8 @@ def find_dialer_lead
 		load_dialer_lead
 	else
 		@dialer_lead_found = false
-		@statusCode = 300
-		@statusMessage = "[ERROR] DialerLeadRecordNotFound"
+		@status_code = 300
+		@status_message = "[ERROR] DialerLeadRecordNotFound"
 		set_response
 		log_result_to_console
 	end
@@ -47,11 +43,11 @@ end
 
 def load_dialer_lead
 	@dialer_lead = @dialer_lead[0] # Load the record from the first position of the array.
-	@namefirst = @dialer_lead["First Name"]
+	@name_first = @dialer_lead["First Name"]
 	@serial = @dialer_lead["_Serial"].to_i
 	@customer = "#{@database}#{@lead_id}" # The "ID" used to create a customer profile.
-	@namelast = @dialer_lead["Last Name"]
-	@namefull = "#{@namefirst} #{@namelast}"
+	@name_last = @dialer_lead["Last Name"]
+	@name_full = "#{@name_first} #{@name_last}"
 	@customer_token_bar = @dialer_lead["Token_Profile_ID"]
 	@customer_token_ptd = @dialer_lead["Token_Profile_ID_PTD"]
 
@@ -71,7 +67,7 @@ def check_customer_tokens
 end
 
 def update_dialer_lead
-	if @responseKind == "OK"
+	if @response_kind == "OK"
 		if @merchant == "BAR"
 			@dialer_lead[:Token_Profile_ID] = @customer_token
 		elsif @merchant == "PTD"
@@ -79,9 +75,9 @@ def update_dialer_lead
 		end
 
 	else
-		@dialer_lead[:zzPP_Response] = @theResponse
-		@dialer_lead[:zzPP_Response_Code] = @responseCode
-		@dialer_lead[:zzPP_Response_Error] = @responseError
+		@dialer_lead[:zzPP_Response] = @response
+		@dialer_lead[:zzPP_Response_Code] = @response_code
+		@dialer_lead[:zzPP_Response_Error] = @response_error
 	end
 
 	@dialer_lead.save

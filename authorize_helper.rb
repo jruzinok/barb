@@ -58,3 +58,20 @@ def transaction_ready
 		false
 	end
 end
+
+def transaction_ok
+	if transaction_ready == false
+		false
+	elsif @response.messages.resultCode == MessageTypeEnum::Ok
+		@response_kind = "OK"
+		true
+	else
+		response_kind_error
+	end
+end
+
+def response_kind_error
+	@response_kind = "ERROR"
+	@response_code = @response.messages.messages[0].code
+	@response_error = @response.messages.messages[0].text
+end

@@ -7,8 +7,8 @@ def find_event_attendee_by_directory
 		load_event_attendee
 	else
 		@event_attendee_found = false
-		@statusCode = 300
-		@statusMessage = "[ERROR] EventAttendeeRecordNotFound"
+		@status_code = 300
+		@status_message = "[ERROR] EventAttendeeRecordNotFound"
 		set_response
 		log_result_to_console
 	end
@@ -17,5 +17,5 @@ end
 def load_event_attendee
 	@event_attendee_id = @event_attendee["__kP_EventAttendee"]
 	@event_id = @event_attendee["_kF_Event"]
-	@eventAbbr = @event_attendee["T57_EVENT::Name_Abbreviation"]
+	@event_abbr = @event_attendee["T57_EVENT::Name_Abbreviation"]
 end

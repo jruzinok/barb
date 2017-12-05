@@ -121,9 +121,9 @@ class PaymentProcessor < Sinatra::Application
 		@payment_method_id = params[:payment_method_id]
 
 		# Grab the credit card values from the POST object.
-		@cardnumber = params[:CreditCard]
-		@carddate = params[:MMYY]
-		@cardcvv = params[:CVV]
+		@card_number = params[:CreditCard]
+		@card_mmyy = params[:MMYY]
+		@card_cvv = params[:CVV]
 
 		create_payment_token_logic
 
@@ -162,9 +162,9 @@ class PaymentProcessor < Sinatra::Application
 		@update_card_cvv = to_boolean(@update_card_cvv_string)
 
 		# Grab the credit card values from the POST object.
-		# @cardnumber = params[:CreditCard]
-		@carddate = params[:MMYY]
-		@cardcvv = params[:CVV]
+		# @card_number = params[:CreditCard]
+		@card_mmyy = params[:MMYY]
+		@card_cvv = params[:CVV]
 
 		update_payment_token
 

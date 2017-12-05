@@ -3,29 +3,25 @@ def create_dialer_payment_token
  
 	if @has_customer_token == true
 		request = CreateCustomerPaymentProfileRequest.new
-		creditcard = CreditCardType.new(@cardnumber,@carddate,@cardcvv)
+		creditcard = CreditCardType.new(@card_number,@card_mmyy,@card_cvv)
 		payment = PaymentType.new(creditcard)
 		profile = CustomerPaymentProfileType.new(nil,nil,payment,nil,nil)
 		profile.billTo = CustomerAddressType.new
-		profile.billTo.firstName = @namefirstCC
-		profile.billTo.lastName = @namelastCC
+		profile.billTo.firstName = @card_name_first
+		profile.billTo.lastName = @card_name_last
 		request.customerProfileId = @customer_token
 		request.paymentProfile = profile
 
-		@theResponse = transaction.create_customer_payment_profile(request)
+		@response = transaction.create_customer_payment_profile(request)
 
 		# The transaction has a response.
-		if @theResponse.messages.resultCode == MessageTypeEnum::Ok
-			@responseKind = "OK"
-			@payment_token = @theResponse.customerPaymentProfileId
-			@statusCode = 200
-			@statusMessage = "[OK] PaymentTokenCreated"
+		if transaction_ok
+			@payment_token = @response.customerPaymentProfileId
+			@status_code = 200
+			@status_message = "[OK] PaymentTokenCreated"
 		else
-			@responseKind = "ERROR"
-			@responseCode = @theResponse.messages.messages[0].code
-			@responseError = @theResponse.messages.messages[0].text
-			@statusCode = 210
-			@statusMessage = "[ERROR] PaymentTokenNotCreated"
+			@status_code = 210
+			@status_message = "[ERROR] PaymentTokenNotCreated"
 			log_result_to_console
 		end
 
@@ -34,8 +30,8 @@ def create_dialer_payment_token
 	end
 
 	# This sends the PaymentMethodID back to the Dialer php web app in the response body.
-	if @responseKind == "OK" && @dailer_payment_method_found == true
-		@statusMessage = @payment_method_id.to_s
+	if @response_kind == "OK" && @dailer_payment_method_found == true
+		@status_message = @payment_method_id.to_s
 	end
 
 	set_response
@@ -50,8 +46,8 @@ def find_dialer_payment_method
 		load_dialer_payment_method
 	else
 		@dailer_payment_method_found = false
-		@statusCode = 300
-		@statusMessage = "[ERROR] PaymentMethodRecordNotFound"
+		@status_code = 300
+		@status_message = "[ERROR] PaymentMethodRecordNotFound"
 		set_response
 		log_result_to_console
 	end
@@ -65,8 +61,8 @@ def find_dialer_payment_method_by_payment_token
 		load_dialer_payment_method
 	else
 		@dailer_payment_method_found = false
-		@statusCode = 300
-		@statusMessage = "[ERROR] PaymentMethodRecordNotFound"
+		@status_code = 300
+		@status_message = "[ERROR] PaymentMethodRecordNotFound"
 		set_response
 		log_result_to_console
 	end
@@ -85,23 +81,23 @@ def save_dialer_payment_method
 
 	@dailer_payment_method[:_kF_DialerLead] = @lead_id
 	@dailer_payment_method[:_kF_Guest] = @guest_id
-	@dailer_payment_method[:Name_First] = @namefirstCC
-	@dailer_payment_method[:Name_Last] = @namelastCC
-	@dailer_payment_method[:CreditCard_Number] = @cardnumber
-	@dailer_payment_method[:MMYY] = @carddate
-	@dailer_payment_method[:CVV] = @cardcvv
+	@dailer_payment_method[:Name_First] = @card_name_first
+	@dailer_payment_method[:Name_Last] = @card_name_last
+	@dailer_payment_method[:CreditCard_Number] = @card_number
+	@dailer_payment_method[:MMYY] = @card_mmyy
+	@dailer_payment_method[:CVV] = @card_cvv
 	@dailer_payment_method[:zzF_Payment_Deposit] = @flag_deposit
 	@dailer_payment_method[:zzF_Payment_Recurring] = @flag_recurring
 	@dailer_payment_method[:zzF_Merchant] = @merchant
 
-	if @responseKind == "OK"
+	if @response_kind == "OK"
 		@dailer_payment_method[:Token_Payment_ID] = @payment_token
 		@dailer_payment_method[:zzF_Status] = "Active"
 		@dailer_payment_method[:zzF_Type] = "Token"
 	else
-		@dailer_payment_method[:zzPP_Response] = @theResponse
-		@dailer_payment_method[:zzPP_Response_Code] = @responseCode
-		@dailer_payment_method[:zzPP_Response_Error] = @responseError
+		@dailer_payment_method[:zzPP_Response] = @response
+		@dailer_payment_method[:zzPP_Response_Code] = @response_code
+		@dailer_payment_method[:zzPP_Response_Error] = @response_error
 		@dailer_payment_method[:zzF_Status] = "Inactive"
 		@dailer_payment_method[:zzF_Type] = "Error"
 	end
@@ -109,7 +105,7 @@ def save_dialer_payment_method
 	@dailer_payment_method.save
 
 	# GRAB the ID from the newly created PaymentMethod.
-	if @responseKind == "OK"
+	if @response_kind == "OK"
 		find_dialer_payment_method_by_payment_token
 	end
 end

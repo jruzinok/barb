@@ -55,9 +55,9 @@ end
 def load_csv_customer_data
 	@customer = @cvsRow[0]
 	@serial = @cvsRow[0]
-	@namefirst = @cvsRow[1]
-	@namelast = @cvsRow[2]
-	@namefull = "#{@namefirst} #{@namelast}"
+	@name_first = @cvsRow[1]
+	@name_last = @cvsRow[2]
+	@name_full = "#{@name_first} #{@name_last}"
 	@customer_token = @cvsRow[3]
 
 	check_customer_token
@@ -66,22 +66,18 @@ end
 def create_customer_token_by_csv
 	if @has_customer_token == false
 		request = CreateCustomerProfileRequest.new
-		request.profile = CustomerProfileType.new(@customer,@namefull,nil,nil,nil) #(merchantCustomerId,description,email,paymentProfiles,shipToList)
+		request.profile = CustomerProfileType.new(@customer,@name_full,nil,nil,nil) #(merchantCustomerId,description,email,paymentProfiles,shipToList)
 
-		@theResponse = transaction.create_customer_profile(request)
+		@response = transaction.create_customer_profile(request)
 
 		# The transaction has a response.
-		if @theResponse.messages.resultCode == MessageTypeEnum::Ok
-			@responseKind = "OK"
-			@customer_token = @theResponse.customerProfileId
-			@statusCode = 200
-			@statusMessage = "[OK] CustomerTokenCreated"
+		if transaction_ok
+			@customer_token = @response.customerProfileId
+			@status_code = 200
+			@status_message = "[OK] CustomerTokenCreated"
 		else
-			@responseKind = "ERROR"
-			@responseCode = @theResponse.messages.messages[0].code
-			@responseError = @theResponse.messages.messages[0].text
-			@statusCode = 210
-			@statusMessage = "[ERROR] CustomerTokenNotCreated"
+			@status_code = 210
+			@status_message = "[ERROR] CustomerTokenNotCreated"
 		end
 
 		@flag_update_csv = true
@@ -143,11 +139,11 @@ end
 
 def load_csv_credit_card_data
 	@serial = @cvsRow[0]
-	@namefirst = @cvsRow[1]
-	@namelast = @cvsRow[2]
-	@cardnumber = @cvsRow[3]
-	@carddate = @cvsRow[4]
-	@cardcvv = @cvsRow[5]
+	@name_first = @cvsRow[1]
+	@name_last = @cvsRow[2]
+	@card_number = @cvsRow[3]
+	@card_mmyy = @cvsRow[4]
+	@card_cvv = @cvsRow[5]
 	@customer_token = @cvsRow[6]
 	@payment_token = @cvsRow[7]
 
@@ -158,29 +154,25 @@ end
 def create_payment_token_by_csv
 	if @has_customer_token == true && @has_payment_token == false
 		request = CreateCustomerPaymentProfileRequest.new
-		creditcard = CreditCardType.new(@cardnumber,@carddate,@cardcvv)
+		creditcard = CreditCardType.new(@card_number,@card_mmyy,@card_cvv)
 		payment = PaymentType.new(creditcard)
 		profile = CustomerPaymentProfileType.new(nil,nil,payment,nil,nil)
 		profile.billTo = CustomerAddressType.new
-		profile.billTo.firstName = @namefirst
-		profile.billTo.lastName = @namelast
+		profile.billTo.firstName = @name_first
+		profile.billTo.lastName = @name_last
 		request.customerProfileId = @customer_token
 		request.paymentProfile = profile
 
-		@theResponse = transaction.create_customer_payment_profile(request)
+		@response = transaction.create_customer_payment_profile(request)
 
 		# The transaction has a response.
-		if @theResponse.messages.resultCode == MessageTypeEnum::Ok
-			@responseKind = "OK"
-			@payment_token = @theResponse.customerPaymentProfileId
-			@statusCode = 200
-			@statusMessage = "[OK] PaymentTokenCreated"
+		if transaction_ok
+			@payment_token = @response.customerPaymentProfileId
+			@status_code = 200
+			@status_message = "[OK] PaymentTokenCreated"
 		else
-			@responseKind = "ERROR"
-			@responseCode = @theResponse.messages.messages[0].code
-			@responseError = @theResponse.messages.messages[0].text
-			@statusCode = 210
-			@statusMessage = "[ERROR] PaymentTokenNotCreated"
+			@status_code = 210
+			@status_message = "[ERROR] PaymentTokenNotCreated"
 		end
 
 		@flag_update_csv = true
@@ -191,5 +183,5 @@ def create_payment_token_by_csv
 end
 
 def log_result_to_console_for_batch_csv_tokenization
-	puts "R-#{@responseKind},S-#{@serial},CT-#{@customer_token},PT-#{@payment_token},RC-#{@responseCode},M-#{@statusMessage},E-#{@responseError}"
+	puts "R-#{@response_kind},S-#{@serial},CT-#{@customer_token},PT-#{@payment_token},RC-#{@response_code},M-#{@status_message},E-#{@response_error}"
 end

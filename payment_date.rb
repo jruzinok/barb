@@ -71,8 +71,8 @@ def find_payment_date
 		load_payment_date
 	else
 		@payment_date_found = false
-		@statusCode = 300
-		@statusMessage = "[ERROR] PaymentDateRecordNotFound"
+		@status_code = 300
+		@status_message = "[ERROR] PaymentDateRecordNotFound"
 		set_response
 		log_result_to_console
 	end
@@ -91,19 +91,19 @@ def load_payment_date
 	@api_transaction_key = @payment_date["T54_Directory | MERCHANT::API_Transaction_Key"]
 
 	# Credit Card values.
-	@cardnumber = @payment_date["T54_PAYMENTMETHOD::CreditCard_Number"]
-	@carddate = @payment_date["T54_PAYMENTMETHOD::MMYY"]
-	@cardcvv = @payment_date["T54_PAYMENTMETHOD::CVV"]
+	@card_number = @payment_date["T54_PAYMENTMETHOD::CreditCard_Number"]
+	@card_mmyy = @payment_date["T54_PAYMENTMETHOD::MMYY"]
+	@card_cvv = @payment_date["T54_PAYMENTMETHOD::CVV"]
 
 	@amount = @payment_date["Amount"].to_f
 
 	if @database == "BC"
-		@eventAbbr = @payment_date["T54_EVENT::Name_Abbreviation"]
+		@event_abbr = @payment_date["T54_EVENT::Name_Abbreviation"]
 		@gl_override_flag	= to_boolean(@payment_date["zzF_GL_Code_Override"])
 		@gl_override_code	= @payment_date["GL_Code_Override"]
 		set_gl_codes # The GL Code needs to be set for each PaymentDate record.
 	elsif @database == "CS"
-		@classdate = @payment_date["Date_Class"]
+		@class_date = @payment_date["Date_Class"]
 		@invoice = @payment_date["T54_DIRECTORY::Number_Invoice_GL"]
 		set_gl_codes # The GL Code needs to be set for each PaymentDate record.
 	end
@@ -129,9 +129,9 @@ def clear_payment_date_variables
 	@payment_method_id = nil
 	@payment_date_id = nil
 	@serial = nil
-	@namefirst = nil
-	@namelast = nil
-	@namefull = nil
+	@name_first = nil
+	@name_last = nil
+	@name_full = nil
 	@customer = nil
 	@customer_token = nil
 	@payment_token = nil
@@ -140,7 +140,7 @@ end
 
 def update_payment_date
 
-		if @resultCode == "OK"
+		if @result_code == "OK"
 
 			# RECORD the Date Processed.
 			if @database == "PTD" || @database == "BC" || @database == "CS"
@@ -148,51 +148,51 @@ def update_payment_date
 			end
 
 			# SAVE the response values for all transactions.
-			@payment_date[:zzPP_Transaction] = @transactionID
-			@payment_date[:zzPP_Response] = @theResponse
-			@payment_date[:zzPP_Response_AVS_Code] = @avsCode
-			@payment_date[:zzPP_Response_CVV_Code] = @cvvCode
-			@payment_date[:zzPP_Response_Code] = @responseCode
+			@payment_date[:zzPP_Transaction] = @transaction_id
+			@payment_date[:zzPP_Response] = @response
+			@payment_date[:zzPP_Response_AVS_Code] = @avs_code
+			@payment_date[:zzPP_Response_CVV_Code] = @cvv_code
+			@payment_date[:zzPP_Response_Code] = @response_code
 
 			# These transaction WERE processed.
-			if @responseKind == "Approved"
+			if @response_kind == "Approved"
 				@payment_date[:zzF_Status] = "Approved"
-				@payment_date[:zzPP_Authorization_Code] = @authorizationCode
-				@payment_date[:zzPP_Response_Message] = @responseMessage
+				@payment_date[:zzPP_Authorization_Code] = @authorization_code
+				@payment_date[:zzPP_Response_Message] = @response_message
 
-			elsif @responseKind == "Declined"
+			elsif @response_kind == "Declined"
 				@payment_date[:zzF_Status] = "Declined"
-				@payment_date[:zzPP_Response_Error] = @responseError
+				@payment_date[:zzPP_Response_Error] = @response_error
 
-			elsif @responseKind == "Error"
+			elsif @response_kind == "Error"
 				@payment_date[:zzF_Status] = "Error"
-				@payment_date[:zzPP_Response_Error] = @responseError
+				@payment_date[:zzPP_Response_Error] = @response_error
 
-			elsif @responseKind == "HeldforReview"
+			elsif @response_kind == "HeldforReview"
 				@payment_date[:zzF_Status] = "HeldForReview"
-				@payment_date[:zzPP_Response_Error] = @responseError
+				@payment_date[:zzPP_Response_Error] = @response_error
 			end
 
-		elsif @resultCode == "ERROR"
+		elsif @result_code == "ERROR"
 
 			# These transaction were NOT processed.
-			if @responseKind == "TransactionError"
+			if @response_kind == "TransactionError"
 				@payment_date[:zzF_Status] = "TransactionError"
-				@payment_date[:zzPP_Transaction] = @transactionID
-				@payment_date[:zzPP_Response] = @theResponse
-				@payment_date[:zzPP_Response_Code] = @responseCode
-				@payment_date[:zzPP_Response_Error] = @responseError
+				@payment_date[:zzPP_Transaction] = @transaction_id
+				@payment_date[:zzPP_Response] = @response
+				@payment_date[:zzPP_Response_Code] = @response_code
+				@payment_date[:zzPP_Response_Error] = @response_error
 
-			elsif @responseKind == "TokenError"
+			elsif @response_kind == "TokenError"
 				@payment_date[:zzF_Status] = "TokenError"
-				@payment_date[:zzPP_Response] = @theResponse
-				@payment_date[:zzPP_Response_Code] = @responseCode
-				@payment_date[:zzPP_Response_Error] = @responseError
+				@payment_date[:zzPP_Response] = @response
+				@payment_date[:zzPP_Response_Code] = @response_code
+				@payment_date[:zzPP_Response_Error] = @response_error
 
 			# This transaction was NOT sent to Authorize.net successfully.
-			elsif @responseKind == "TransactionFailure"
+			elsif @response_kind == "TransactionFailure"
 				@payment_date[:zzF_Status] = "TransactionFailure"
-				@payment_date[:zzPP_Response_Error] = @responseError
+				@payment_date[:zzPP_Response_Error] = @response_error
 			end
 
 		end
