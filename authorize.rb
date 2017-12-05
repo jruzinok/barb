@@ -11,6 +11,27 @@ def transaction
 	end
 end
 
+def create_customer_token_request
+	request = CreateCustomerProfileRequest.new
+	request.profile = CustomerProfileType.new(@customer,@name_full,nil,nil,nil) #(merchantCustomerId,description,email,paymentProfiles,shipToList)
+
+	@response = transaction.create_customer_profile(request)
+
+	# The transaction has a response.
+	if transaction_ok
+		@has_customer_token = true
+		@customer_token = @response.customerProfileId
+		@status_code = 200
+		@status_message = "[OK] CustomerTokenCreated"
+		@return_json_package = JSON.generate ["responseKind"=>@response_kind,"statusCode"=>@status_code,"statusMessage"=>@status_message,"customer_token"=>@customer_token][0]
+	else
+		@status_code = 199 # Most likely caused by a '@customer' id issue.
+		@status_message = "[ERROR] CustomerTokenNotCreated"
+		@return_json_package = JSON.generate ["responseKind"=>@response_kind,"statusCode"=>@status_code,"statusMessage"=>@status_message,"responseCode"=>@response_code,"responseError"=>@response_error][0]
+		log_result_to_console
+	end
+end
+
 def validate_tokens
 	request = ValidateCustomerPaymentProfileRequest.new
 

@@ -25,23 +25,7 @@ def create_customer_token
 	end
 
 	if @directory_found == true && @has_customer_token == false
-		request = CreateCustomerProfileRequest.new
-		request.profile = CustomerProfileType.new(@customer,@name_full,nil,nil,nil) #(merchantCustomerId,description,email,paymentProfiles,shipToList)
-
-		@response = transaction.create_customer_profile(request)
-
-		# The transaction has a response.
-		if transaction_ok
-			@customer_token = @response.customerProfileId
-			@has_customer_token = true
-			@status_code = 200
-			@status_message = "[OK] CustomerTokenCreated"
-		else
-			@status_code = 199 # Most likely caused by a '@customer' id issue.
-			@status_message = "[ERROR] TokenIssue (Contact Admin)"
-			log_result_to_console
-		end
-
+		create_customer_token_request
 		update_directory
 		create_payment_processor_log
 		set_response
