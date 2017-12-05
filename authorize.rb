@@ -23,11 +23,11 @@ def create_customer_token
 		@customer_token = @response.customerProfileId
 		@status_code = 200
 		@status_message = "[OK] CustomerTokenCreated"
-		@return_json_package = JSON.generate ["responseKind"=>@response_kind,"statusCode"=>@status_code,"statusMessage"=>@status_message,"customer_token"=>@customer_token][0]
+		@return_json_package = JSON.generate ["response_kind"=>@response_kind,"status_code"=>@status_code,"status_message"=>@status_message,"customer_token"=>@customer_token][0]
 	else
 		@status_code = 199 # Most likely caused by a '@customer' id issue.
 		@status_message = "[ERROR] CustomerTokenNotCreated"
-		@return_json_package = JSON.generate ["responseKind"=>@response_kind,"statusCode"=>@status_code,"statusMessage"=>@status_message,"responseCode"=>@response_code,"responseError"=>@response_error][0]
+		@return_json_package = JSON.generate ["response_kind"=>@response_kind,"status_code"=>@status_code,"status_message"=>@status_message,"response_code"=>@response_code,"response_error"=>@response_error][0]
 		log_result_to_console
 	end
 end
