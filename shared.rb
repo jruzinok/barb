@@ -14,6 +14,19 @@ def check_payment_token
 	end
 end
 
+# This either loads the merchant value from the directory object or sets it to the default per application.
+def load_merchant_or_set_default_merchant
+	if @merchant_directory == "BAR" || @merchant_directory == "PTD"
+		@merchant = @merchant_directory
+	elsif @database == "BC" || @database == "CS" || @database == "DATA"
+		@merchant = "BAR"
+	elsif @database == "PTD"
+		@merchant = "PTD"
+	end
+
+	load_merchant_vars
+end
+
 # This determines whether or not to process this payment or not.
 def process_or_skip
 

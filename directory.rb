@@ -78,12 +78,11 @@ def load_directory
 	@customer = "#{@database}#{@serial}" # The "ID" used to create a customer profile.
 	@namelast = @directory["Name_Last"]
 	@namefull = "#{@namefirst} #{@namelast}"
-	@d_merchant_id = @directory["_kF_Merchant"]
+	@merchant_directory = @directory["zzF_Merchant"]
 	@customer_token = @directory["Token_Profile_ID"]
-	@d_api_login_id = @directory["T55_Directory | MERCHANT::API_Login_ID"]
-	@d_api_transaction_key = @directory["T55_Directory | MERCHANT::API_Transaction_Key"]
 
 	check_customer_token
+	load_merchant_or_set_default_merchant
 end
 
 def load_directory_current_student_data
@@ -94,6 +93,7 @@ end
 def update_directory
 	if @responseKind == "OK"
 		@directory[:Token_Profile_ID] = @customer_token
+		@directory[:zzF_Merchant] = @merchant
 	else
 		@directory[:zzPP_Response] = @theResponse
 		@directory[:zzPP_Response_Code] = @responseCode

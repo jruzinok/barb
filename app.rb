@@ -218,7 +218,7 @@ class PaymentProcessor < Sinatra::Application
 		load_merchant_vars
 		create_dialer_lead_customer_token
 
-		@merchant = "BC"
+		@merchant = "BAR"
 		load_merchant_vars
 		create_dialer_lead_customer_token
 
@@ -256,7 +256,7 @@ class PaymentProcessor < Sinatra::Application
 		# Stash the newly created PaymentMethod's ID.
 		set_stash_to_id
 
-		@merchant = "BC"
+		@merchant = "BAR"
 		load_merchant_vars
 		process_create_dialer_payment_method_request_v2 # This version only creates tokens.
 
@@ -277,7 +277,7 @@ class PaymentProcessor < Sinatra::Application
 
 		@merchant = params[:merchant] #BC or PTD
 
-		if @merchant == "BC" || @merchant == "PTD"
+		if @merchant == "BAR" || @merchant == "PTD"
 			process_create_dialer_payment_date_request
 		else
 			@status = 301
@@ -318,7 +318,7 @@ class PaymentProcessor < Sinatra::Application
 		# Stash the newly created PaymentMethod's ID.
 		set_stash_to_id
 
-		@merchant = "BC"
+		@merchant = "BAR"
 		load_merchant_vars
 		process_create_dialer_payment_method_request_v2 # This version only creates tokens.
 
@@ -339,7 +339,7 @@ class PaymentProcessor < Sinatra::Application
 
 		@merchant = params[:merchant] #BC or PTD
 
-		if @merchant == "BC" || @merchant == "PTD"
+		if @merchant == "BAR" || @merchant == "PTD"
 			process_create_dialer_payment_date_request
 		else
 			@status = 301

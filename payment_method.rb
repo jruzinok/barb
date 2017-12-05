@@ -152,10 +152,8 @@ end
 def load_payment_method
 	@namefirst = @payment_method["Name_First"]
 	@namelast = @payment_method["Name_Last"]
-	@pm_merchant_id = @payment_method["_kF_Merchant"]
+	@merchant_payment_method = @payment_method["zzF_Merchant"] # Not currently being used.
 	@payment_token = @payment_method["Token_Payment_ID"]
-	@pm_api_login_id = @payment_method["T55_MERCHANT::API_Login_ID"]
-	@pm_api_transaction_key = @payment_method["T55_MERCHANT::API_Transaction_Key"]
 	@address = @payment_method["Address_Address"]
 	@city = @payment_method["Address_City"]
 	@state = @payment_method["Address_State"]
@@ -181,7 +179,6 @@ def create_payment_method
 	end
 
 	@payment_method[:_kF_Directory] = @directory_id
-	@payment_method[:_kF_Merchant] = @d_merchant_id #The Merchant that was assigned to the Directory record.
 	@payment_method[:Name_First] = @namefirst
 	@payment_method[:Name_Last] = @namelast
 	@payment_method[:CreditCard] = @cardnumber
@@ -194,6 +191,7 @@ end
 def update_payment_method
 	if @responseKind == "OK"
 		@payment_method[:Token_Payment_ID] = @payment_token
+		@payment_method[:zzF_Merchant] = @merchant
 		@payment_method[:zzF_Status] = "Active"
 		@payment_method[:zzF_Type] = "Token"
 	else
