@@ -1,4 +1,4 @@
-def create_payment_token_logic
+def create_payment_method_payment_token
 	create_directory_customer_token
 
 	if @has_customer_token == true
@@ -7,6 +7,9 @@ def create_payment_token_logic
 		if @payment_method_found == true && @has_payment_token == false
 			@skip_find_payment_method = true # This prevents the find routine from hitting the database again (to speed the process up and make it less db intensive).
 			create_payment_token
+			@save_payment_method = "Update" # Update the PM record that already exists in the database.
+			save_payment_method
+			create_payment_processor_log
 
 		elsif @payment_method_found == true && @has_payment_token == true
 			@status_code = 220
@@ -16,59 +19,6 @@ def create_payment_token_logic
 	end
 
 	set_response
-end
-
-def create_payment_token
-	unless @skip_find_directory == true
-		find_directory
-	end
-
-	unless @skip_find_payment_method == true
-		find_payment_method
-	end
-
-	if @create_payment_token_requirements_met == true
-		request = CreateCustomerPaymentProfileRequest.new
-		creditcard = CreditCardType.new(@card_number,@card_mmyy,@card_cvv)
-		payment = PaymentType.new(creditcard)
-		profile = CustomerPaymentProfileType.new(nil,nil,payment,nil,nil)
-		profile.billTo = CustomerAddressType.new
-		profile.billTo.firstName = @name_first
-		profile.billTo.lastName = @name_last
-		request.customerProfileId = @customer_token
-		request.paymentProfile = profile
-
-		@response = transaction.create_customer_payment_profile(request)
-
-		# The transaction has a response.
-		if transaction_ok
-			@payment_token = @response.customerPaymentProfileId
-			@has_payment_token = true
-			@status_code = 200
-			@status_message = "[OK] PaymentTokenCreated"
-			log_result_to_console
-		else
-			@status_code = 210
-			@status_message = "[ERROR] PaymentTokenNotCreated"
-			log_result_to_console
-		end
-		
-		save_payment_method
-		create_payment_processor_log
-		set_response
-	end
-end
-
-def create_payment_token_requirements_met
-	if @directory_found == true && @has_customer_token == true && @payment_method_found == true && @has_payment_token == false
-		@create_payment_token_requirements_met = true
-		@save_payment_method = "Update"
-	elsif @directory_found == true && @has_customer_token == true && @payment_method_to_be_created == true
-		@create_payment_token_requirements_met = true
-		@save_payment_method = "Create"
-	else
-		@create_payment_token_requirements_met = false
-	end
 end
 
 def delete_payment_token
@@ -125,8 +75,8 @@ def find_payment_method
 end
 
 def load_payment_method_by_batch
-	@name_first = @payment_method["Name_First"]
-	@name_last = @payment_method["Name_Last"]
+	@card_name_first = @payment_method["Name_First"]
+	@card_name_last = @payment_method["Name_Last"]
 	@customer_token = @payment_method["T55_DIRECTORY::Token_Profile_ID"]
 	@payment_token = @payment_method["Token_Payment_ID"]
 	@card_number = @payment_method["CreditCard_Number"]
@@ -142,8 +92,8 @@ def load_payment_method_by_batch
 end
 
 def load_payment_method
-	@name_first = @payment_method["Name_First"]
-	@name_last = @payment_method["Name_Last"]
+	@card_name_first = @payment_method["Name_First"]
+	@card_name_last = @payment_method["Name_Last"]
 	@merchant_payment_method = @payment_method["zzF_Merchant"] # Not currently being used.
 	@payment_token = @payment_method["Token_Payment_ID"]
 	@address = @payment_method["Address_Address"]
@@ -154,11 +104,13 @@ def load_payment_method
 	check_payment_token
 end
 
+# @save_payment_method = "Create"
+
 def save_payment_method
-	if @save_payment_method == "Update"
-		update_payment_method
-	elsif @save_payment_method == "Create"
+	if @save_payment_method == "Create"
 		create_payment_method
+		update_payment_method
+	elsif @save_payment_method == "Update"
 		update_payment_method
 	end
 end
@@ -336,32 +288,9 @@ end
 
 def create_payment_token_by_batch
 	if @has_customer_token == true && @has_payment_token == false
-		request = CreateCustomerPaymentProfileRequest.new
-		creditcard = CreditCardType.new(@card_number,@card_mmyy,@card_cvv)
-		payment = PaymentType.new(creditcard)
-		profile = CustomerPaymentProfileType.new(nil,nil,payment,nil,nil)
-		profile.billTo = CustomerAddressType.new
-		profile.billTo.firstName = @name_first
-		profile.billTo.lastName = @name_last
-		request.customerProfileId = @customer_token
-		request.paymentProfile = profile
-
-		@response = transaction.create_customer_payment_profile(request)
-
-		# The transaction has a response.
-		if transaction_ok
-			@payment_token = @response.customerPaymentProfileId
-			@status_code = 200
-			@status_message = "[OK] PaymentTokenCreated"
-		else
-			@status_code = 210
-			@status_message = "[ERROR] PaymentTokenNotCreated"
-		end
-
+		create_payment_token
 		@flag_update_payment_method = true
-
 	else
 		@flag_update_payment_method = false
-
 	end
 end

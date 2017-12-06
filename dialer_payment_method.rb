@@ -2,29 +2,7 @@ def create_dialer_payment_token
 	find_dialer_lead
  
 	if @has_customer_token == true
-		request = CreateCustomerPaymentProfileRequest.new
-		creditcard = CreditCardType.new(@card_number,@card_mmyy,@card_cvv)
-		payment = PaymentType.new(creditcard)
-		profile = CustomerPaymentProfileType.new(nil,nil,payment,nil,nil)
-		profile.billTo = CustomerAddressType.new
-		profile.billTo.firstName = @card_name_first
-		profile.billTo.lastName = @card_name_last
-		request.customerProfileId = @customer_token
-		request.paymentProfile = profile
-
-		@response = transaction.create_customer_payment_profile(request)
-
-		# The transaction has a response.
-		if transaction_ok
-			@payment_token = @response.customerPaymentProfileId
-			@status_code = 200
-			@status_message = "[OK] PaymentTokenCreated"
-		else
-			@status_code = 210
-			@status_message = "[ERROR] PaymentTokenNotCreated"
-			log_result_to_console
-		end
-
+		create_payment_token
 		save_dialer_payment_method
 		create_payment_processor_log
 	end

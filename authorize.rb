@@ -32,6 +32,51 @@ def create_customer_token
 	log_result_to_console
 end
 
+def create_payment_token
+	request = CreateCustomerPaymentProfileRequest.new
+	creditcard = CreditCardType.new(@card_number,@card_mmyy,@card_cvv)
+	payment = PaymentType.new(creditcard)
+
+	# Build an address object
+	billTo = CustomerAddressType.new
+	billTo.firstName = @card_name_first
+	billTo.lastName = @card_name_last
+	billTo.address = @address
+	billTo.city = @city
+	billTo.state = @state
+	billTo.zip = @zip
+	billTo.phoneNumber = @phone
+
+	# Use the previously defined payment and billTo objects to
+	# build a payment profile to send with the request
+	paymentProfile = CustomerPaymentProfileType.new
+	paymentProfile.payment = payment
+	paymentProfile.billTo = billTo
+	paymentProfile.defaultPaymentProfile = true
+
+	# Build the request object
+
+	request.paymentProfile = paymentProfile
+	request.customerProfileId = @customer_token
+
+	@response = transaction.create_customer_payment_profile(request)
+
+	# The transaction has a response.
+	if transaction_ok
+		@payment_token = @response.customerPaymentProfileId
+		@has_payment_token = true
+		@status_code = 200
+		@status_message = "[OK] PaymentTokenCreated"
+		@maskedCardNumber = @card_number.split(//).last(4).join
+		@return_json_package = JSON.generate ["result"=>@result,"status_code"=>@status_code,"status_message"=>@status_message,"payment_token"=>@payment_token,"card_number"=>@maskedCardNumber][0]
+	else
+		@status_code = 196
+		@status_message = "[ERROR] PaymentTokenNotCreated"
+		@return_json_package = JSON.generate ["result"=>@result,"status_code"=>@status_code,"status_message"=>@status_message,"response_code"=>@response_code,"response_error"=>@response_error][0]
+	end
+
+end
+
 def validate_tokens
 	request = ValidateCustomerPaymentProfileRequest.new
 

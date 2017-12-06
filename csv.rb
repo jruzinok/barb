@@ -153,30 +153,8 @@ end
 
 def create_payment_token_by_csv
 	if @has_customer_token == true && @has_payment_token == false
-		request = CreateCustomerPaymentProfileRequest.new
-		creditcard = CreditCardType.new(@card_number,@card_mmyy,@card_cvv)
-		payment = PaymentType.new(creditcard)
-		profile = CustomerPaymentProfileType.new(nil,nil,payment,nil,nil)
-		profile.billTo = CustomerAddressType.new
-		profile.billTo.firstName = @name_first
-		profile.billTo.lastName = @name_last
-		request.customerProfileId = @customer_token
-		request.paymentProfile = profile
-
-		@response = transaction.create_customer_payment_profile(request)
-
-		# The transaction has a response.
-		if transaction_ok
-			@payment_token = @response.customerPaymentProfileId
-			@status_code = 200
-			@status_message = "[OK] PaymentTokenCreated"
-		else
-			@status_code = 210
-			@status_message = "[ERROR] PaymentTokenNotCreated"
-		end
-
+		create_payment_token
 		@flag_update_csv = true
-
 	else
 		@flag_update_csv = false
 	end
