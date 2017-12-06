@@ -16,7 +16,7 @@ def save_processed_dailer_payment_date
 
 	@dailer_payment[:zzPP_Response_Code] = @response_code
 
-	if @result_code == "OK"
+	if @result == "OK"
 	
 		if @response_kind == "Approved"
 			@dailer_payment[:zzF_Status] = "Approved"
@@ -37,7 +37,7 @@ def save_processed_dailer_payment_date
 		end
 
 	# These payments were NOT processes.
-	elsif @result_code == "ERROR"
+	elsif @result == "ERROR"
 
 		if @response_kind == "TransactionError"
 			@dailer_payment[:zzF_Status] = "TransactionError"

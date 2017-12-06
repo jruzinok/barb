@@ -2,12 +2,12 @@ def process_create_dialer_payment_method_request
 	parse_create_dialer_payment_method_post
 	if @request_type == "Charge"
 		create_dialer_tokens
-		if @response_kind == "OK"
+		if @result == "OK"
 			process_dialer_payment_date
 		end
 	elsif @request_type == "Schedule"
 		create_dialer_tokens
-		if @response_kind == "OK"
+		if @result == "OK"
 			save_scheduled_dailer_payment_date
 			create_payment_processor_log
 		end
@@ -98,7 +98,7 @@ end
 
 def create_dialer_tokens
 	create_dialer_lead_customer_token
-	if @response_kind == "OK"
+	if @result == "OK"
 		create_dialer_payment_token
 	elsif @dialer_lead_found == true && @has_customer_token == true
 		create_dialer_payment_token

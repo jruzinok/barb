@@ -1,7 +1,7 @@
 def load_merchant_vars
 	load_merchant_from_yml
 	# load_merchant_from_env
-
+	load_gateway
 	transaction_ready
 end
 
@@ -39,20 +39,21 @@ def load_merchant_from_env
 	end
 end
 
-def gateway
+def load_gateway
 	if @gateway == "production"
 		@merchant_gateway_loaded = true
-		{:gateway => :production}
+		@gateway = {:gateway => :production}
 	elsif @gateway == "sandbox"
 		@merchant_gateway_loaded = true
-		{:gateway => :sandbox, :verify_ssl => true}
+		@gateway = {:gateway => :sandbox, :verify_ssl => true}
 	else
 		@merchant_gateway_loaded = false
+		@gateway = nil
 	end
 end
 
 def transaction_ready
-	if @merchant_credentials_loaded == true && @merchant_gateway_loaded == true && @api_login_id != nil && @api_transaction_key != nil
+	if @merchant_credentials_loaded == true && @merchant_gateway_loaded == true && @api_login_id != nil && @api_transaction_key != nil && @gateway != nil
 		true
 	else
 		false
@@ -63,7 +64,7 @@ def transaction_ok
 	if transaction_ready == false
 		false
 	elsif @response.messages.resultCode == MessageTypeEnum::Ok
-		@response_kind = "OK"
+		@result = "OK"
 		true
 	else
 		response_kind_error
@@ -71,7 +72,7 @@ def transaction_ok
 end
 
 def response_kind_error
-	@response_kind = "ERROR"
+	@result = "ERROR"
 	@response_code = @response.messages.messages[0].code
 	@response_error = @response.messages.messages[0].text
 end

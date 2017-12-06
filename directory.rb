@@ -7,7 +7,7 @@ def create_directory_customer_token
 		update_directory
 		create_payment_processor_log
 
-		if @response_kind == "OK"
+		if @result == "OK"
 			@has_customer_token = true
 		end
 
@@ -60,7 +60,7 @@ def load_directory_current_student_data
 end
 
 def update_directory
-	if @response_kind == "OK"
+	if @result == "OK"
 		@directory[:Token_Profile_ID] = @customer_token
 		@directory[:zzF_Merchant] = @merchant
 	else

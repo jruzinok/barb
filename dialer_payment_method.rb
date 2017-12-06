@@ -30,7 +30,7 @@ def create_dialer_payment_token
 	end
 
 	# This sends the PaymentMethodID back to the Dialer php web app in the response body.
-	if @response_kind == "OK" && @dailer_payment_method_found == true
+	if @result == "OK" && @dailer_payment_method_found == true
 		@status_message = @payment_method_id.to_s
 	end
 
@@ -90,7 +90,7 @@ def save_dialer_payment_method
 	@dailer_payment_method[:zzF_Payment_Recurring] = @flag_recurring
 	@dailer_payment_method[:zzF_Merchant] = @merchant
 
-	if @response_kind == "OK"
+	if @result == "OK"
 		@dailer_payment_method[:Token_Payment_ID] = @payment_token
 		@dailer_payment_method[:zzF_Status] = "Active"
 		@dailer_payment_method[:zzF_Type] = "Token"
@@ -105,7 +105,7 @@ def save_dialer_payment_method
 	@dailer_payment_method.save
 
 	# GRAB the ID from the newly created PaymentMethod.
-	if @response_kind == "OK"
+	if @result == "OK"
 		find_dialer_payment_method_by_payment_token
 	end
 end

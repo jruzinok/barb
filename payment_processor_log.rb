@@ -56,7 +56,7 @@ def create_payment_processor_log
 
 	elsif @processType == "Payment"
 
-		if @result_code == "OK"
+		if @result == "OK"
 
 			if @response_kind == "Approved"
 				@payment_processor_log[:zzF_Status] = "Approved"
@@ -77,7 +77,7 @@ def create_payment_processor_log
 			end
 
 		# These payments were NOT processes.
-		elsif @result_code == "ERROR"
+		elsif @result == "ERROR"
 
 			if @response_kind == "TransactionError"
 				@payment_processor_log[:zzF_Status] = "TransactionError"

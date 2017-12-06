@@ -52,7 +52,7 @@ def check_customer_tokens
 end
 
 def update_dialer_lead
-	if @response_kind == "OK"
+	if @result == "OK"
 		if @merchant == "BAR"
 			@dialer_lead[:Token_Profile_ID] = @customer_token
 		elsif @merchant == "PTD"

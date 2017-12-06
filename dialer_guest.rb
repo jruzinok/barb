@@ -38,7 +38,7 @@ def load_dialer_guest
 end
 
 def update_dialer_guest
-	if @response_kind == "OK"
+	if @result == "OK"
 		@dialer_guest[:Token_Profile_ID] = @customer_token
 	else
 		@dialer_guest[:zzPP_Response] = @response

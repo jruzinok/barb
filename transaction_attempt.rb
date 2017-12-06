@@ -49,7 +49,7 @@ def process_onetime_payment
 end
 
 def capture_response
-	if @result_code == "OK"
+	if @result == "OK"
 
 		if @response_kind == "Approved"
 			@status_code = 200
@@ -93,7 +93,7 @@ def save_transaction_attempt
 	@transaction_attempt[:Date] = @date
 
 	# Record the transaction results for each processed payment.
-	if @result_code == "OK"
+	if @result == "OK"
 
 		if @response_kind == "Approved"
 			@transaction_attempt[:zzF_Status] = "Approved"
@@ -114,7 +114,7 @@ def save_transaction_attempt
 		end
 
 	# These payments were NOT processes.
-	elsif @result_code == "ERROR"
+	elsif @result == "ERROR"
 
 		if @response_kind == "TransactionError"
 			@transaction_attempt[:zzF_Status] = "TransactionError"

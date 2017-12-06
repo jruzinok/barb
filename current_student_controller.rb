@@ -137,7 +137,7 @@ def create_current_student_payment_token_by_batch
 end
 
 def log_result_to_console_for_batch_tokenization
-	puts "\n[RESPONSE] #{@response_kind}"
+	puts "\n[RESULT] #{@result}"
 	puts "[CUSTOMER TOKEN] #{@customer_token}"
 	puts "[PAYMENT TOKEN] #{@payment_token}"
 	puts "[MESSAGE] #{@status_message}"

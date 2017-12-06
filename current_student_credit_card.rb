@@ -98,7 +98,7 @@ def load_credit_card_by_batch
 end
 
 def update_credit_card
-	if @response_kind == "OK"
+	if @result == "OK"
 		@credit_card[:Token_Payment_ID] = @payment_token
 		@credit_card[:zzF_Status] = "Active"
 		@credit_card[:zzF_Type] = "Token"

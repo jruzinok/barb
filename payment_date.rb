@@ -140,7 +140,7 @@ end
 
 def update_payment_date
 
-		if @result_code == "OK"
+		if @result == "OK"
 
 			# RECORD the Date Processed.
 			if @database == "PTD" || @database == "BC" || @database == "CS"
@@ -173,7 +173,7 @@ def update_payment_date
 				@payment_date[:zzPP_Response_Error] = @response_error
 			end
 
-		elsif @result_code == "ERROR"
+		elsif @result == "ERROR"
 
 			# These transaction were NOT processed.
 			if @response_kind == "TransactionError"

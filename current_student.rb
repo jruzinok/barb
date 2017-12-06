@@ -46,7 +46,7 @@ def find_and_load_current_student_classdate
 end
 
 def update_current_student
-	if @response_kind == "OK"
+	if @result == "OK"
 		@current_student[:Token_Profile_ID] = @customer_token
 	else
 		@current_student[:zzPP_Response] = @response

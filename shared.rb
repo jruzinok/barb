@@ -157,7 +157,7 @@ def clear_response
 	@response_kind = nil
 	@response_code = nil
 	@response_error = nil
-	@result_code = nil
+	@result = nil
 	@avs_code = nil
 	@cvv_code = nil
 	@transaction_id = nil

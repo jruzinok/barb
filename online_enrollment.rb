@@ -4,21 +4,21 @@ def create_oe_customer_token_logic
 		@check_by_merchant_id = true
 		check_for_customer_profile
 
-		if @has_profile == false && @result_code == "OK"
+		if @has_profile == false && @result == "OK"
 			prepare_oe_customer_variables
 			create_oe_customer_token
-		elsif @has_profile == true && @result_code == "OK"
-			@response_kind = "OK"
+		elsif @has_profile == true && @result == "OK"
+			@result = "OK"
 			@status_code = 230
 			@status_message = "[OK] CustomerTokenAlreadyExisted"
-			@return_json_package = JSON.generate ["response_kind"=>@response_kind,"status_code"=>@status_code,"status_message"=>@status_message,"customer_token"=>@customer_token][0]
+			@return_json_package = JSON.generate ["result"=>@result,"status_code"=>@status_code,"status_message"=>@status_message,"customer_token"=>@customer_token][0]
 		end
 
 	else
-		@response_kind = "ERROR"
+		@result = "ERROR"
 		@status_code = 194
 		@status_message = "[ERROR] Missing required JSON variables."
-		@return_json_package = JSON.generate ["response_kind"=>@response_kind,"status_code"=>@status_code,"status_message"=>@status_message][0]
+		@return_json_package = JSON.generate ["result"=>@result,"status_code"=>@status_code,"status_message"=>@status_message][0]
 	end
 end
 
@@ -28,20 +28,20 @@ def create_oe_payment_token_logic
 		@check_by_customer_token = true
 		check_for_customer_profile
 
-		if @has_profile == true && @result_code == "OK"
+		if @has_profile == true && @result == "OK"
 			create_oe_payment_token
 		else
-			@response_kind = "ERROR"
+			@result = "ERROR"
 			@status_code = 195
 			@status_message = "[ERROR] CustomerTokenDoesntExist"
-			@return_json_package = JSON.generate ["response_kind"=>@response_kind,"status_code"=>@status_code,"status_message"=>@status_message][0]
+			@return_json_package = JSON.generate ["result"=>@result,"status_code"=>@status_code,"status_message"=>@status_message][0]
 		end
 
 	else
-		@response_kind = "ERROR"
+		@result = "ERROR"
 		@status_code = 193
 		@status_message = "[ERROR] Missing required JSON variables."
-		@return_json_package = JSON.generate ["response_kind"=>@response_kind,"status_code"=>@status_code,"status_message"=>@status_message][0]
+		@return_json_package = JSON.generate ["result"=>@result,"status_code"=>@status_code,"status_message"=>@status_message][0]
 	end
 end
 
@@ -51,23 +51,23 @@ def list_oe_payment_token_logic
 		@check_by_customer_token = true
 		check_for_customer_profile
 
-		if @has_profile == true && @result_code == "OK"
-			@response_kind = "OK"
+		if @has_profile == true && @result == "OK"
+			@result = "OK"
 			@status_code = 210
 			@status_message = "[OK] PaymentTokensRetrieved"
-			@return_json_package = JSON.generate ["response_kind"=>@response_kind,"status_code"=>@status_code,"status_message"=>@status_message,"customer_token"=>@customer_token,"payment_tokens"=>@tokens][0]
+			@return_json_package = JSON.generate ["result"=>@result,"status_code"=>@status_code,"status_message"=>@status_message,"customer_token"=>@customer_token,"payment_tokens"=>@tokens][0]
 		else
-			@response_kind = "ERROR"
+			@result = "ERROR"
 			@status_code = 194
 			@status_message = "[ERROR] CustomerTokenDoesntExist"
-			@return_json_package = JSON.generate ["response_kind"=>@response_kind,"status_code"=>@status_code,"status_message"=>@status_message][0]
+			@return_json_package = JSON.generate ["result"=>@result,"status_code"=>@status_code,"status_message"=>@status_message][0]
 		end
 
 	else
-		@response_kind = "ERROR"
+		@result = "ERROR"
 		@status_code = 192
 		@status_message = "[ERROR] Missing required JSON variables."
-		@return_json_package = JSON.generate ["response_kind"=>@response_kind,"status_code"=>@status_code,"status_message"=>@status_message][0]
+		@return_json_package = JSON.generate ["result"=>@result,"status_code"=>@status_code,"status_message"=>@status_message][0]
 	end
 end
 
@@ -89,7 +89,6 @@ def check_for_customer_profile
 			if transaction_ok
 				# This is the expected result when the OE webapp requested to create a PT.
 				@has_profile = true
-				@result_code = "OK"
 				
 				@customer_token = response.profile.customerProfileId
 				@payment_tokens = response.profile.paymentProfiles
@@ -108,31 +107,31 @@ def check_for_customer_profile
 			else
 				# This is the expected result when the OE webapp requested to create a CT.
 				@has_profile = false
-				@result_code = "OK"
+				@result = "OK"
 			end
 
 			# A transactional FAILURE occurred. [NIL]
 		else
-			@result_code = "ERROR"
+			@result = "ERROR"
 
 			@response_kind = "TransactionFailure"
 			@status_code = 198
 			@status_message = "[ERROR] A transactional FAILURE occurred."
-			@return_json_package = JSON.generate ["response_kind"=>@response_kind,"status_code"=>@status_code,"status_message"=>@status_message][0]
+			@return_json_package = JSON.generate ["result"=>@result,"status_code"=>@status_code,"status_message"=>@status_message][0]
 		end
 
 	rescue Errno::ETIMEDOUT => e
-		@result_code = "ERROR"
+		@result = "ERROR"
 
 		@response_kind = "TransactionFailure"
 		@status_code = 197
 		@status_message = "[ERROR] Authorize.net isn't available."
-		@return_json_package = JSON.generate ["response_kind"=>@response_kind,"status_code"=>@status_code,"status_message"=>@status_message][0]
+		@return_json_package = JSON.generate ["result"=>@result,"status_code"=>@status_code,"status_message"=>@status_message][0]
 	end
 end
 
 def check_required_ct_params
-	if @json[:program] && @json[:filemaker_id] && @json[:name_first] && @json[:name_last]
+	if @json[:filemaker_id] && @json[:merchant] && @json[:name_first] && @json[:name_last] && @json[:program]
 		true
 	else
 		false
@@ -140,7 +139,7 @@ def check_required_ct_params
 end
 
 def check_required_pt_params
-	if @json[:customer_token] && @json[:name_first] && @json[:name_last] && @json[:card_number] && @json[:card_mmyy] && @json[:card_cvv]
+	if @json[:customer_token] && @json[:card_number] && @json[:card_mmyy] && @json[:card_cvv] && @json[:merchant] && @json[:name_first] && @json[:name_last]
 		true
 	else
 		false
@@ -211,19 +210,19 @@ def create_oe_payment_token
 	request.paymentProfile = paymentProfile
 	request.customerProfileId = @customer_token
 
-	response = transaction.create_customer_payment_profile(request)
+	@response = transaction.create_customer_payment_profile(request)
 
 	# The transaction has a response.
 	if transaction_ok
-		@payment_token = response.customerPaymentProfileId
+		@payment_token = @response.customerPaymentProfileId
 		@status_code = 200
 		@status_message = "[OK] PaymentTokenCreated"
 		@maskedCardNumber = @card_number.split(//).last(4).join
-		@return_json_package = JSON.generate ["response_kind"=>@response_kind,"status_code"=>@status_code,"status_message"=>@status_message,"payment_token"=>@payment_token,"card_number"=>@maskedCardNumber][0]
+		@return_json_package = JSON.generate ["result"=>@result,"status_code"=>@status_code,"status_message"=>@status_message,"payment_token"=>@payment_token,"card_number"=>@maskedCardNumber][0]
 	else
 		@status_code = 196
 		@status_message = "[ERROR] PaymentTokenNotCreated"
-		@return_json_package = JSON.generate ["response_kind"=>@response_kind,"status_code"=>@status_code,"status_message"=>@status_message,"response_code"=>@response_code,"response_error"=>@response_error][0]
+		@return_json_package = JSON.generate ["result"=>@result,"status_code"=>@status_code,"status_message"=>@status_message,"response_code"=>@response_code,"response_error"=>@response_error][0]
 	end
 
 end

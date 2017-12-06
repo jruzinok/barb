@@ -2,11 +2,11 @@ include AuthorizeNet::API
 
 def transaction
 	if transaction_ready
-		transaction = Transaction.new(@api_login_id, @api_transaction_key, gateway)
+		transaction = Transaction.new(@api_login_id, @api_transaction_key, @gateway)
 	else
-		@result_code = "ERROR"
-
+		@result = "ERROR"
 		@response_kind = "TransactionNotAttempted"
+		@status_code = 99
 		@response_error = "Merchant variables are missing."
 	end
 end
@@ -28,8 +28,8 @@ def create_customer_token
 		@status_code = 199 # Most likely caused by a '@customer' id issue.
 		@status_message = "[ERROR] CustomerTokenNotCreated"
 		@return_json_package = JSON.generate ["response_kind"=>@response_kind,"status_code"=>@status_code,"status_message"=>@status_message,"response_code"=>@response_code,"response_error"=>@response_error][0]
-		log_result_to_console
 	end
+	log_result_to_console
 end
 
 def validate_tokens
@@ -53,7 +53,7 @@ def validate_tokens
 			@valid_tokens = false
 
 			# Capture the complete response and set the ResultCode (logic variable) to Error.
-			@result_code = "ERROR"
+			@result = "ERROR"
 
 			@response_kind = "TokenError"
 		end
@@ -61,14 +61,14 @@ def validate_tokens
 			# A transactional FAILURE occurred. [NIL]
 		else
 			@valid_tokens = false
-			@result_code = "ERROR"
+			@result = "ERROR"
 
 			@response_kind = "TransactionFailure"
 			@response_error = "A transactional FAILURE occurred."
 		end
 
 	rescue Errno::ETIMEDOUT => e
-		@result_code = "ERROR"
+		@result = "ERROR"
 
 		@response_kind = "TransactionFailure"
 		@response_error = "Authorize.net isn't available."
@@ -108,7 +108,7 @@ def process_payment
 
 			# The transaction has a response.
 			if transaction_ok
-				@result_code = "OK"
+				@result = "OK"
 
 				# CAPTURE the transaction details.
 				@transaction_id = @response.transactionResponse.transId
@@ -138,7 +138,7 @@ def process_payment
 
 			# A transactional ERROR occurred.
 			elsif @response.messages.resultCode == MessageTypeEnum::Error
-				@result_code = "ERROR"
+				@result = "ERROR"
 
 				@response_kind = "TransactionError"
 				@response_code = @response.transactionResponse.errors.errors[0].errorCode
@@ -147,14 +147,14 @@ def process_payment
 
 		# A transactional FAILURE occurred. [NIL]
 		else
-			@result_code = "ERROR"
+			@result = "ERROR"
 
 			@response_kind = "TransactionFailure"
 			@response_error = "A transactional FAILURE occurred."
 		end
 
 	rescue Errno::ETIMEDOUT => e
-		@result_code = "ERROR"
+		@result = "ERROR"
 
 		@response_kind = "TransactionFailure"
 		@response_error = "Authorize.net isn't available."

@@ -181,7 +181,7 @@ def create_payment_method
 end
 
 def update_payment_method
-	if @response_kind == "OK"
+	if @result == "OK"
 		@payment_method[:Token_Payment_ID] = @payment_token
 		@payment_method[:zzF_Merchant] = @merchant
 		@payment_method[:zzF_Status] = "Active"
@@ -198,7 +198,7 @@ def update_payment_method
 end
 
 def update_payment_method_after_payment_token_is_deleted
-	if @response_kind == "OK"
+	if @result == "OK"
 		@payment_method[:Token_Payment_ID] = ""
 		@payment_method[:zzF_Status] = "Deleted"
 		@payment_method[:zzF_Type] = "Token"
