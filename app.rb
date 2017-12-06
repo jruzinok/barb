@@ -78,24 +78,24 @@ class PaymentProcessor < Sinatra::Application
 	end
 
 	# This process doesn't rely on FileMaker.
-	post '/create-oe-customer-token' do
+	post '/create-customer-token' do
 		@process = "Create Customer Token"
 		@processType = "Token"
 		@json = JSON.parse(request.body.read).symbolize_keys unless params[:path]
 
-		create_oe_customer_token_logic
+		create_customer_token_logic
 
 		# Return the response back to the requesting application.
 		@return_json_package
 	end
 
 	# This process doesn't rely on FileMaker.
-	post '/create-oe-payment-token' do
+	post '/create-payment-token' do
 		@process = "Create Payment Token"
 		@processType = "Token"
 		@json = JSON.parse(request.body.read).symbolize_keys unless params[:path]
 
-		create_oe_payment_token_logic
+		create_payment_token_logic
 
 		# Return the response back to the requesting application.
 		@return_json_package
@@ -125,7 +125,7 @@ class PaymentProcessor < Sinatra::Application
 		@card_mmyy = params[:MMYY]
 		@card_cvv = params[:CVV]
 
-		create_payment_token_logic
+		create_payment_method_payment_token
 
 		# Return the response back to FileMaker.
 		status @status
