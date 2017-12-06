@@ -41,7 +41,7 @@ require_relative 'payment_processor_log.rb'
 require_relative 'current_student.rb'
 require_relative 'current_student_controller.rb'
 require_relative 'current_student_credit_card.rb'
-require_relative 'online_enrollment.rb'
+require_relative 'tokens.rb'
 
 class PaymentProcessor < Sinatra::Application
 
