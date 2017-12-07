@@ -25,13 +25,6 @@ def load_merchant_from_yml
 	end
 end
 
-authorize_api_id_bar: 37XCbbHD93tZ
-authorize_api_key_bar: 42kTS85hFX9Sh2k7
-authorize_api_id_ptd: 369kwY5b9rEB
-authorize_api_key_ptd:
-
-
-
 def load_merchant_from_env
 	@gateway = ENV['AUTHORIZE_API_GATEWAY']
 
