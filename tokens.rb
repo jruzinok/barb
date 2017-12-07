@@ -112,6 +112,7 @@ def check_required_list_params
 end
 
 def prepare_customer_variables
+	@merchant = @json[:merchant]
 	@customer = "#{@json[:program]}#{@json[:filemaker_id]}" # The "ID" used to create a customer profile.
 	@name_full = "#{@json[:name_first]} #{@json[:name_last]}"
 end
@@ -121,6 +122,7 @@ def prepare_list_payment_variables
 end
 
 def prepare_payment_variables
+	@merchant = @json[:merchant]
 	@customer_token = @json[:customer_token]
 	@card_name_first = @json[:name_first]
 	@card_name_last = @json[:name_last]
