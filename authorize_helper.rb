@@ -62,7 +62,7 @@ def load_gateway
 end
 
 def transaction_ready
-	load_merchant_vars
+	load_merchant_variables
 	if @merchant_credentials_loaded == true && @merchant_gateway_loaded == true && @api_login_id != nil && @api_transaction_key != nil && @gateway != nil
 		true
 	else

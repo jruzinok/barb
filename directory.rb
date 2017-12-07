@@ -47,7 +47,7 @@ def load_directory
 	@customer_token = @directory["Token_Profile_ID"]
 
 	check_customer_token
-	load_merchant_or_set_default_merchant
+	load_assigned_merchant_or_set_default
 end
 
 def load_directory_current_student_data

@@ -215,11 +215,9 @@ class PaymentProcessor < Sinatra::Application
 		@recordtype = "DialerLead"
 
 		@merchant = "PTD"
-		load_merchant_vars
 		create_dialer_lead_customer_token
 
 		@merchant = "BAR"
-		load_merchant_vars
 		create_dialer_lead_customer_token
 
 		# Return the response back to the Dialer.
@@ -250,14 +248,12 @@ class PaymentProcessor < Sinatra::Application
 		@recordtype = "DialerLead"
 
 		@merchant = "PTD"
-		load_merchant_vars
 		process_create_dialer_payment_method_request # This version processes/schedules payments.
 
 		# Stash the newly created PaymentMethod's ID.
 		set_stash_to_id
 
 		@merchant = "BAR"
-		load_merchant_vars
 		process_create_dialer_payment_method_request_v2 # This version only creates tokens.
 
 		# Link both payment methods to each other.
@@ -274,15 +270,9 @@ class PaymentProcessor < Sinatra::Application
 		@processType = "Payment"
 		@database = "DL"
 		@recordtype = "DialerLead"
+		@merchant = params[:merchant] #BAR or PTD
 
-		@merchant = params[:merchant] #BC or PTD
-
-		if @merchant == "BAR" || @merchant == "PTD"
-			process_create_dialer_payment_date_request
-		else
-			@status = 301
-			@body = "[ERROR] Merchant not specified."
-		end
+		process_create_dialer_payment_date_request
 
 		# Return the response back to the Dialer.
 		status @status
@@ -312,14 +302,12 @@ class PaymentProcessor < Sinatra::Application
 		@recordtype = "DialerGuest"
 
 		@merchant = "PTD"
-		load_merchant_vars
 		process_create_dialer_payment_method_request # This version processes/schedules payments.
 
 		# Stash the newly created PaymentMethod's ID.
 		set_stash_to_id
 
 		@merchant = "BAR"
-		load_merchant_vars
 		process_create_dialer_payment_method_request_v2 # This version only creates tokens.
 
 		# Link both payment methods to each other.
@@ -336,15 +324,9 @@ class PaymentProcessor < Sinatra::Application
 		@processType = "Payment"
 		@database = "DL"
 		@recordtype = "DialerGuest"
+		@merchant = params[:merchant] #BAR or PTD
 
-		@merchant = params[:merchant] #BC or PTD
-
-		if @merchant == "BAR" || @merchant == "PTD"
-			process_create_dialer_payment_date_request
-		else
-			@status = 301
-			@body = "[ERROR] Merchant not specified."
-		end
+		process_create_dialer_payment_date_request
 
 		# Return the response back to the Dialer.
 		status @status
