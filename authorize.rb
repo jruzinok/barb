@@ -17,11 +17,11 @@ def create_customer_token
 			@customer_token = @authorize_response.customerProfileId
 			@status_code = 200
 			@status_message = "[OK] CustomerTokenCreated"
-			@return_json_package = JSON.generate ["response_kind"=>@authorize_response_kind,"status_code"=>@status_code,"status_message"=>@status_message,"customer_token"=>@customer_token][0]
+			@return_json_package = JSON.generate ["result"=>@result,"status_code"=>@status_code,"status_message"=>@status_message,"customer_token"=>@customer_token][0]
 		else
 			@status_code = 199 # Most likely caused by a '@customer' id issue.
 			@status_message = "[ERROR] CustomerTokenNotCreated"
-			@return_json_package = JSON.generate ["response_kind"=>@authorize_response_kind,"status_code"=>@status_code,"status_message"=>@status_message,"response_code"=>@authorize_response_code,"response_error"=>@authorize_response_error][0]
+			@return_json_package = JSON.generate ["result"=>@result,"status_code"=>@status_code,"status_message"=>@status_message,"response_code"=>@authorize_response_code,"response_error"=>@authorize_response_error][0]
 		end
 		log_result_to_console
 	end
@@ -69,7 +69,7 @@ def create_payment_token
 		else
 			@status_code = 196
 			@status_message = "[ERROR] PaymentTokenNotCreated"
-			@return_json_package = JSON.generate ["result"=>@result,"status_code"=>@status_code,"status_message"=>@status_message,"response_code"=>@authorize_response_code,"response_error"=>@authorize_response_error][0]
+			@return_json_package = JSON.generate ["result"=>@result,"status_code"=>@status_code,"status_message"=>@status_message,"authorize_response_code"=>@authorize_response_error,"response_error"=>@authorize_response_error][0]
 			log_result_to_console
 		end
 	end
