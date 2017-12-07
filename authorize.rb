@@ -1,17 +1,11 @@
 include AuthorizeNet::API
 
 def transaction
-	if transaction_ready
-		transaction = Transaction.new(@api_login_id, @api_transaction_key, @gateway)
-	else
-		@result = "ERROR"
-		@response_kind = "TransactionNotAttempted"
-		@status_code = 99
-		@response_error = "Merchant variables are missing."
-	end
+	transaction = Transaction.new(@api_login_id, @api_transaction_key, @gateway)
 end
 
 def create_customer_token
+	if transaction_ready
 	request = CreateCustomerProfileRequest.new
 	request.profile = CustomerProfileType.new(@customer,@name_full,nil,nil,nil) #(merchantCustomerId,description,email,paymentProfiles,shipToList)
 
@@ -30,9 +24,11 @@ def create_customer_token
 		@return_json_package = JSON.generate ["response_kind"=>@response_kind,"status_code"=>@status_code,"status_message"=>@status_message,"response_code"=>@response_code,"response_error"=>@response_error][0]
 	end
 	log_result_to_console
+	end
 end
 
 def create_payment_token
+	if transaction_ready
 	request = CreateCustomerPaymentProfileRequest.new
 	creditcard = CreditCardType.new(@card_number,@card_mmyy,@card_cvv)
 	payment = PaymentType.new(creditcard)
@@ -74,9 +70,11 @@ def create_payment_token
 		@status_message = "[ERROR] PaymentTokenNotCreated"
 		@return_json_package = JSON.generate ["result"=>@result,"status_code"=>@status_code,"status_message"=>@status_message,"response_code"=>@response_code,"response_error"=>@response_error][0]
 	end
+	end
 end
 
 def update_payment_token
+	if transaction_ready
 	request = UpdateCustomerPaymentProfileRequest.new
 
 	# Set the @card_mmyy = 'XXXX' and @card_cvv = nil if the user didn't enter any values.
@@ -114,9 +112,11 @@ def update_payment_token
 		@status_message = "[ERROR] PaymentTokenNotUpdated"
 		log_result_to_console
 	end
+	end
 end
 
 def delete_payment_token
+	if transaction_ready
 	request = DeleteCustomerPaymentProfileRequest.new
 	request.customerProfileId = @customer_token
 	request.customerPaymentProfileId = @payment_token
@@ -133,9 +133,11 @@ def delete_payment_token
 		@status_message = "[ERROR] PaymentTokenNotDeleted"
 		log_result_to_console
 	end
+	end
 end
 
 def validate_customer_token
+	if transaction_ready
 	request = GetCustomerProfileRequest.new
 
 	if @check_by_merchant_id == true
@@ -182,9 +184,11 @@ def validate_customer_token
 		@status_message = "[ERROR] Authorize.net isn't available."
 		@return_json_package = JSON.generate ["result"=>@result,"status_code"=>@status_code,"status_message"=>@status_message][0]
 	end
+	end
 end
 
 def retrieve_payment_token
+	if transaction_ready
 	request = GetCustomerPaymentProfileRequest.new
 	request.customerProfileId = @customer_token
 	request.customerPaymentProfileId = @payment_token
@@ -200,9 +204,11 @@ def retrieve_payment_token
 		@status_message = "[ERROR] PaymentTokenCouldNotBeRetrieved"
 		log_result_to_console
 	end
+	end
 end
 
 def validate_tokens
+	if transaction_ready
 	request = ValidateCustomerPaymentProfileRequest.new
 
 	#Edit this part to select a specific customer
@@ -243,10 +249,12 @@ def validate_tokens
 		@response_kind = "TransactionFailure"
 		@response_error = "Authorize.net isn't available."
 	end
+	end
 end
 
 # This method connects all of the payment processing methods together.
 def process_payment
+	if transaction_ready
 	request = CreateTransactionRequest.new
 	request.transactionRequest = TransactionRequestType.new()
 	request.transactionRequest.amount = @amount
@@ -328,5 +336,6 @@ def process_payment
 
 		@response_kind = "TransactionFailure"
 		@response_error = "Authorize.net isn't available."
+	end
 	end
 end

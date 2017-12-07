@@ -2,7 +2,6 @@ def load_merchant_vars
 	load_merchant_from_yml
 	# load_merchant_from_env
 	load_gateway
-	transaction_ready
 end
 
 def load_merchant_from_yml
@@ -53,25 +52,33 @@ def load_gateway
 end
 
 def transaction_ready
+	load_merchant_vars
 	if @merchant_credentials_loaded == true && @merchant_gateway_loaded == true && @api_login_id != nil && @api_transaction_key != nil && @gateway != nil
 		true
 	else
+		transaction_not_ready
 		false
 	end
+end
+
+def transaction_not_ready
+	@result = "ERROR"
+	@response_kind = "TransactionNotAttempted"
+	@status_code = 99
+	@response_error = "Merchant variables are missing."
 end
 
 def transaction_ok
-	if transaction_ready == false
-		false
-	elsif @response.messages.resultCode == MessageTypeEnum::Ok
+	if @response.messages.resultCode == MessageTypeEnum::Ok
 		@result = "OK"
 		true
 	else
-		response_kind_error
+		transaction_error
+		false
 	end
 end
 
-def response_kind_error
+def transaction_error
 	@result = "ERROR"
 	@response_code = @response.messages.messages[0].code
 	@response_error = @response.messages.messages[0].text
