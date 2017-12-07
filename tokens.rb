@@ -73,8 +73,8 @@ def list_payment_token_logic
 end
 
 def build_array_of_payment_tokens
-	@customer_token = @response.profile.customerProfileId
-	@payment_tokens = @response.profile.paymentProfiles
+	@customer_token = @authorize_response.profile.customerProfileId
+	@payment_tokens = @authorize_response.profile.paymentProfiles
 
 	if @payment_tokens.length >= 1
 		@tokens = Array.new

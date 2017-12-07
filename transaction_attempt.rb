@@ -51,19 +51,19 @@ end
 def capture_response
 	if @result == "OK"
 
-		if @response_kind == "Approved"
+		if @authorize_response_kind == "Approved"
 			@status_code = 200
-			@status_message = "[OK] Transaction#{@response_kind}"
+			@status_message = "[OK] Transaction#{@authorize_response_kind}"
 			log_result_to_console
 		else # Declined, Error, & HeldforReview
 			@status_code = 205
-			@status_message = "[ERROR] Transaction#{@response_kind}"
+			@status_message = "[ERROR] Transaction#{@authorize_response_kind}"
 			log_result_to_console
 		end
 
 	else # Transactional Error (issue with CC or Authorize)
 		@status_code = 210
-		@status_message = "[ERROR] #{@response_kind}"
+		@status_message = "[ERROR] #{@authorize_response_kind}"
 		log_result_to_console
 	end	
 end
@@ -77,10 +77,10 @@ def save_transaction_attempt
 
 	# SAVE the response values for all transactions.
 	@transaction_attempt[:zzPP_Transaction] = @transaction_id
-	@transaction_attempt[:zzPP_Response] = @response
+	@transaction_attempt[:zzPP_Response] = @authorize_response
 	@transaction_attempt[:zzPP_Response_AVS_Code] = @avs_code
 	@transaction_attempt[:zzPP_Response_CVV_Code] = @cvv_code
-	@transaction_attempt[:zzPP_Response_Code] = @response_code
+	@transaction_attempt[:zzPP_Response_Code] = @authorize_response_code
 
 	# SET the foreign key fields.
 	@transaction_attempt[:_kF_Directory] = @directory_id
@@ -95,44 +95,44 @@ def save_transaction_attempt
 	# Record the transaction results for each processed payment.
 	if @result == "OK"
 
-		if @response_kind == "Approved"
+		if @authorize_response_kind == "Approved"
 			@transaction_attempt[:zzF_Status] = "Approved"
 			@transaction_attempt[:zzPP_Authorization_Code] = @authorization_code
-			@transaction_attempt[:zzPP_Response_Message] = @response_message
+			@transaction_attempt[:zzPP_Response_Message] = @authorize_response_message
 
-		elsif @response_kind == "Declined"
+		elsif @authorize_response_kind == "Declined"
 			@transaction_attempt[:zzF_Status] = "Declined"
-			@transaction_attempt[:zzPP_Response_Error] = @response_error
+			@transaction_attempt[:zzPP_Response_Error] = @authorize_response_error
 
-		elsif @response_kind == "Error"
+		elsif @authorize_response_kind == "Error"
 			@transaction_attempt[:zzF_Status] = "Error"
-			@transaction_attempt[:zzPP_Response_Error] = @response_error
+			@transaction_attempt[:zzPP_Response_Error] = @authorize_response_error
 
-		elsif @response_kind == "HeldforReview"
+		elsif @authorize_response_kind == "HeldforReview"
 			@transaction_attempt[:zzF_Status] = "HeldForReview"
-			@transaction_attempt[:zzPP_Response_Error] = @response_error
+			@transaction_attempt[:zzPP_Response_Error] = @authorize_response_error
 		end
 
 	# These payments were NOT processes.
 	elsif @result == "ERROR"
 
-		if @response_kind == "TransactionError"
+		if @authorize_response_kind == "TransactionError"
 			@transaction_attempt[:zzF_Status] = "TransactionError"
 			@transaction_attempt[:zzPP_Transaction] = @transaction_id
 
-			@transaction_attempt[:zzPP_Response] = @response
-			@transaction_attempt[:zzPP_Response_Code] = @response_code
-			@transaction_attempt[:zzPP_Response_Error] = @response_error
+			@transaction_attempt[:zzPP_Response] = @authorize_response
+			@transaction_attempt[:zzPP_Response_Code] = @authorize_response_code
+			@transaction_attempt[:zzPP_Response_Error] = @authorize_response_error
 
-		elsif @response_kind == "TokenError"
+		elsif @authorize_response_kind == "TokenError"
 			@transaction_attempt[:zzF_Status] = "TokenError"
-			@transaction_attempt[:zzPP_Response] = @response
-			@transaction_attempt[:zzPP_Response_Code] = @response_code
-			@transaction_attempt[:zzPP_Response_Error] = @response_error
+			@transaction_attempt[:zzPP_Response] = @authorize_response
+			@transaction_attempt[:zzPP_Response_Code] = @authorize_response_code
+			@transaction_attempt[:zzPP_Response_Error] = @authorize_response_error
 
-		elsif @response_kind == "TransactionFailure"
+		elsif @authorize_response_kind == "TransactionFailure"
 			@transaction_attempt[:zzF_Status] = "TransactionFailure"
-			@transaction_attempt[:zzPP_Response_Error] = @response_error
+			@transaction_attempt[:zzPP_Response_Error] = @authorize_response_error
 		end
 	end
 

@@ -7,10 +7,6 @@ def create_directory_customer_token
 		update_directory
 		create_payment_processor_log
 
-		if @result == "OK"
-			@has_customer_token = true
-		end
-
 	elsif @directory_found == true && @has_customer_token == true
 		@has_customer_token = true
 		@status_code = 220
@@ -64,9 +60,9 @@ def update_directory
 		@directory[:Token_Profile_ID] = @customer_token
 		@directory[:zzF_Merchant] = @merchant
 	else
-		@directory[:zzPP_Response] = @response
-		@directory[:zzPP_Response_Code] = @response_code
-		@directory[:zzPP_Response_Error] = @response_error
+		@directory[:zzPP_Response] = @authorize_response
+		@directory[:zzPP_Response_Code] = @authorize_response_code
+		@directory[:zzPP_Response_Error] = @authorize_response_error
 	end
 
 	@directory.save

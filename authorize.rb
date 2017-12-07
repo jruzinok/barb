@@ -9,19 +9,19 @@ def create_customer_token
 		request = CreateCustomerProfileRequest.new
 		request.profile = CustomerProfileType.new(@customer,@name_full,nil,nil,nil) #(merchantCustomerId,description,email,paymentProfiles,shipToList)
 
-		@response = transaction.create_customer_profile(request)
+		@authorize_response = transaction.create_customer_profile(request)
 
 		# The transaction has a response.
 		if transaction_ok
 			@has_customer_token = true
-			@customer_token = @response.customerProfileId
+			@customer_token = @authorize_response.customerProfileId
 			@status_code = 200
 			@status_message = "[OK] CustomerTokenCreated"
-			@return_json_package = JSON.generate ["response_kind"=>@response_kind,"status_code"=>@status_code,"status_message"=>@status_message,"customer_token"=>@customer_token][0]
+			@return_json_package = JSON.generate ["response_kind"=>@authorize_response_kind,"status_code"=>@status_code,"status_message"=>@status_message,"customer_token"=>@customer_token][0]
 		else
 			@status_code = 199 # Most likely caused by a '@customer' id issue.
 			@status_message = "[ERROR] CustomerTokenNotCreated"
-			@return_json_package = JSON.generate ["response_kind"=>@response_kind,"status_code"=>@status_code,"status_message"=>@status_message,"response_code"=>@response_code,"response_error"=>@response_error][0]
+			@return_json_package = JSON.generate ["response_kind"=>@authorize_response_kind,"status_code"=>@status_code,"status_message"=>@status_message,"response_code"=>@authorize_response_code,"response_error"=>@authorize_response_error][0]
 		end
 		log_result_to_console
 	end
@@ -55,20 +55,22 @@ def create_payment_token
 		request.paymentProfile = paymentProfile
 		request.customerProfileId = @customer_token
 
-		@response = transaction.create_customer_payment_profile(request)
+		@authorize_response = transaction.create_customer_payment_profile(request)
 
 		# The transaction has a response.
 		if transaction_ok
-			@payment_token = @response.customerPaymentProfileId
+			@payment_token = @authorize_response.customerPaymentProfileId
 			@has_payment_token = true
 			@status_code = 200
 			@status_message = "[OK] PaymentTokenCreated"
 			@maskedCardNumber = @card_number.split(//).last(4).join
 			@return_json_package = JSON.generate ["result"=>@result,"status_code"=>@status_code,"status_message"=>@status_message,"payment_token"=>@payment_token,"card_number"=>@maskedCardNumber][0]
+			log_result_to_console
 		else
 			@status_code = 196
 			@status_message = "[ERROR] PaymentTokenNotCreated"
-			@return_json_package = JSON.generate ["result"=>@result,"status_code"=>@status_code,"status_message"=>@status_message,"response_code"=>@response_code,"response_error"=>@response_error][0]
+			@return_json_package = JSON.generate ["result"=>@result,"status_code"=>@status_code,"status_message"=>@status_message,"response_code"=>@authorize_response_code,"response_error"=>@authorize_response_error][0]
+			log_result_to_console
 		end
 	end
 end
@@ -99,7 +101,7 @@ def update_payment_token
 		profile.customerPaymentProfileId = @payment_token
 
 		# PASS the transaction request and CAPTURE the transaction response.
-		@response = transaction.update_customer_payment_profile(request)
+		@authorize_response = transaction.update_customer_payment_profile(request)
 
 		if transaction_ok
 			@payment_token_updated = true
@@ -121,7 +123,7 @@ def delete_payment_token
 		request.customerProfileId = @customer_token
 		request.customerPaymentProfileId = @payment_token
 
-		@response = transaction.delete_customer_payment_profile(request)
+		@authorize_response = transaction.delete_customer_payment_profile(request)
 
 		# The transaction has a response.
 		if transaction_ok
@@ -146,11 +148,11 @@ def validate_customer_token
 			request.customerProfileId = @customer_token
 		end
 
-		@response = transaction.get_customer_profile(request)
+		@authorize_response = transaction.get_customer_profile(request)
 
 		# Ensure that a response was received before proceeding.
 		begin
-			if @response.messages != nil
+			if @authorize_response.messages != nil
 
 				if transaction_ok
 					# This is the expected result when a webapp requests to create a PT.
@@ -170,7 +172,7 @@ def validate_customer_token
 			else
 				@result = "ERROR"
 
-				@response_kind = "TransactionFailure"
+				@authorize_response_kind = "TransactionFailure"
 				@status_code = 198
 				@status_message = "[ERROR] A transactional FAILURE occurred."
 				@return_json_package = JSON.generate ["result"=>@result,"status_code"=>@status_code,"status_message"=>@status_message][0]
@@ -179,7 +181,7 @@ def validate_customer_token
 		rescue Errno::ETIMEDOUT => e
 			@result = "ERROR"
 
-			@response_kind = "TransactionFailure"
+			@authorize_response_kind = "TransactionFailure"
 			@status_code = 197
 			@status_message = "[ERROR] Authorize.net isn't available."
 			@return_json_package = JSON.generate ["result"=>@result,"status_code"=>@status_code,"status_message"=>@status_message][0]
@@ -193,11 +195,12 @@ def retrieve_payment_token
 		request.customerProfileId = @customer_token
 		request.customerPaymentProfileId = @payment_token
 
-		@response = transaction.get_customer_payment_profile(request)
+		@authorize_response = transaction.get_customer_payment_profile(request)
 
 		if transaction_ok
 			@payment_token_retrieved = true
-			@masked_card_number = @response.paymentProfile.payment.creditCard.cardNumber
+			@masked_card_number = @authorize_response.paymentProfile.payment.creditCard.cardNumber
+			log_result_to_console
 		else
 			@payment_token_retrieved = false
 			@status_code = 240
@@ -217,21 +220,23 @@ def validate_tokens
 		request.validationMode = ValidationModeEnum::TestMode
 
 		# PASS the transaction request and CAPTURE the transaction response.
-		@response = transaction.validate_customer_payment_profile(request)
+		@authorize_response = transaction.validate_customer_payment_profile(request)
 
 		# Ensure that a response was received before proceeding.
 		begin
-			if @response.messages != nil
+			if @authorize_response.messages != nil
 
 			if transaction_ok
 				@valid_tokens = true
+				log_result_to_console
 			else
 				@valid_tokens = false
 
 				# Capture the complete response and set the ResultCode (logic variable) to Error.
 				@result = "ERROR"
 
-				@response_kind = "TokenError"
+				@authorize_response_kind = "TokenError"
+				log_result_to_console
 			end
 
 				# A transactional FAILURE occurred. [NIL]
@@ -239,15 +244,15 @@ def validate_tokens
 				@valid_tokens = false
 				@result = "ERROR"
 
-				@response_kind = "TransactionFailure"
-				@response_error = "A transactional FAILURE occurred."
+				@authorize_response_kind = "TransactionFailure"
+				@authorize_response_error = "A transactional FAILURE occurred."
 			end
 
 		rescue Errno::ETIMEDOUT => e
 			@result = "ERROR"
 
-			@response_kind = "TransactionFailure"
-			@response_error = "Authorize.net isn't available."
+			@authorize_response_kind = "TransactionFailure"
+			@authorize_response_error = "Authorize.net isn't available."
 		end
 	end
 end
@@ -275,10 +280,10 @@ def process_payment
 		request.transactionRequest.order.description = @gl_code
 		
 		# PASS the transaction request and CAPTURE the transaction response.
-		@response = transaction.create_transaction(request)
+		@authorize_response = transaction.create_transaction(request)
 
 		begin
-			if @response.transactionResponse != nil
+			if @authorize_response.transactionResponse != nil
 
 				# Capture the response variables for all transactions.
 				@avs_code = response.transactionResponse.avsResultCode
@@ -289,53 +294,53 @@ def process_payment
 					@result = "OK"
 
 					# CAPTURE the transaction details.
-					@transaction_id = @response.transactionResponse.transId
-					@transaction_response_code = @response.transactionResponse.responseCode
+					@transaction_id = @authorize_response.transactionResponse.transId
+					@transaction_response_code = @authorize_response.transactionResponse.responseCode
 
 					if @transaction_response_code == "1"
-						@response_kind = "Approved"
-						@authorization_code = @response.transactionResponse.authCode
-						@response_code = @response.messages.messages[0].code
-						@response_message = @response.messages.messages[0].text
+						@authorize_response_kind = "Approved"
+						@authorization_code = @authorize_response.transactionResponse.authCode
+						@authorize_response_code = @authorize_response.messages.messages[0].code
+						@authorize_response_message = @authorize_response.messages.messages[0].text
 
 					elsif @transaction_response_code == "2"
-						@response_kind = "Declined"
-						@response_code = @response.transactionResponse.errors.errors[0].errorCode
-						@response_error = @response.transactionResponse.errors.errors[0].errorText
+						@authorize_response_kind = "Declined"
+						@authorize_response_code = @authorize_response.transactionResponse.errors.errors[0].errorCode
+						@authorize_response_error = @authorize_response.transactionResponse.errors.errors[0].errorText
 
 					elsif @transaction_response_code == "3"
-						@response_kind = "Error"
-						@response_code = @response.transactionResponse.errors.errors[0].errorCode
-						@response_error = @response.transactionResponse.errors.errors[0].errorText
+						@authorize_response_kind = "Error"
+						@authorize_response_code = @authorize_response.transactionResponse.errors.errors[0].errorCode
+						@authorize_response_error = @authorize_response.transactionResponse.errors.errors[0].errorText
 
 					elsif @transaction_response_code == "4"
-						@response_kind = "HeldforReview"
-						@response_code = @response.transactionResponse.errors.errors[0].errorCode
-						@response_error = @@response.transactionResponse.errors.errors[0].errorText
+						@authorize_response_kind = "HeldforReview"
+						@authorize_response_code = @authorize_response.transactionResponse.errors.errors[0].errorCode
+						@authorize_response_error = @@authorize_response.transactionResponse.errors.errors[0].errorText
 					end
 
 				# A transactional ERROR occurred.
-				elsif @response.messages.resultCode == MessageTypeEnum::Error
+				elsif @authorize_response.messages.resultCode == MessageTypeEnum::Error
 					@result = "ERROR"
 
-					@response_kind = "TransactionError"
-					@response_code = @response.transactionResponse.errors.errors[0].errorCode
-					@response_error = @response.transactionResponse.errors.errors[0].errorText
+					@authorize_response_kind = "TransactionError"
+					@authorize_response_code = @authorize_response.transactionResponse.errors.errors[0].errorCode
+					@authorize_response_error = @authorize_response.transactionResponse.errors.errors[0].errorText
 				end
 
 			# A transactional FAILURE occurred. [NIL]
 			else
 				@result = "ERROR"
 
-				@response_kind = "TransactionFailure"
-				@response_error = "A transactional FAILURE occurred."
+				@authorize_response_kind = "TransactionFailure"
+				@authorize_response_error = "A transactional FAILURE occurred."
 			end
 
 		rescue Errno::ETIMEDOUT => e
 			@result = "ERROR"
 
-			@response_kind = "TransactionFailure"
-			@response_error = "Authorize.net isn't available."
+			@authorize_response_kind = "TransactionFailure"
+			@authorize_response_error = "Authorize.net isn't available."
 		end
 	end
 end

@@ -73,9 +73,9 @@ def save_dialer_payment_method
 		@dailer_payment_method[:zzF_Status] = "Active"
 		@dailer_payment_method[:zzF_Type] = "Token"
 	else
-		@dailer_payment_method[:zzPP_Response] = @response
-		@dailer_payment_method[:zzPP_Response_Code] = @response_code
-		@dailer_payment_method[:zzPP_Response_Error] = @response_error
+		@dailer_payment_method[:zzPP_Response] = @authorize_response
+		@dailer_payment_method[:zzPP_Response_Code] = @authorize_response_code
+		@dailer_payment_method[:zzPP_Response_Error] = @authorize_response_error
 		@dailer_payment_method[:zzF_Status] = "Inactive"
 		@dailer_payment_method[:zzF_Type] = "Error"
 	end

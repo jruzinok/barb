@@ -49,9 +49,9 @@ def update_current_student
 	if @result == "OK"
 		@current_student[:Token_Profile_ID] = @customer_token
 	else
-		@current_student[:zzPP_Response] = @response
-		@current_student[:zzPP_Response_Code] = @response_code
-		@current_student[:zzPP_Response_Error] = @response_error
+		@current_student[:zzPP_Response] = @authorize_response
+		@current_student[:zzPP_Response_Code] = @authorize_response_code
+		@current_student[:zzPP_Response_Error] = @authorize_response_error
 	end
 
 	@current_student.save

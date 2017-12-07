@@ -123,9 +123,9 @@ def update_payment_method
 		@payment_method[:zzF_Status] = "Active"
 		@payment_method[:zzF_Type] = "Token"
 	else
-		@payment_method[:zzPP_Response] = @response
-		@payment_method[:zzPP_Response_Code] = @response_code
-		@payment_method[:zzPP_Response_Error] = @response_error
+		@payment_method[:zzPP_Response] = @authorize_response
+		@payment_method[:zzPP_Response_Code] = @authorize_response_code
+		@payment_method[:zzPP_Response_Error] = @authorize_response_error
 		@payment_method[:zzF_Status] = "Inactive"
 		@payment_method[:zzF_Type] = "Error"
 	end
@@ -139,9 +139,9 @@ def update_payment_method_after_payment_token_is_deleted
 		@payment_method[:zzF_Status] = "Deleted"
 		@payment_method[:zzF_Type] = "Token"
 	else
-		@payment_method[:zzPP_Response] = @response
-		@payment_method[:zzPP_Response_Code] = @response_code
-		@payment_method[:zzPP_Response_Error] = @response_error
+		@payment_method[:zzPP_Response] = @authorize_response
+		@payment_method[:zzPP_Response_Code] = @authorize_response_code
+		@payment_method[:zzPP_Response_Error] = @authorize_response_error
 		@payment_method[:zzF_Status] = "Inactive"
 		@payment_method[:zzF_Type] = "Error"
 	end

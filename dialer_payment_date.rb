@@ -10,52 +10,52 @@ def save_processed_dailer_payment_date
 	@dailer_payment[:Amount] = @amount
 	@dailer_payment[:zzPP_Transaction] = @transaction_id
 
-	@dailer_payment[:zzPP_Response] = @response
+	@dailer_payment[:zzPP_Response] = @authorize_response
 	@dailer_payment[:zzPP_Response_AVS_Code] = @avs_code
 	@dailer_payment[:zzPP_Response_CVV_Code] = @cvv_code
 
-	@dailer_payment[:zzPP_Response_Code] = @response_code
+	@dailer_payment[:zzPP_Response_Code] = @authorize_response_code
 
 	if @result == "OK"
 	
-		if @response_kind == "Approved"
+		if @authorize_response_kind == "Approved"
 			@dailer_payment[:zzF_Status] = "Approved"
 			@dailer_payment[:zzPP_Authorization_Code] = @authorization_code
-			@dailer_payment[:zzPP_Response_Message] = @response_message
+			@dailer_payment[:zzPP_Response_Message] = @authorize_response_message
 
-		elsif @response_kind == "Declined"
+		elsif @authorize_response_kind == "Declined"
 			@dailer_payment[:zzF_Status] = "Declined"
-			@dailer_payment[:zzPP_Response_Error] = @response_error
+			@dailer_payment[:zzPP_Response_Error] = @authorize_response_error
 
-		elsif @response_kind == "Error"
+		elsif @authorize_response_kind == "Error"
 			@dailer_payment[:zzF_Status] = "Error"
-			@dailer_payment[:zzPP_Response_Error] = @response_error
+			@dailer_payment[:zzPP_Response_Error] = @authorize_response_error
 
-		elsif @response_kind == "HeldforReview"
+		elsif @authorize_response_kind == "HeldforReview"
 			@dailer_payment[:zzF_Status] = "HeldForReview"
-			@dailer_payment[:zzPP_Response_Error] = @response_error
+			@dailer_payment[:zzPP_Response_Error] = @authorize_response_error
 		end
 
 	# These payments were NOT processes.
 	elsif @result == "ERROR"
 
-		if @response_kind == "TransactionError"
+		if @authorize_response_kind == "TransactionError"
 			@dailer_payment[:zzF_Status] = "TransactionError"
 			@dailer_payment[:zzPP_Transaction] = @transaction_id
 
-			@dailer_payment[:zzPP_Response] = @response
-			@dailer_payment[:zzPP_Response_Code] = @response_code
-			@dailer_payment[:zzPP_Response_Error] = @response_error
+			@dailer_payment[:zzPP_Response] = @authorize_response
+			@dailer_payment[:zzPP_Response_Code] = @authorize_response_code
+			@dailer_payment[:zzPP_Response_Error] = @authorize_response_error
 
-		elsif @response_kind == "TokenError"
+		elsif @authorize_response_kind == "TokenError"
 			@dailer_payment[:zzF_Status] = "TokenError"
-			@dailer_payment[:zzPP_Response] = @response
-			@dailer_payment[:zzPP_Response_Code] = @response_code
-			@dailer_payment[:zzPP_Response_Error] = @response_error
+			@dailer_payment[:zzPP_Response] = @authorize_response
+			@dailer_payment[:zzPP_Response_Code] = @authorize_response_code
+			@dailer_payment[:zzPP_Response_Error] = @authorize_response_error
 
-		elsif @response_kind == "TransactionFailure"
+		elsif @authorize_response_kind == "TransactionFailure"
 			@dailer_payment[:zzF_Status] = "TransactionFailure"
-			@dailer_payment[:zzPP_Response_Error] = @response_error
+			@dailer_payment[:zzPP_Response_Error] = @authorize_response_error
 		end
 	end
 

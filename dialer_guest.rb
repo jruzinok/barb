@@ -41,9 +41,9 @@ def update_dialer_guest
 	if @result == "OK"
 		@dialer_guest[:Token_Profile_ID] = @customer_token
 	else
-		@dialer_guest[:zzPP_Response] = @response
-		@dialer_guest[:zzPP_Response_Code] = @response_code
-		@dialer_guest[:zzPP_Response_Error] = @response_error
+		@dialer_guest[:zzPP_Response] = @authorize_response
+		@dialer_guest[:zzPP_Response_Code] = @authorize_response_code
+		@dialer_guest[:zzPP_Response_Error] = @authorize_response_error
 	end
 
 	@dialer_guest.save

@@ -97,8 +97,8 @@ def log_result_to_console_for_batch_tokenization
 	puts "[CUSTOMER TOKEN] #{@customer_token}"
 	puts "[PAYMENT TOKEN] #{@payment_token}"
 	puts "[MESSAGE] #{@status_message}"
-	puts "[ERROR] #{@response_error}"
-	puts "[CODE] #{@response_code}"
+	puts "[ERROR] #{@authorize_response_error}"
+	puts "[CODE] #{@authorize_response_code}"
 	puts "[RECORD] #{@serial}"
 	puts "\n----------------------------------------"
 end

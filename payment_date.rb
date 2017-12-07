@@ -149,50 +149,50 @@ def update_payment_date
 
 			# SAVE the response values for all transactions.
 			@payment_date[:zzPP_Transaction] = @transaction_id
-			@payment_date[:zzPP_Response] = @response
+			@payment_date[:zzPP_Response] = @authorize_response
 			@payment_date[:zzPP_Response_AVS_Code] = @avs_code
 			@payment_date[:zzPP_Response_CVV_Code] = @cvv_code
-			@payment_date[:zzPP_Response_Code] = @response_code
+			@payment_date[:zzPP_Response_Code] = @authorize_response_code
 
 			# These transaction WERE processed.
-			if @response_kind == "Approved"
+			if @authorize_response_kind == "Approved"
 				@payment_date[:zzF_Status] = "Approved"
 				@payment_date[:zzPP_Authorization_Code] = @authorization_code
-				@payment_date[:zzPP_Response_Message] = @response_message
+				@payment_date[:zzPP_Response_Message] = @authorize_response_message
 
-			elsif @response_kind == "Declined"
+			elsif @authorize_response_kind == "Declined"
 				@payment_date[:zzF_Status] = "Declined"
-				@payment_date[:zzPP_Response_Error] = @response_error
+				@payment_date[:zzPP_Response_Error] = @authorize_response_error
 
-			elsif @response_kind == "Error"
+			elsif @authorize_response_kind == "Error"
 				@payment_date[:zzF_Status] = "Error"
-				@payment_date[:zzPP_Response_Error] = @response_error
+				@payment_date[:zzPP_Response_Error] = @authorize_response_error
 
-			elsif @response_kind == "HeldforReview"
+			elsif @authorize_response_kind == "HeldforReview"
 				@payment_date[:zzF_Status] = "HeldForReview"
-				@payment_date[:zzPP_Response_Error] = @response_error
+				@payment_date[:zzPP_Response_Error] = @authorize_response_error
 			end
 
 		elsif @result == "ERROR"
 
 			# These transaction were NOT processed.
-			if @response_kind == "TransactionError"
+			if @authorize_response_kind == "TransactionError"
 				@payment_date[:zzF_Status] = "TransactionError"
 				@payment_date[:zzPP_Transaction] = @transaction_id
-				@payment_date[:zzPP_Response] = @response
-				@payment_date[:zzPP_Response_Code] = @response_code
-				@payment_date[:zzPP_Response_Error] = @response_error
+				@payment_date[:zzPP_Response] = @authorize_response
+				@payment_date[:zzPP_Response_Code] = @authorize_response_code
+				@payment_date[:zzPP_Response_Error] = @authorize_response_error
 
-			elsif @response_kind == "TokenError"
+			elsif @authorize_response_kind == "TokenError"
 				@payment_date[:zzF_Status] = "TokenError"
-				@payment_date[:zzPP_Response] = @response
-				@payment_date[:zzPP_Response_Code] = @response_code
-				@payment_date[:zzPP_Response_Error] = @response_error
+				@payment_date[:zzPP_Response] = @authorize_response
+				@payment_date[:zzPP_Response_Code] = @authorize_response_code
+				@payment_date[:zzPP_Response_Error] = @authorize_response_error
 
 			# This transaction was NOT sent to Authorize.net successfully.
-			elsif @response_kind == "TransactionFailure"
+			elsif @authorize_response_kind == "TransactionFailure"
 				@payment_date[:zzF_Status] = "TransactionFailure"
-				@payment_date[:zzPP_Response_Error] = @response_error
+				@payment_date[:zzPP_Response_Error] = @authorize_response_error
 			end
 
 		end

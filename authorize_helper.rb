@@ -63,13 +63,13 @@ end
 
 def transaction_not_ready
 	@result = "ERROR"
-	@response_kind = "TransactionNotAttempted"
+	@authorize_response_kind = "TransactionNotAttempted"
 	@status_code = 99
-	@response_error = "Merchant variables are missing."
+	@authorize_response_error = "Merchant variables are missing."
 end
 
 def transaction_ok
-	if @response.messages.resultCode == MessageTypeEnum::Ok
+	if @authorize_response.messages.resultCode == MessageTypeEnum::Ok
 		@result = "OK"
 		true
 	else
@@ -80,6 +80,6 @@ end
 
 def transaction_error
 	@result = "ERROR"
-	@response_code = @response.messages.messages[0].code
-	@response_error = @response.messages.messages[0].text
+	@authorize_response_code = @authorize_response.messages.messages[0].code
+	@authorize_response_error = @authorize_response.messages.messages[0].text
 end
