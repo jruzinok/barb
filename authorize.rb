@@ -74,7 +74,132 @@ def create_payment_token
 		@status_message = "[ERROR] PaymentTokenNotCreated"
 		@return_json_package = JSON.generate ["result"=>@result,"status_code"=>@status_code,"status_message"=>@status_message,"response_code"=>@response_code,"response_error"=>@response_error][0]
 	end
+end
 
+def update_payment_token
+	request = UpdateCustomerPaymentProfileRequest.new
+
+	# Set the @card_mmyy = 'XXXX' and @card_cvv = nil if the user didn't enter any values.
+	mask_card_date
+	nil_card_cvv
+
+	# The credit card number should not be updated per Ashley's decision. Hence the use of the @masked_card_number variable.
+	creditcard = CreditCardType.new(@masked_card_number,@card_mmyy,@card_cvv)
+	payment = PaymentType.new(creditcard)
+	profile = CustomerPaymentProfileExType.new(nil,nil,payment,nil,nil)
+	if @update_card_address == true
+		profile.billTo = CustomerAddressType.new
+		profile.billTo.firstName = @name_first
+		profile.billTo.lastName = @name_last
+		profile.billTo.address = @address
+		profile.billTo.city = @city
+		profile.billTo.state = @state
+		profile.billTo.zip = @zip
+	end
+	request.paymentProfile = profile
+	request.customerProfileId = @customer_token
+	profile.customerPaymentProfileId = @payment_token
+
+	# PASS the transaction request and CAPTURE the transaction response.
+	@response = transaction.update_customer_payment_profile(request)
+
+	if transaction_ok
+		@payment_token_updated = true
+		@status_code = 200
+		@status_message = "[OK] PaymentTokenUpdated"
+		log_result_to_console
+	else
+		@payment_token_updated = false
+		@status_code = 210
+		@status_message = "[ERROR] PaymentTokenNotUpdated"
+		log_result_to_console
+	end
+end
+
+def delete_payment_token
+	request = DeleteCustomerPaymentProfileRequest.new
+	request.customerProfileId = @customer_token
+	request.customerPaymentProfileId = @payment_token
+
+	@response = transaction.delete_customer_payment_profile(request)
+
+	# The transaction has a response.
+	if transaction_ok
+		@status_code = 200
+		@status_message = "[OK] PaymentTokenDeleted"
+		log_result_to_console
+	else
+		@status_code = 194
+		@status_message = "[ERROR] PaymentTokenNotDeleted"
+		log_result_to_console
+	end
+end
+
+def validate_customer_token
+	request = GetCustomerProfileRequest.new
+
+	if @check_by_merchant_id == true
+		request.merchantCustomerId = @customer
+	elsif @check_by_customer_token == true
+		request.customerProfileId = @customer_token
+	end
+
+	@response = transaction.get_customer_profile(request)
+
+	# Ensure that a response was received before proceeding.
+	begin
+		if @response.messages != nil
+
+			if transaction_ok
+				# This is the expected result when a webapp requests to create a PT.
+				@has_customer_token = true
+				@status_code = 200
+				@status_message = "[OK] CustomerTokenExists"
+				log_result_to_console
+			else
+				# This is the expected result when a webapp requests to create a CT.
+				@has_customer_token = false
+				@status_code = 194
+				@status_message = "[ERROR] CustomerTokenDoesNotExist"
+				log_result_to_console
+			end
+
+			# A transactional FAILURE occurred. [NIL]
+		else
+			@result = "ERROR"
+
+			@response_kind = "TransactionFailure"
+			@status_code = 198
+			@status_message = "[ERROR] A transactional FAILURE occurred."
+			@return_json_package = JSON.generate ["result"=>@result,"status_code"=>@status_code,"status_message"=>@status_message][0]
+		end
+
+	rescue Errno::ETIMEDOUT => e
+		@result = "ERROR"
+
+		@response_kind = "TransactionFailure"
+		@status_code = 197
+		@status_message = "[ERROR] Authorize.net isn't available."
+		@return_json_package = JSON.generate ["result"=>@result,"status_code"=>@status_code,"status_message"=>@status_message][0]
+	end
+end
+
+def retrieve_payment_token
+	request = GetCustomerPaymentProfileRequest.new
+	request.customerProfileId = @customer_token
+	request.customerPaymentProfileId = @payment_token
+
+	@response = transaction.get_customer_payment_profile(request)
+
+	if transaction_ok
+		@payment_token_retrieved = true
+		@masked_card_number = @response.paymentProfile.payment.creditCard.cardNumber
+	else
+		@payment_token_retrieved = false
+		@status_code = 240
+		@status_message = "[ERROR] PaymentTokenCouldNotBeRetrieved"
+		log_result_to_console
+	end
 end
 
 def validate_tokens

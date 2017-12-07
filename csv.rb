@@ -65,21 +65,7 @@ end
 
 def create_customer_token_by_csv
 	if @has_customer_token == false
-		request = CreateCustomerProfileRequest.new
-		request.profile = CustomerProfileType.new(@customer,@name_full,nil,nil,nil) #(merchantCustomerId,description,email,paymentProfiles,shipToList)
-
-		@response = transaction.create_customer_profile(request)
-
-		# The transaction has a response.
-		if transaction_ok
-			@customer_token = @response.customerProfileId
-			@status_code = 200
-			@status_message = "[OK] CustomerTokenCreated"
-		else
-			@status_code = 210
-			@status_message = "[ERROR] CustomerTokenNotCreated"
-		end
-
+		create_customer_token
 		@flag_update_csv = true
 	else
 		@flag_update_csv = false

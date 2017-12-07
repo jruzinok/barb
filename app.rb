@@ -139,7 +139,7 @@ class PaymentProcessor < Sinatra::Application
 		@directory_id = params[:directory_id]
 		@payment_method_id = params[:payment_method_id]
 
-		delete_payment_token
+		delete_payment_method_payment_token
 
 		# Return the response back to FileMaker.
 		status @status
@@ -166,7 +166,7 @@ class PaymentProcessor < Sinatra::Application
 		@card_mmyy = params[:MMYY]
 		@card_cvv = params[:CVV]
 
-		update_payment_token
+		update_payment_method_payment_token
 
 		# Return the response back to FileMaker.
 		status @status

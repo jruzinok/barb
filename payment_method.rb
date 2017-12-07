@@ -21,7 +21,7 @@ def create_payment_method_payment_token
 	set_response
 end
 
-def delete_payment_token
+def delete_payment_method_payment_token
 	unless @skip_find_directory == true
 		find_directory
 	end
@@ -31,23 +31,7 @@ def delete_payment_token
 	end
 
 	if @directory_found == true && @has_customer_token == true && @payment_method_found == true && @has_payment_token == true
-		request = DeleteCustomerPaymentProfileRequest.new
-		request.customerProfileId = @customer_token
-		request.customerPaymentProfileId = @payment_token
-
-		@response = transaction.delete_customer_payment_profile(request)
-
-		# The transaction has a response.
-		if transaction_ok
-			@status_code = 200
-			@status_message = "[OK] PaymentTokenDeleted"
-			log_result_to_console
-		else
-			@status_code = 210
-			@status_message = "[ERROR] PaymentTokenNotDeleted"
-			log_result_to_console
-		end
-
+		delete_payment_token
 		update_payment_method_after_payment_token_is_deleted
 		create_payment_processor_log
 		set_response
@@ -129,7 +113,7 @@ def create_payment_method
 	@payment_method[:MMYY] = @card_mmyy
 	@payment_method[:CVV] = @card_cvv
 
-	# I am purposely NOT saving the record here. Instead, it'll be saved in the update_payment_token method.
+	# I am purposely NOT saving the record here. Instead, it'll be saved in the update_payment_method_payment_token method.
 end
 
 def update_payment_method
@@ -165,7 +149,7 @@ def update_payment_method_after_payment_token_is_deleted
 	@payment_method.save
 end
 
-def update_payment_token
+def update_payment_method_payment_token
 	find_directory
 	find_payment_method
 
@@ -173,46 +157,7 @@ def update_payment_token
 		retrieve_payment_token
 
 		if @payment_token_retrieved == true
-			request = UpdateCustomerPaymentProfileRequest.new
-
-			# Set the @card_mmyy = 'XXXX' and @card_cvv = nil if the user didn't enter any values.
-			mask_card_date
-			nil_card_cvv
-
-			# The credit card number should not be updated per Ashley's decision. Hence the use of the @masked_card_number variable.
-			creditcard = CreditCardType.new(@masked_card_number,@card_mmyy,@card_cvv)
-
-			payment = PaymentType.new(creditcard)
-			profile = CustomerPaymentProfileExType.new(nil,nil,payment,nil,nil)
-			if @update_card_address == true
-				profile.billTo = CustomerAddressType.new
-				profile.billTo.firstName = @name_first
-				profile.billTo.lastName = @name_last
-				profile.billTo.address = @address
-				profile.billTo.city = @city
-				profile.billTo.state = @state
-				profile.billTo.zip = @zip
-			end
-			request.paymentProfile = profile
-			request.customerProfileId = @customer_token
-			profile.customerPaymentProfileId = @payment_token
-
-			# PASS the transaction request and CAPTURE the transaction response.
-			@response = transaction.update_customer_payment_profile(request)
-
-			if transaction_ok
-				@payment_token_updated = true
-
-				@status_code = 200
-				@status_message = "[OK] PaymentTokenUpdated"
-				log_result_to_console
-			else
-				@payment_token_updated = false
-				@status_code = 210
-				@status_message = "[ERROR] PaymentTokenNotUpdated"
-				log_result_to_console
-			end
-
+			update_payment_token
 			create_payment_processor_log
 		end
 				
@@ -224,24 +169,6 @@ def update_payment_token
 
 	set_response
 	clear_response
-end
-
-def retrieve_payment_token
-	request = GetCustomerPaymentProfileRequest.new
-	request.customerProfileId = @customer_token
-	request.customerPaymentProfileId = @payment_token
-
-	@response = transaction.get_customer_payment_profile(request)
-
-	if transaction_ok
-		@payment_token_retrieved = true
-		@masked_card_number = @response.paymentProfile.payment.creditCard.cardNumber
-	else
-		@payment_token_retrieved = false
-		@status_code = 240
-		@status_message = "[ERROR] PaymentTokenCouldNotBeRetrieved"
-		log_result_to_console
-	end
 end
 
 def batch_tokenize_payment_methods

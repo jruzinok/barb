@@ -2,12 +2,12 @@ def create_customer_token_logic
 	if check_required_ct_params
 		prepare_customer_variables
 		@check_by_merchant_id = true
-		check_for_customer_profile
+		validate_customer_token
 
-		if @has_profile == false && @result == "OK"
+		if @has_customer_token == false && @result == "OK"
 			prepare_customer_variables
 			create_customer_token
-		elsif @has_profile == true && @result == "OK"
+		elsif @has_customer_token == true && @result == "OK"
 			@result = "OK"
 			@status_code = 230
 			@status_message = "[OK] CustomerTokenAlreadyExisted"
@@ -26,9 +26,9 @@ def create_payment_token_logic
 	if check_required_pt_params
 		prepare_payment_variables
 		@check_by_customer_token = true
-		check_for_customer_profile
+		validate_customer_token
 
-		if @has_profile == true && @result == "OK"
+		if @has_customer_token == true && @result == "OK"
 			create_payment_token
 		else
 			@result = "ERROR"
@@ -49,9 +49,10 @@ def list_payment_token_logic
 	if check_required_list_params
 		prepare_list_payment_variables
 		@check_by_customer_token = true
-		check_for_customer_profile
+		validate_customer_token
 
-		if @has_profile == true && @result == "OK"
+		if @has_customer_token == true && @result == "OK"
+			build_array_of_payment_tokens
 			@result = "OK"
 			@status_code = 210
 			@status_message = "[OK] PaymentTokensRetrieved"
@@ -71,62 +72,18 @@ def list_payment_token_logic
 	end
 end
 
-def check_for_customer_profile
-	request = GetCustomerProfileRequest.new
+def build_array_of_payment_tokens
+	@customer_token = @response.profile.customerProfileId
+	@payment_tokens = @response.profile.paymentProfiles
 
-	if @check_by_merchant_id == true
-		request.merchantCustomerId = @customer
-	elsif @check_by_customer_token == true
-		request.customerProfileId = @customer_token
-	end
+	if @payment_tokens.length >= 1
+		@tokens = Array.new
+		@i = 0
 
-	response = transaction.get_customer_profile(request)
-
-	# Ensure that a response was received before proceeding.
-	begin
-		if response.messages != nil
-
-			if transaction_ok
-				# This is the expected result when the OE webapp requested to create a PT.
-				@has_profile = true
-				
-				@customer_token = response.profile.customerProfileId
-				@payment_tokens = response.profile.paymentProfiles
-
-				if @payment_tokens.length >= 1
-					@tokens = Array.new
-					@i = 0
-
-					@payment_tokens.each do |p|
-						@tokens[@i] = {'payment_token' => p.customerPaymentProfileId, 'card_number'=> p.payment.creditCard.cardNumber}
-						@i += 1
-					end
-
-				end
-
-			else
-				# This is the expected result when the OE webapp requested to create a CT.
-				@has_profile = false
-				@result = "OK"
-			end
-
-			# A transactional FAILURE occurred. [NIL]
-		else
-			@result = "ERROR"
-
-			@response_kind = "TransactionFailure"
-			@status_code = 198
-			@status_message = "[ERROR] A transactional FAILURE occurred."
-			@return_json_package = JSON.generate ["result"=>@result,"status_code"=>@status_code,"status_message"=>@status_message][0]
+		@payment_tokens.each do |p|
+			@tokens[@i] = {'payment_token' => p.customerPaymentProfileId, 'card_number'=> p.payment.creditCard.cardNumber}
+			@i += 1
 		end
-
-	rescue Errno::ETIMEDOUT => e
-		@result = "ERROR"
-
-		@response_kind = "TransactionFailure"
-		@status_code = 197
-		@status_message = "[ERROR] Authorize.net isn't available."
-		@return_json_package = JSON.generate ["result"=>@result,"status_code"=>@status_code,"status_message"=>@status_message][0]
 	end
 end
 
@@ -165,8 +122,8 @@ end
 
 def prepare_payment_variables
 	@customer_token = @json[:customer_token]
-	@name_first = @json[:name_first]
-	@name_last = @json[:name_last]
+	@card_name_first = @json[:name_first]
+	@card_name_last = @json[:name_last]
 	@card_number = @json[:card_number]
 	@card_mmyy = @json[:card_mmyy]
 	@card_cvv = @json[:card_cvv]
