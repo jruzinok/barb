@@ -4,8 +4,7 @@ def create_customer_token_logic
 		@check_by_merchant_id = true
 		validate_customer_token
 
-		if @has_customer_token == false && @result == "OK"
-			prepare_customer_variables
+		if @has_customer_token == false
 			create_customer_token
 		elsif @has_customer_token == true && @result == "OK"
 			@result = "OK"
