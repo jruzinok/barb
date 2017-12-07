@@ -1,34 +1,44 @@
-def load_merchant_vars
-	load_merchant_from_yml
-	# load_merchant_from_env
+def load_merchant_variables
+	if ENV['CLOUD'] == "Heroku"
+		load_merchant_from_env
+	else
+		load_merchant_from_yml
+	end
 	load_gateway
 end
 
 def load_merchant_from_yml
 	# LOAD the Authorize.net api credentials.
 	credentials = YAML.load_file(File.dirname(__FILE__) + "/config/credentials.yml")
-	@gateway = credentials['gateway']
+	@gateway = credentials['authorize_api_gateway']
 
 	if @merchant == "BAR"
 		@merchant_credentials_loaded = true
-		@api_login_id = credentials['api_login_id_bar']
-		@api_transaction_key = credentials['api_transaction_key_bar']
+		@api_login_id = credentials['authorize_api_id_bar']
+		@api_transaction_key = credentials['authorize_api_key_bar']
 	elsif @merchant == "PTD"
 		@merchant_credentials_loaded = true
-		@api_login_id = credentials['api_login_id_ptd']
-		@api_transaction_key = credentials['api_transaction_key_ptd']
+		@api_login_id = credentials['authorize_api_id_ptd']
+		@api_transaction_key = credentials['authorize_api_key_ptd']
 	else
 		@merchant_credentials_loaded = false
 	end
 end
 
+authorize_api_id_bar: 37XCbbHD93tZ
+authorize_api_key_bar: 42kTS85hFX9Sh2k7
+authorize_api_id_ptd: 369kwY5b9rEB
+authorize_api_key_ptd:
+
+
+
 def load_merchant_from_env
-	@gateway = ENV['AUTHORIZE_API_ENDPOINT']
+	@gateway = ENV['AUTHORIZE_API_GATEWAY']
 
 	if @merchant == "BAR"
 		@merchant_credentials_loaded = true
-		@api_login_id = ENV['AUTHORIZE_API_ID_BC']
-		@api_transaction_key = ENV['AUTHORIZE_API_KEY_BC']
+		@api_login_id = ENV['AUTHORIZE_API_ID_BAR']
+		@api_transaction_key = ENV['AUTHORIZE_API_KEY_BAR']
 	elsif @merchant == "PTD"
 		@merchant_credentials_loaded = true
 		@api_login_id = ENV['AUTHORIZE_API_ID_PTD']
