@@ -66,9 +66,9 @@ end
 
 def transaction_not_ready
 	@result = "ERROR"
-	@authorize_response_kind = "TransactionNotAttempted"
 	@status_code = 99
-	@authorize_response_error = "Merchant variables are missing."
+	@status_message = "[ERROR] Merchant variables are missing."
+	@return_json_package = JSON.generate ["result"=>@result,"status_code"=>@status_code,"status_message"=>@status_message][0]
 end
 
 def transaction_ok
@@ -84,5 +84,5 @@ end
 def transaction_error
 	@result = "ERROR"
 	@authorize_response_code = @authorize_response.messages.messages[0].code
-	@authorize_response_error = @authorize_response.messages.messages[0].text
+	@authorize_response_message = @authorize_response.messages.messages[0].text
 end

@@ -61,7 +61,7 @@ def update_dialer_lead
 	else
 		@dialer_lead[:zzPP_Response] = @authorize_response
 		@dialer_lead[:zzPP_Response_Code] = @authorize_response_code
-		@dialer_lead[:zzPP_Response_Error] = @authorize_response_error
+		@dialer_lead[:zzPP_Response_Error] = @authorize_response_message
 	end
 
 	@dialer_lead.save

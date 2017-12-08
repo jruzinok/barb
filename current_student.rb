@@ -51,7 +51,7 @@ def update_current_student
 	else
 		@current_student[:zzPP_Response] = @authorize_response
 		@current_student[:zzPP_Response_Code] = @authorize_response_code
-		@current_student[:zzPP_Response_Error] = @authorize_response_error
+		@current_student[:zzPP_Response_Error] = @authorize_response_message
 	end
 
 	@current_student.save

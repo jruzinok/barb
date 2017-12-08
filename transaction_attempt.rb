@@ -102,15 +102,15 @@ def save_transaction_attempt
 
 		elsif @authorize_response_kind == "Declined"
 			@transaction_attempt[:zzF_Status] = "Declined"
-			@transaction_attempt[:zzPP_Response_Error] = @authorize_response_error
+			@transaction_attempt[:zzPP_Response_Error] = @authorize_response_message
 
 		elsif @authorize_response_kind == "Error"
 			@transaction_attempt[:zzF_Status] = "Error"
-			@transaction_attempt[:zzPP_Response_Error] = @authorize_response_error
+			@transaction_attempt[:zzPP_Response_Error] = @authorize_response_message
 
 		elsif @authorize_response_kind == "HeldforReview"
 			@transaction_attempt[:zzF_Status] = "HeldForReview"
-			@transaction_attempt[:zzPP_Response_Error] = @authorize_response_error
+			@transaction_attempt[:zzPP_Response_Error] = @authorize_response_message
 		end
 
 	# These payments were NOT processes.
@@ -122,17 +122,17 @@ def save_transaction_attempt
 
 			@transaction_attempt[:zzPP_Response] = @authorize_response
 			@transaction_attempt[:zzPP_Response_Code] = @authorize_response_code
-			@transaction_attempt[:zzPP_Response_Error] = @authorize_response_error
+			@transaction_attempt[:zzPP_Response_Error] = @authorize_response_message
 
 		elsif @authorize_response_kind == "TokenError"
 			@transaction_attempt[:zzF_Status] = "TokenError"
 			@transaction_attempt[:zzPP_Response] = @authorize_response
 			@transaction_attempt[:zzPP_Response_Code] = @authorize_response_code
-			@transaction_attempt[:zzPP_Response_Error] = @authorize_response_error
+			@transaction_attempt[:zzPP_Response_Error] = @authorize_response_message
 
 		elsif @authorize_response_kind == "TransactionFailure"
 			@transaction_attempt[:zzF_Status] = "TransactionFailure"
-			@transaction_attempt[:zzPP_Response_Error] = @authorize_response_error
+			@transaction_attempt[:zzPP_Response_Error] = @authorize_response_message
 		end
 	end
 

@@ -62,7 +62,7 @@ def update_directory
 	else
 		@directory[:zzPP_Response] = @authorize_response
 		@directory[:zzPP_Response_Code] = @authorize_response_code
-		@directory[:zzPP_Response_Error] = @authorize_response_error
+		@directory[:zzPP_Response_Error] = @authorize_response_message
 	end
 
 	@directory.save

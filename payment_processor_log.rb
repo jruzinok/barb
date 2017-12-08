@@ -43,7 +43,7 @@ def create_payment_processor_log
 	if @processType == "Token"
 
 		@payment_processor_log[:zzPP_Response_Message] = @status_message
-		@payment_processor_log[:zzPP_Response_Error] = @authorize_response_error
+		@payment_processor_log[:zzPP_Response_Error] = @authorize_response_message
 
 		# Only applicable to the update_payment_token method WHEN the user selected to update the billing address (avs).
 		if @update_card_address == true
@@ -65,15 +65,15 @@ def create_payment_processor_log
 
 			elsif @authorize_response_kind == "Declined"
 				@payment_processor_log[:zzF_Status] = "Declined"
-				@payment_processor_log[:zzPP_Response_Error] = @authorize_response_error
+				@payment_processor_log[:zzPP_Response_Error] = @authorize_response_message
 
 			elsif @authorize_response_kind == "Error"
 				@payment_processor_log[:zzF_Status] = "Error"
-				@payment_processor_log[:zzPP_Response_Error] = @authorize_response_error
+				@payment_processor_log[:zzPP_Response_Error] = @authorize_response_message
 
 			elsif @authorize_response_kind == "HeldforReview"
 				@payment_processor_log[:zzF_Status] = "HeldForReview"
-				@payment_processor_log[:zzPP_Response_Error] = @authorize_response_error
+				@payment_processor_log[:zzPP_Response_Error] = @authorize_response_message
 			end
 
 		# These payments were NOT processes.
@@ -85,17 +85,17 @@ def create_payment_processor_log
 
 				@payment_processor_log[:zzPP_Response] = @authorize_response
 				@payment_processor_log[:zzPP_Response_Code] = @authorize_response_code
-				@payment_processor_log[:zzPP_Response_Error] = @authorize_response_error
+				@payment_processor_log[:zzPP_Response_Error] = @authorize_response_message
 
 			elsif @authorize_response_kind == "TokenError"
 				@payment_processor_log[:zzF_Status] = "TokenError"
 				@payment_processor_log[:zzPP_Response] = @authorize_response
 				@payment_processor_log[:zzPP_Response_Code] = @authorize_response_code
-				@payment_processor_log[:zzPP_Response_Error] = @authorize_response_error
+				@payment_processor_log[:zzPP_Response_Error] = @authorize_response_message
 
 			elsif @authorize_response_kind == "TransactionFailure"
 				@payment_processor_log[:zzF_Status] = "TransactionFailure"
-				@payment_processor_log[:zzPP_Response_Error] = @authorize_response_error
+				@payment_processor_log[:zzPP_Response_Error] = @authorize_response_message
 			end
 		end
 	end

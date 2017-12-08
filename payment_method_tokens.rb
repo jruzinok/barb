@@ -57,7 +57,7 @@ def save_payment_method_token_validation_result
 	else
 		@payment_method[:zzPP_Response] = @authorize_response
 		@payment_method[:zzPP_Response_Code] = @authorize_response_code
-		@payment_method[:zzPP_Response_Error] = @authorize_response_error.sub "(TESTMODE) ", ""
+		@payment_method[:zzPP_Response_Error] = @authorize_response_message.sub "(TESTMODE) ", ""
 		@payment_method[:zzF_Validated] = "NotValid"
 		@payment_method[:zzF_Status] = "Inactive"
 		@payment_method[:zzF_Type] = "Error"
@@ -77,7 +77,7 @@ def log_token_validation_result_to_console
 	puts "\n"
 	puts "[VALID] #{@valid_tokens}"
 	puts "[CODE] #{@authorize_response_code}"
-	puts "[ERROR] #{@authorize_response_error}"
+	puts "[ERROR] #{@authorize_response_message}"
 	puts "\n"
 	puts "[TIMESTAMP] #{Time.now}"
 	puts "----------------------------------------"

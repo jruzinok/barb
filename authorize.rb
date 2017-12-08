@@ -21,7 +21,7 @@ def create_customer_token
 		else
 			@status_code = 199 # Most likely caused by a '@customer' id issue.
 			@status_message = "[ERROR] CustomerTokenNotCreated"
-			@return_json_package = JSON.generate ["result"=>@result,"status_code"=>@status_code,"status_message"=>@status_message,"response_code"=>@authorize_response_code,"response_error"=>@authorize_response_error][0]
+			@return_json_package = JSON.generate ["result"=>@result,"status_code"=>@status_code,"status_message"=>@status_message,"authorize_response_code"=>@authorize_response_code,"authorize_response_message"=>@authorize_response_message][0]
 		end
 		log_result_to_console
 	end
@@ -69,7 +69,7 @@ def create_payment_token
 		else
 			@status_code = 196
 			@status_message = "[ERROR] PaymentTokenNotCreated"
-			@return_json_package = JSON.generate ["result"=>@result,"status_code"=>@status_code,"status_message"=>@status_message,"authorize_response_code"=>@authorize_response_error,"response_error"=>@authorize_response_error][0]
+			@return_json_package = JSON.generate ["result"=>@result,"status_code"=>@status_code,"status_message"=>@status_message,"authorize_response_code"=>@authorize_response_message,"authorize_response_message"=>@authorize_response_message][0]
 			log_result_to_console
 		end
 	end
@@ -245,14 +245,14 @@ def validate_tokens
 				@result = "ERROR"
 
 				@authorize_response_kind = "TransactionFailure"
-				@authorize_response_error = "A transactional FAILURE occurred."
+				@authorize_response_message = "A transactional FAILURE occurred."
 			end
 
 		rescue Errno::ETIMEDOUT => e
 			@result = "ERROR"
 
 			@authorize_response_kind = "TransactionFailure"
-			@authorize_response_error = "Authorize.net isn't available."
+			@authorize_response_message = "Authorize.net isn't available."
 		end
 	end
 end
@@ -306,17 +306,17 @@ def process_payment
 					elsif @transaction_response_code == "2"
 						@authorize_response_kind = "Declined"
 						@authorize_response_code = @authorize_response.transactionResponse.errors.errors[0].errorCode
-						@authorize_response_error = @authorize_response.transactionResponse.errors.errors[0].errorText
+						@authorize_response_message = @authorize_response.transactionResponse.errors.errors[0].errorText
 
 					elsif @transaction_response_code == "3"
 						@authorize_response_kind = "Error"
 						@authorize_response_code = @authorize_response.transactionResponse.errors.errors[0].errorCode
-						@authorize_response_error = @authorize_response.transactionResponse.errors.errors[0].errorText
+						@authorize_response_message = @authorize_response.transactionResponse.errors.errors[0].errorText
 
 					elsif @transaction_response_code == "4"
 						@authorize_response_kind = "HeldforReview"
 						@authorize_response_code = @authorize_response.transactionResponse.errors.errors[0].errorCode
-						@authorize_response_error = @@authorize_response.transactionResponse.errors.errors[0].errorText
+						@authorize_response_message = @@authorize_response.transactionResponse.errors.errors[0].errorText
 					end
 
 				# A transactional ERROR occurred.
@@ -325,7 +325,7 @@ def process_payment
 
 					@authorize_response_kind = "TransactionError"
 					@authorize_response_code = @authorize_response.transactionResponse.errors.errors[0].errorCode
-					@authorize_response_error = @authorize_response.transactionResponse.errors.errors[0].errorText
+					@authorize_response_message = @authorize_response.transactionResponse.errors.errors[0].errorText
 				end
 
 			# A transactional FAILURE occurred. [NIL]
@@ -333,14 +333,14 @@ def process_payment
 				@result = "ERROR"
 
 				@authorize_response_kind = "TransactionFailure"
-				@authorize_response_error = "A transactional FAILURE occurred."
+				@authorize_response_message = "A transactional FAILURE occurred."
 			end
 
 		rescue Errno::ETIMEDOUT => e
 			@result = "ERROR"
 
 			@authorize_response_kind = "TransactionFailure"
-			@authorize_response_error = "Authorize.net isn't available."
+			@authorize_response_message = "Authorize.net isn't available."
 		end
 	end
 end

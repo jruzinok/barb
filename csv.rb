@@ -147,5 +147,5 @@ def create_payment_token_by_csv
 end
 
 def log_result_to_console_for_batch_csv_tokenization
-	puts "R-#{@result},S-#{@serial},CT-#{@customer_token},PT-#{@payment_token},RC-#{@authorize_response_code},M-#{@status_message},E-#{@authorize_response_error}"
+	puts "R-#{@result},S-#{@serial},CT-#{@customer_token},PT-#{@payment_token},RC-#{@authorize_response_code},M-#{@status_message},E-#{@authorize_response_message}"
 end

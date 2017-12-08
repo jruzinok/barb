@@ -43,7 +43,7 @@ def update_dialer_guest
 	else
 		@dialer_guest[:zzPP_Response] = @authorize_response
 		@dialer_guest[:zzPP_Response_Code] = @authorize_response_code
-		@dialer_guest[:zzPP_Response_Error] = @authorize_response_error
+		@dialer_guest[:zzPP_Response_Error] = @authorize_response_message
 	end
 
 	@dialer_guest.save

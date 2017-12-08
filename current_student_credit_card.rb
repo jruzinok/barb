@@ -83,7 +83,7 @@ def update_credit_card
 	else
 		@credit_card[:zzPP_Response] = @authorize_response
 		@credit_card[:zzPP_Response_Code] = @authorize_response_code
-		@credit_card[:zzPP_Response_Error] = @authorize_response_error
+		@credit_card[:zzPP_Response_Error] = @authorize_response_message
 		@credit_card[:zzF_Status] = "Inactive"
 		@credit_card[:zzF_Type] = "Error"
 	end

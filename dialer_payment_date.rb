@@ -25,15 +25,15 @@ def save_processed_dailer_payment_date
 
 		elsif @authorize_response_kind == "Declined"
 			@dailer_payment[:zzF_Status] = "Declined"
-			@dailer_payment[:zzPP_Response_Error] = @authorize_response_error
+			@dailer_payment[:zzPP_Response_Error] = @authorize_response_message
 
 		elsif @authorize_response_kind == "Error"
 			@dailer_payment[:zzF_Status] = "Error"
-			@dailer_payment[:zzPP_Response_Error] = @authorize_response_error
+			@dailer_payment[:zzPP_Response_Error] = @authorize_response_message
 
 		elsif @authorize_response_kind == "HeldforReview"
 			@dailer_payment[:zzF_Status] = "HeldForReview"
-			@dailer_payment[:zzPP_Response_Error] = @authorize_response_error
+			@dailer_payment[:zzPP_Response_Error] = @authorize_response_message
 		end
 
 	# These payments were NOT processes.
@@ -45,17 +45,17 @@ def save_processed_dailer_payment_date
 
 			@dailer_payment[:zzPP_Response] = @authorize_response
 			@dailer_payment[:zzPP_Response_Code] = @authorize_response_code
-			@dailer_payment[:zzPP_Response_Error] = @authorize_response_error
+			@dailer_payment[:zzPP_Response_Error] = @authorize_response_message
 
 		elsif @authorize_response_kind == "TokenError"
 			@dailer_payment[:zzF_Status] = "TokenError"
 			@dailer_payment[:zzPP_Response] = @authorize_response
 			@dailer_payment[:zzPP_Response_Code] = @authorize_response_code
-			@dailer_payment[:zzPP_Response_Error] = @authorize_response_error
+			@dailer_payment[:zzPP_Response_Error] = @authorize_response_message
 
 		elsif @authorize_response_kind == "TransactionFailure"
 			@dailer_payment[:zzF_Status] = "TransactionFailure"
-			@dailer_payment[:zzPP_Response_Error] = @authorize_response_error
+			@dailer_payment[:zzPP_Response_Error] = @authorize_response_message
 		end
 	end
 

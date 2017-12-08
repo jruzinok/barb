@@ -154,14 +154,14 @@ def clear_response
 	@authorize_response = nil
 	@authorize_response_kind = nil
 	@authorize_response_code = nil
-	@authorize_response_error = nil
+	@authorize_response_message = nil
 	@result = nil
 	@avs_code = nil
 	@cvv_code = nil
 	@transaction_id = nil
 	@authorization_code = nil
 	@authorize_response_message = nil
-	@authorize_response_error = nil
+	@authorize_response_message = nil
 end
 
 def to_boolean (string)
@@ -200,7 +200,7 @@ def log_result_to_console
 	puts "[RESPONSE] #{@authorize_response_kind}"
 	puts "[AUTHORIZATION] #{@authorization_code}"
 	puts "[CODE] #{@authorize_response_code}"
-	puts "[ERROR] #{@authorize_response_error}"
+	puts "[ERROR] #{@authorize_response_message}"
 	puts "[P or S] #{@process_or_skip}"
 	puts "\n"
 	puts "[GLCODE] #{@gl_code}"
