@@ -162,8 +162,6 @@ def clear_response
 	@cvv_code = nil
 	@transaction_id = nil
 	@authorization_code = nil
-	@authorize_response_message = nil
-	@authorize_response_message = nil
 end
 
 def to_boolean (string)

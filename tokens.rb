@@ -5,6 +5,7 @@ def create_customer_token_logic
 		validate_customer_token
 
 		if @has_customer_token == false
+			clear_response
 			create_customer_token
 		elsif @has_customer_token == true && @result == "OK"
 			@result = "OK"
@@ -28,6 +29,7 @@ def create_payment_token_logic
 		validate_customer_token
 
 		if @has_customer_token == true && @result == "OK"
+			clear_response
 			create_payment_token
 		else
 			@result = "ERROR"
