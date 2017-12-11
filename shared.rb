@@ -95,8 +95,13 @@ def ptd_gl_code
 end
 
 def bc_gl_code
+	date = Time.now
+	year = date.year
+
 	if @gl_override_flag == true && @gl_override_code != nil
 		@gl_code = @gl_override_code
+	elsif @event_year.to_i > year # If the event is next year.
+		@gl_code = "421"
 	else
 		@gl_code = "422"
 	end
