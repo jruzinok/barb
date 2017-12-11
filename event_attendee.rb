@@ -17,5 +17,5 @@ end
 def load_event_attendee
 	@event_attendee_id = @event_attendee["__kP_EventAttendee"]
 	@event_id = @event_attendee["_kF_Event"]
-	@eventAbbr = @event_attendee["T57_EVENT::Name_Abbreviation"]
+	@event_abbr = @event_attendee["T57_EVENT::Name_Abbreviation"]
 end

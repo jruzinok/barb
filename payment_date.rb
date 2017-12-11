@@ -75,7 +75,8 @@ def load_payment_date
 	@amount = @payment_date["Amount"].to_f
 
 	if @database == "BC"
-		@eventAbbr = @payment_date["T54_EVENT::Name_Abbreviation"]
+		@event_abbr = @payment_date["T54_EVENT::Name_Abbreviation"]
+		@event_year = @payment_date["T54_EVENT::zzC_Year"]
 		@gl_override_flag	= to_boolean(@payment_date["zzF_GL_Code_Override"])
 		@gl_override_code	= @payment_date["GL_Code_Override"]
 		set_gl_codes # The GL Code needs to be set for each PaymentDate record.
