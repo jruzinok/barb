@@ -72,11 +72,17 @@ def transaction_not_ready
 end
 
 def transaction_ok
-	if @authorize_response.messages.resultCode == MessageTypeEnum::Ok
-		@result = "OK"
-		true
-	else
-		transaction_error
+	begin # This ensures that a response was received before proceeding.
+		if @authorize_response.messages.resultCode == MessageTypeEnum::Ok
+			@result = "OK"
+			true
+		else
+			transaction_error
+			false
+		end
+
+	rescue NoMethodError, Errno::ETIMEDOUT => e
+		transaction_failure
 		false
 	end
 end
@@ -85,4 +91,13 @@ def transaction_error
 	@result = "ERROR"
 	@authorize_response_code = @authorize_response.messages.messages[0].code
 	@authorize_response_message = @authorize_response.messages.messages[0].text
+	@return_json_package = JSON.generate ["result"=>@result,"status_code"=>@status_code,"status_message"=>@status_message][0]
+end
+
+def transaction_failure
+	@result = "FAILURE"
+	@authorize_response_kind = "TransactionFailure"
+	@status_code = 98
+	@status_message = "[ERROR] A transactional FAILURE occurred."
+	@return_json_package = JSON.generate ["result"=>@result,"status_code"=>@status_code,"status_message"=>@status_message][0]
 end

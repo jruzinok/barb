@@ -18,11 +18,12 @@ def create_customer_token
 			@status_code = 200
 			@status_message = "[OK] CustomerTokenCreated"
 			@return_json_package = JSON.generate ["result"=>@result,"status_code"=>@status_code,"status_message"=>@status_message,"customer_token"=>@customer_token][0]
-		else
+		elsif @result == "ERROR"
 			@status_code = 199 # Most likely caused by a '@customer' id issue.
 			@status_message = "[ERROR] CustomerTokenNotCreated"
 			@return_json_package = JSON.generate ["result"=>@result,"status_code"=>@status_code,"status_message"=>@status_message,"authorize_response_code"=>@authorize_response_code,"authorize_response_message"=>@authorize_response_message][0]
 		end
+
 		log_result_to_console
 	end
 end
@@ -65,13 +66,13 @@ def create_payment_token
 			@status_message = "[OK] PaymentTokenCreated"
 			@maskedCardNumber = @card_number.split(//).last(4).join
 			@return_json_package = JSON.generate ["result"=>@result,"status_code"=>@status_code,"status_message"=>@status_message,"payment_token"=>@payment_token,"card_number"=>@maskedCardNumber][0]
-			log_result_to_console
-		else
+		elsif @result == "ERROR"
 			@status_code = 196
 			@status_message = "[ERROR] PaymentTokenNotCreated"
 			@return_json_package = JSON.generate ["result"=>@result,"status_code"=>@status_code,"status_message"=>@status_message,"authorize_response_code"=>@authorize_response_message,"authorize_response_message"=>@authorize_response_message][0]
-			log_result_to_console
 		end
+
+		log_result_to_console
 	end
 end
 
@@ -107,13 +108,13 @@ def update_payment_token
 			@payment_token_updated = true
 			@status_code = 200
 			@status_message = "[OK] PaymentTokenUpdated"
-			log_result_to_console
-		else
+		elsif @result == "ERROR"
 			@payment_token_updated = false
 			@status_code = 210
 			@status_message = "[ERROR] PaymentTokenNotUpdated"
-			log_result_to_console
 		end
+
+		log_result_to_console
 	end
 end
 
@@ -129,12 +130,12 @@ def delete_payment_token
 		if transaction_ok
 			@status_code = 200
 			@status_message = "[OK] PaymentTokenDeleted"
-			log_result_to_console
-		else
+		elsif @result == "ERROR"
 			@status_code = 194
 			@status_message = "[ERROR] PaymentTokenNotDeleted"
-			log_result_to_console
 		end
+
+		log_result_to_console
 	end
 end
 
@@ -150,42 +151,19 @@ def validate_customer_token
 
 		@authorize_response = transaction.get_customer_profile(request)
 
-		# Ensure that a response was received before proceeding.
-		begin
-			if @authorize_response.messages != nil
-
 				if transaction_ok
 					# This is the expected result when a webapp requests to create a PT.
 					@has_customer_token = true
 					@status_code = 200
 					@status_message = "[OK] CustomerTokenExists"
-					log_result_to_console
-				else
+				elsif @result == "ERROR"
 					# This is the expected result when a webapp requests to create a CT.
 					@has_customer_token = false
 					@status_code = 194
 					@status_message = "[ERROR] CustomerTokenDoesNotExist"
-					log_result_to_console
 				end
 
-				# A transactional FAILURE occurred. [NIL]
-			else
-				@result = "ERROR"
-
-				@authorize_response_kind = "TransactionFailure"
-				@status_code = 198
-				@status_message = "[ERROR] A transactional FAILURE occurred."
-				@return_json_package = JSON.generate ["result"=>@result,"status_code"=>@status_code,"status_message"=>@status_message][0]
-			end
-
-		rescue Errno::ETIMEDOUT => e
-			@result = "ERROR"
-
-			@authorize_response_kind = "TransactionFailure"
-			@status_code = 197
-			@status_message = "[ERROR] Authorize.net isn't available."
-			@return_json_package = JSON.generate ["result"=>@result,"status_code"=>@status_code,"status_message"=>@status_message][0]
-		end
+		log_result_to_console
 	end
 end
 
@@ -200,13 +178,13 @@ def retrieve_payment_token
 		if transaction_ok
 			@payment_token_retrieved = true
 			@masked_card_number = @authorize_response.paymentProfile.payment.creditCard.cardNumber
-			log_result_to_console
-		else
+		elsif @result == "ERROR"
 			@payment_token_retrieved = false
 			@status_code = 240
 			@status_message = "[ERROR] PaymentTokenCouldNotBeRetrieved"
-			log_result_to_console
 		end
+
+		log_result_to_console
 	end
 end
 
@@ -222,38 +200,14 @@ def validate_tokens
 		# PASS the transaction request and CAPTURE the transaction response.
 		@authorize_response = transaction.validate_customer_payment_profile(request)
 
-		# Ensure that a response was received before proceeding.
-		begin
-			if @authorize_response.messages != nil
-
 			if transaction_ok
 				@valid_tokens = true
-				log_result_to_console
-			else
+			elsif @result == "ERROR"
 				@valid_tokens = false
-
-				# Capture the complete response and set the ResultCode (logic variable) to Error.
-				@result = "ERROR"
-
 				@authorize_response_kind = "TokenError"
-				log_result_to_console
 			end
 
-				# A transactional FAILURE occurred. [NIL]
-			else
-				@valid_tokens = false
-				@result = "ERROR"
-
-				@authorize_response_kind = "TransactionFailure"
-				@authorize_response_message = "A transactional FAILURE occurred."
-			end
-
-		rescue Errno::ETIMEDOUT => e
-			@result = "ERROR"
-
-			@authorize_response_kind = "TransactionFailure"
-			@authorize_response_message = "Authorize.net isn't available."
-		end
+		log_result_to_console
 	end
 end
 
@@ -282,16 +236,12 @@ def process_payment
 		# PASS the transaction request and CAPTURE the transaction response.
 		@authorize_response = transaction.create_transaction(request)
 
-		begin
-			if @authorize_response.transactionResponse != nil
-
-				# Capture the response variables for all transactions.
-				@avs_code = response.transactionResponse.avsResultCode
-				@cvv_code = response.transactionResponse.cvvResultCode
-
 				# The transaction has a response.
 				if transaction_ok
-					@result = "OK"
+
+					# Capture the response variables for all transactions.
+					@avs_code = @authorize_response.transactionResponse.avsResultCode
+					@cvv_code = @authorize_response.transactionResponse.cvvResultCode
 
 					# CAPTURE the transaction details.
 					@transaction_id = @authorize_response.transactionResponse.transId
@@ -320,27 +270,10 @@ def process_payment
 					end
 
 				# A transactional ERROR occurred.
-				elsif @authorize_response.messages.resultCode == MessageTypeEnum::Error
-					@result = "ERROR"
-
+				elsif @result == "ERROR"
 					@authorize_response_kind = "TransactionError"
 					@authorize_response_code = @authorize_response.transactionResponse.errors.errors[0].errorCode
 					@authorize_response_message = @authorize_response.transactionResponse.errors.errors[0].errorText
 				end
-
-			# A transactional FAILURE occurred. [NIL]
-			else
-				@result = "ERROR"
-
-				@authorize_response_kind = "TransactionFailure"
-				@authorize_response_message = "A transactional FAILURE occurred."
-			end
-
-		rescue Errno::ETIMEDOUT => e
-			@result = "ERROR"
-
-			@authorize_response_kind = "TransactionFailure"
-			@authorize_response_message = "Authorize.net isn't available."
-		end
 	end
 end
