@@ -95,16 +95,13 @@ def ptd_gl_code
 end
 
 def bc_gl_code
-	date = Time.now
-	year = date.year
-
 	if @gl_override_flag == true && @gl_override_code != nil
 		@gl_code = @gl_override_code
 	else
 		@gl_code = "422"
 	end
 	
-	@invoice = "BCOMP#{@event_abbr}#{short_year(year)}"
+	@invoice = "BCOMP#{@event_abbr}#{short_year(@event_year)}"
 end
 
 def cs_gl_code
