@@ -34,6 +34,7 @@ def create_payment_processor_log
 	# Tokens
 	@payment_processor_log[:Token_Profile_ID] = @customer_token
 	@payment_processor_log[:Token_Payment_ID] = @payment_token
+	@payment_processor_log[:zzF_Merchant] = @merchant
 
 	# RECORD which database, process and batch created this record.
 	@payment_processor_log[:Log_Database] = @database
@@ -76,27 +77,14 @@ def create_payment_processor_log
 				@payment_processor_log[:zzPP_Response_Error] = @authorize_response_message
 			end
 
-		# These payments were NOT processes.
 		elsif @result == "ERROR"
 
-			if @authorize_response_kind == "TransactionError"
-				@payment_processor_log[:zzF_Status] = "TransactionError"
-				@payment_processor_log[:zzPP_Transaction] = @transaction_id
+			@payment_processor_log[:zzF_Status] = "Error"
+			@payment_processor_log[:zzPP_Transaction] = @transaction_id
+			@payment_processor_log[:zzPP_Response] = @authorize_response
+			@payment_processor_log[:zzPP_Response_Code] = @authorize_response_code
+			@payment_processor_log[:zzPP_Response_Error] = @authorize_response_message
 
-				@payment_processor_log[:zzPP_Response] = @authorize_response
-				@payment_processor_log[:zzPP_Response_Code] = @authorize_response_code
-				@payment_processor_log[:zzPP_Response_Error] = @authorize_response_message
-
-			elsif @authorize_response_kind == "TokenError"
-				@payment_processor_log[:zzF_Status] = "TokenError"
-				@payment_processor_log[:zzPP_Response] = @authorize_response
-				@payment_processor_log[:zzPP_Response_Code] = @authorize_response_code
-				@payment_processor_log[:zzPP_Response_Error] = @authorize_response_message
-
-			elsif @authorize_response_kind == "TransactionFailure"
-				@payment_processor_log[:zzF_Status] = "TransactionFailure"
-				@payment_processor_log[:zzPP_Response_Error] = @authorize_response_message
-			end
 		end
 	end
 
