@@ -83,12 +83,13 @@ def load_payment_date
 	@serial = @payment_date["_Serial"].to_i
 	@directory_id = @payment_date["_kF_Directory"]
 	@payment_method_id = @payment_date["_kF_PaymentMethod"]
-	@merchant_id = @payment_date["T54_DIRECTORY::_kF_Merchant"]
 
 	@customer_token = @payment_date["T54_DIRECTORY::Token_Profile_ID"]
 	@payment_token = @payment_date["T54_PAYMENTMETHOD::Token_Payment_ID"]
-	@api_login_id = @payment_date["T54_Directory | MERCHANT::API_Login_ID"]
-	@api_transaction_key = @payment_date["T54_Directory | MERCHANT::API_Transaction_Key"]
+
+	# I am capturing both merchant flags to double check that they're associated to the same merchant account.
+	@merchant_directory = @payment_date["T54_DIRECTORY::zzF_Merchant"]
+	@merchant_payment_method = @payment_date["T54_PAYMENTMETHOD::zzF_Merchant"]
 
 	# Credit Card values.
 	@card_number = @payment_date["T54_PAYMENTMETHOD::CreditCard_Number"]
@@ -109,9 +110,11 @@ def load_payment_date
 		set_gl_codes # The GL Code needs to be set for each PaymentDate record.
 	end
 
+	check_directory_and_payment_method_merchants
 end
 
 def load_dialer_payment_date
+	# TBD: I need to update how the PHP Web Dialer app initiates this code to indicate which merchant to use. (12/12/2017)
 	@payment_date_id = @payment_date["__kP_Payment"]
 	@serial = @payment_date["_Serial"].to_i
 	@lead_id = @payment_date["_kF_DialerLead"]
@@ -176,25 +179,11 @@ def update_payment_date
 
 		elsif @result == "ERROR"
 
-			# These transaction were NOT processed.
-			if @authorize_response_kind == "TransactionError"
-				@payment_date[:zzF_Status] = "TransactionError"
-				@payment_date[:zzPP_Transaction] = @transaction_id
-				@payment_date[:zzPP_Response] = @authorize_response
-				@payment_date[:zzPP_Response_Code] = @authorize_response_code
-				@payment_date[:zzPP_Response_Error] = @authorize_response_message
-
-			elsif @authorize_response_kind == "TokenError"
-				@payment_date[:zzF_Status] = "TokenError"
-				@payment_date[:zzPP_Response] = @authorize_response
-				@payment_date[:zzPP_Response_Code] = @authorize_response_code
-				@payment_date[:zzPP_Response_Error] = @authorize_response_message
-
-			# This transaction was NOT sent to Authorize.net successfully.
-			elsif @authorize_response_kind == "TransactionFailure"
-				@payment_date[:zzF_Status] = "TransactionFailure"
-				@payment_date[:zzPP_Response_Error] = @authorize_response_message
-			end
+			@payment_date[:zzF_Status] = "Error"
+			@payment_date[:zzPP_Transaction] = @transaction_id
+			@payment_date[:zzPP_Response] = @authorize_response
+			@payment_date[:zzPP_Response_Code] = @authorize_response_code
+			@payment_date[:zzPP_Response_Error] = @authorize_response_message
 
 		end
 
