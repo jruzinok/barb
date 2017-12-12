@@ -22,6 +22,21 @@ def load_assigned_merchant_or_set_default
 		@merchant = "BAR"
 	elsif @database == "PTD"
 		@merchant = "PTD"
+	else
+		@merchant = "MISSING"
+	end
+end
+
+# This ensures that the directory and payment method records have been assigned to a merchant.
+# It also clears the @merchant variable if they don't match.
+# Without a @metchant variable, the transaction_ready method will prevent the tranaction from proceeding.
+def check_directory_and_payment_method_merchants
+	if @merchant_payment_method == @merchant_directory && @merchant_directory != nil && @merchant_payment_method != nil
+		@merchant = @merchant_directory
+	elsif @merchant_payment_method != @merchant_directory
+		@merchant = "MISMATCH"
+	else
+		@merchant = "MISSING"
 	end
 end
 
@@ -162,6 +177,8 @@ def clear_response
 	@cvv_code = nil
 	@transaction_id = nil
 	@authorization_code = nil
+	@status_code = nil
+	@status_message = nil
 end
 
 def to_boolean (string)
@@ -194,6 +211,7 @@ def log_result_to_console
 	puts "[PAYMENTMETHOD] #{@payment_method_id}"
 	puts "[PAYMENTDATE] #{@payment_date_id}"
 	puts "[RECORD] #{@serial}"
+	puts "[MERCHANT] #{@merchant}"
 	puts "[CUSTOMERTOKEN] #{@customer_token}"
 	puts "[PAYMENTTOKEN] #{@payment_token}"
 	puts "\n"
