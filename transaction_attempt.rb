@@ -38,8 +38,8 @@ def process_onetime_payment
 	@step1 = set_gl_codes
 
 	if @directory_found == true && @payment_method_found == true	
-		@step2 = card_or_token
-		@step3 = process_payment
+		@step2 = check_directory_and_payment_method_merchants
+		@step3 = process_or_skip
 		@step4 = capture_response
 		@step5 = save_transaction_attempt
 		@step6 = create_payment_processor_log
@@ -113,27 +113,14 @@ def save_transaction_attempt
 			@transaction_attempt[:zzPP_Response_Error] = @authorize_response_message
 		end
 
-	# These payments were NOT processes.
 	elsif @result == "ERROR"
 
-		if @authorize_response_kind == "TransactionError"
-			@transaction_attempt[:zzF_Status] = "TransactionError"
-			@transaction_attempt[:zzPP_Transaction] = @transaction_id
+		@transaction_attempt[:zzF_Status] = "Error"
+		@transaction_attempt[:zzPP_Transaction] = @transaction_id
+		@transaction_attempt[:zzPP_Response] = @authorize_response
+		@transaction_attempt[:zzPP_Response_Code] = @authorize_response_code
+		@transaction_attempt[:zzPP_Response_Error] = @authorize_response_message
 
-			@transaction_attempt[:zzPP_Response] = @authorize_response
-			@transaction_attempt[:zzPP_Response_Code] = @authorize_response_code
-			@transaction_attempt[:zzPP_Response_Error] = @authorize_response_message
-
-		elsif @authorize_response_kind == "TokenError"
-			@transaction_attempt[:zzF_Status] = "TokenError"
-			@transaction_attempt[:zzPP_Response] = @authorize_response
-			@transaction_attempt[:zzPP_Response_Code] = @authorize_response_code
-			@transaction_attempt[:zzPP_Response_Error] = @authorize_response_message
-
-		elsif @authorize_response_kind == "TransactionFailure"
-			@transaction_attempt[:zzF_Status] = "TransactionFailure"
-			@transaction_attempt[:zzPP_Response_Error] = @authorize_response_message
-		end
 	end
 
 	@transaction_attempt.save
