@@ -36,27 +36,14 @@ def save_processed_dailer_payment_date
 			@dailer_payment[:zzPP_Response_Error] = @authorize_response_message
 		end
 
-	# These payments were NOT processes.
 	elsif @result == "ERROR"
 
-		if @authorize_response_kind == "TransactionError"
-			@dailer_payment[:zzF_Status] = "TransactionError"
-			@dailer_payment[:zzPP_Transaction] = @transaction_id
+		@dailer_payment[:zzF_Status] = "Error"
+		@dailer_payment[:zzPP_Transaction] = @transaction_id
+		@dailer_payment[:zzPP_Response] = @authorize_response
+		@dailer_payment[:zzPP_Response_Code] = @authorize_response_code
+		@dailer_payment[:zzPP_Response_Error] = @authorize_response_message
 
-			@dailer_payment[:zzPP_Response] = @authorize_response
-			@dailer_payment[:zzPP_Response_Code] = @authorize_response_code
-			@dailer_payment[:zzPP_Response_Error] = @authorize_response_message
-
-		elsif @authorize_response_kind == "TokenError"
-			@dailer_payment[:zzF_Status] = "TokenError"
-			@dailer_payment[:zzPP_Response] = @authorize_response
-			@dailer_payment[:zzPP_Response_Code] = @authorize_response_code
-			@dailer_payment[:zzPP_Response_Error] = @authorize_response_message
-
-		elsif @authorize_response_kind == "TransactionFailure"
-			@dailer_payment[:zzF_Status] = "TransactionFailure"
-			@dailer_payment[:zzPP_Response_Error] = @authorize_response_message
-		end
 	end
 
 	@dailer_payment.save
