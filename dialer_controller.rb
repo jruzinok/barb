@@ -107,8 +107,7 @@ end
 
 def process_dialer_payment_date
 	@step0 = set_gl_codes
-	@step1 = card_or_token
-	@step2 = process_payment
+	@step1 = process_or_skip
 	@step3 = log_result_to_console
 	@step4 = save_processed_dailer_payment_date
 	@step5 = create_payment_processor_log
