@@ -1,7 +1,6 @@
 require 'bigdecimal'
 
 def process_payment_dates
-	find_by_batch
 
 	# This is used to mark the record's Date Processed.
 	# It's also used to determine the GL Code for Current Student Payment Dates.
@@ -15,36 +14,29 @@ def process_payment_dates
 	puts "[TIMESTAMP] #{Time.now}"
 	puts "----------------------------------------"
 
-	# SET the GL Codes.
-	@step0 = set_gl_codes
+	find_by_batch
+	set_gl_codes
 
 	@payment_dates.each do |pd|
 		@payment_date = pd
-		# These "steps" are for clarity sake.
-		# Later, these objects could be saved somewhere to log the steps of each batch when it's run.
-		if @database == "PTD" || @database == "BC" || @database == "CS"
-			@step1 = load_payment_date
-		elsif @database == "DL"
-			@step1 = load_dialer_payment_date
-		end
-
-		@step2 = process_or_skip
-		@step3 = log_result_to_console
-		@step4 = update_payment_date
-		@step5 = create_payment_processor_log
-		@step6 = clear_response
-		@step7 = clear_payment_date_variables
+		load_which_payment_date
+		process_or_skip
+		log_result_to_console
+		update_payment_date
+		create_payment_processor_log
+		clear_response
+		clear_payment_date_variables
 	end
 
 	# This final step calls a script in either the Data File or PTD17 which in turn calls a Payment Processor Tool script in the Payment Processor application file.
 	if @database == "PTD"
-		@step7 = PTDPaymentDate.find({:_kF_PaymentBatch => @batch}, :post_script => ["PaymentProcessorCallBack", "#{@batch}\nInitiate from Ruby\n[PTD]"])
+		fm = PTDPaymentDate.find({:_kF_PaymentBatch => @batch}, :post_script => ["PaymentProcessorCallBack", "#{@batch}\nInitiate from Ruby\n[PTD]"])
 	elsif @database == "BC"
-		@step7 = DATAPaymentDate.find({:_kF_PaymentBatch => @batch}, :post_script => ["PaymentProcessorCallBack", "#{@batch}\nInitiate from Ruby\n[BC]"])
+		fm = DATAPaymentDate.find({:_kF_PaymentBatch => @batch}, :post_script => ["PaymentProcessorCallBack", "#{@batch}\nInitiate from Ruby\n[BC]"])
 	elsif @database == "CS"
-		@step7 = DATAPaymentDate.find({:_kF_PaymentBatch => @batch}, :post_script => ["PaymentProcessorCallBack", "#{@batch}\nInitiate from Ruby\n[CS]"])
+		fm = DATAPaymentDate.find({:_kF_PaymentBatch => @batch}, :post_script => ["PaymentProcessorCallBack", "#{@batch}\nInitiate from Ruby\n[CS]"])
 	elsif @database == "DL"
-		@step7 = DIALERPaymentDate.find({:_kF_PaymentBatch => @batch}, :post_script => ["PaymentProcessorCallBack", "#{@batch}\nInitiate from Ruby\n[DL]"])
+		fm = DIALERPaymentDate.find({:_kF_PaymentBatch => @batch}, :post_script => ["PaymentProcessorCallBack", "#{@batch}\nInitiate from Ruby\n[DL]"])
 	end
 end
 
@@ -75,6 +67,14 @@ def find_payment_date
 		@status_message = "[ERROR] PaymentDateRecordNotFound"
 		set_response
 		log_result_to_console
+	end
+end
+
+def load_which_payment_date
+	if @database == "PTD" || @database == "BC" || @database == "CS"
+		load_payment_date
+	elsif @database == "DL"
+		load_dialer_payment_date
 	end
 end
 

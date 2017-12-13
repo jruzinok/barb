@@ -68,6 +68,7 @@ def transaction_not_ready
 	@result = "ERROR"
 	@status_code = 99
 	@status_message = "[ERROR] Merchant variables are missing."
+	copy_status_variables_to_response_variables
 	@return_json_package = JSON.generate ["result"=>@result,"status_code"=>@status_code,"status_message"=>@status_message][0]
 end
 

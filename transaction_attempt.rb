@@ -21,31 +21,26 @@ def process_transaction_attempt
 	find_directory
 	find_payment_method
 
-	# CAPTURE additional data needed to determine the GL Codes.
-	if @database == "BC"
-		find_event_attendee_by_directory
-	elsif @database == "CS"
-		load_directory_current_student_data
-		find_and_load_current_student_classdate
-	elsif @database == "PTD"
-		# NOT YET SETUP/ISN'T NEEDED AT THIS TIME. 2/23/2017
+	if @directory_found == true && @payment_method_found == true
+
+		# CAPTURE additional data needed to determine the GL Codes.
+		if @database == "BC"
+			find_event_attendee_by_directory
+		elsif @database == "CS"
+			load_directory_current_student_data
+			find_and_load_current_student_classdate
+		elsif @database == "PTD"
+			# NOT YET SETUP/ISN'T NEEDED AT THIS TIME. 2/23/2017
+		end
+
+		check_directory_and_payment_method_merchants
+		set_gl_codes
+		process_or_skip
+		capture_response
+		save_transaction_attempt
+		create_payment_processor_log
+		set_response
 	end
-
-	process_onetime_payment
-end
-
-def process_onetime_payment
-	@step1 = set_gl_codes
-
-	if @directory_found == true && @payment_method_found == true	
-		@step2 = check_directory_and_payment_method_merchants
-		@step3 = process_or_skip
-		@step4 = capture_response
-		@step5 = save_transaction_attempt
-		@step6 = create_payment_processor_log
-	end
-
-	@step7 = set_response
 end
 
 def capture_response
