@@ -112,6 +112,7 @@ def update_payment_token
 			@payment_token_updated = false
 			@status_code = 210
 			@status_message = "[ERROR] PaymentTokenNotUpdated"
+			@return_json_package = JSON.generate ["result"=>@result,"status_code"=>@status_code,"status_message"=>@status_message,"authorize_response_code"=>@authorize_response_message,"authorize_response_message"=>@authorize_response_message][0]
 		end
 
 		log_result_to_console
@@ -133,6 +134,7 @@ def delete_payment_token
 		elsif @result == "ERROR"
 			@status_code = 194
 			@status_message = "[ERROR] PaymentTokenNotDeleted"
+			@return_json_package = JSON.generate ["result"=>@result,"status_code"=>@status_code,"status_message"=>@status_message,"authorize_response_code"=>@authorize_response_message,"authorize_response_message"=>@authorize_response_message][0]
 		end
 
 		log_result_to_console
@@ -151,17 +153,18 @@ def validate_customer_token
 
 		@authorize_response = transaction.get_customer_profile(request)
 
-				if transaction_ok
-					# This is the expected result when a webapp requests to create a PT.
-					@has_customer_token = true
-					@status_code = 200
-					@status_message = "[OK] CustomerTokenExists"
-				elsif @result == "ERROR"
-					# This is the expected result when a webapp requests to create a CT.
-					@has_customer_token = false
-					@status_code = 194
-					@status_message = "[ERROR] CustomerTokenDoesNotExist"
-				end
+		if transaction_ok
+			# This is the expected result when a webapp requests to create a PT.
+			@has_customer_token = true
+			@status_code = 200
+			@status_message = "[OK] CustomerTokenExists"
+		elsif @result == "ERROR"
+			# This is the expected result when a webapp requests to create a CT.
+			@has_customer_token = false
+			@status_code = 194
+			@status_message = "[ERROR] CustomerTokenDoesNotExist"
+			@return_json_package = JSON.generate ["result"=>@result,"status_code"=>@status_code,"status_message"=>@status_message,"authorize_response_code"=>@authorize_response_message,"authorize_response_message"=>@authorize_response_message][0]
+		end
 
 		log_result_to_console
 	end
@@ -182,6 +185,7 @@ def retrieve_payment_token
 			@payment_token_retrieved = false
 			@status_code = 240
 			@status_message = "[ERROR] PaymentTokenCouldNotBeRetrieved"
+			@return_json_package = JSON.generate ["result"=>@result,"status_code"=>@status_code,"status_message"=>@status_message,"authorize_response_code"=>@authorize_response_message,"authorize_response_message"=>@authorize_response_message][0]
 		end
 
 		log_result_to_console
@@ -200,14 +204,13 @@ def validate_tokens
 		# PASS the transaction request and CAPTURE the transaction response.
 		@authorize_response = transaction.validate_customer_payment_profile(request)
 
-			if transaction_ok
-				@valid_tokens = true
-			elsif @result == "ERROR"
-				@valid_tokens = false
-				@authorize_response_kind = "TokenError"
-			end
-
-		log_result_to_console
+		if transaction_ok
+			@valid_tokens = true
+		elsif @result == "ERROR"
+			@valid_tokens = false
+			@authorize_response_kind = "TokenError"
+			log_result_to_console
+		end
 	end
 end
 
@@ -236,44 +239,36 @@ def process_payment
 		# PASS the transaction request and CAPTURE the transaction response.
 		@authorize_response = transaction.create_transaction(request)
 
-				# The transaction has a response.
-				if transaction_ok
+		# The transaction has a response.
+		if transaction_ok
 
-					# Capture the response variables for all transactions.
-					@avs_code = @authorize_response.transactionResponse.avsResultCode
-					@cvv_code = @authorize_response.transactionResponse.cvvResultCode
+			# Capture the response variables for all transactions.
+			@avs_code = @authorize_response.transactionResponse.avsResultCode
+			@cvv_code = @authorize_response.transactionResponse.cvvResultCode
 
-					# CAPTURE the transaction details.
-					@transaction_id = @authorize_response.transactionResponse.transId
-					@transaction_response_code = @authorize_response.transactionResponse.responseCode
+			# CAPTURE the transaction details.
+			@transaction_id = @authorize_response.transactionResponse.transId
+			@transaction_response_code = @authorize_response.transactionResponse.responseCode
 
-					if @transaction_response_code == "1"
-						@authorize_response_kind = "Approved"
-						@authorization_code = @authorize_response.transactionResponse.authCode
-						@authorize_response_code = @authorize_response.messages.messages[0].code
-						@authorize_response_message = @authorize_response.messages.messages[0].text
-
-					elsif @transaction_response_code == "2"
-						@authorize_response_kind = "Declined"
-						@authorize_response_code = @authorize_response.transactionResponse.errors.errors[0].errorCode
-						@authorize_response_message = @authorize_response.transactionResponse.errors.errors[0].errorText
-
-					elsif @transaction_response_code == "3"
-						@authorize_response_kind = "Error"
-						@authorize_response_code = @authorize_response.transactionResponse.errors.errors[0].errorCode
-						@authorize_response_message = @authorize_response.transactionResponse.errors.errors[0].errorText
-
-					elsif @transaction_response_code == "4"
-						@authorize_response_kind = "HeldforReview"
-						@authorize_response_code = @authorize_response.transactionResponse.errors.errors[0].errorCode
-						@authorize_response_message = @@authorize_response.transactionResponse.errors.errors[0].errorText
-					end
-
-				# A transactional ERROR occurred.
-				elsif @result == "ERROR"
-					@authorize_response_kind = "TransactionError"
-					@authorize_response_code = @authorize_response.transactionResponse.errors.errors[0].errorCode
-					@authorize_response_message = @authorize_response.transactionResponse.errors.errors[0].errorText
+			if @transaction_response_code == "1"
+				@authorize_response_kind = "Approved"
+				@authorization_code = @authorize_response.transactionResponse.authCode
+				transaction_payment_ok
+			else
+				if @transaction_response_code == "2"
+					@authorize_response_kind = "Declined"
+				elsif @transaction_response_code == "3"
+					@authorize_response_kind = "Error"
+				elsif @transaction_response_code == "4"
+					@authorize_response_kind = "HeldforReview"
 				end
+				transaction_payment_error
+			end
+
+		# A transactional ERROR occurred.
+		elsif @result == "ERROR"
+			@authorize_response_kind = "TransactionError"
+			transaction_payment_error
+		end
 	end
 end
