@@ -64,19 +64,6 @@ class PaymentProcessor < Sinatra::Application
 		body "Processed"
 	end
 
-	get '/create-customer-token/:database/:directory_id' do
-		@process = "Create Customer Token"
-		@processType = "Token"
-		@database = params[:database]
-		@directory_id = params[:directory_id]
-
-		create_directory_customer_token
-
-		# Return the response back to FileMaker.
-		status @status
-		body @body
-	end
-
 	# This process doesn't rely on FileMaker.
 	post '/create-customer-token' do
 		@process = "Create Customer Token"
@@ -102,15 +89,28 @@ class PaymentProcessor < Sinatra::Application
 	end
 
 	# This process doesn't rely on FileMaker.
-	post '/list-oe-payment-tokens' do
+	post '/list-payment-tokens' do
 		@process = "List Payment Tokens"
 		@processType = "Token"
 		@json = JSON.parse(request.body.read).symbolize_keys unless params[:path]
 
-		list_oe_payment_token_logic
+		list_payment_token_logic
 
 		# Return the response back to the requesting application.
 		@return_json_package
+	end
+
+	get '/create-customer-token/:database/:directory_id' do
+		@process = "Create Customer Token"
+		@processType = "Token"
+		@database = params[:database]
+		@directory_id = params[:directory_id]
+
+		create_directory_customer_token
+
+		# Return the response back to FileMaker.
+		status @status
+		body @body
 	end
 
 	post '/create-payment-token/:database/:directory_id/:payment_method_id' do
