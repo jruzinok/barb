@@ -152,34 +152,24 @@ def update_payment_date
 			end
 
 			# SAVE the response values for all transactions.
+			@payment_date[:zzF_Status] = @authorize_response_kind
 			@payment_date[:zzPP_Transaction] = @transaction_id
 			@payment_date[:zzPP_Response] = @authorize_response
+			@payment_date[:zzPP_Response_Code] = @authorize_response_code
 			@payment_date[:zzPP_Response_AVS_Code] = @avs_code
 			@payment_date[:zzPP_Response_CVV_Code] = @cvv_code
-			@payment_date[:zzPP_Response_Code] = @authorize_response_code
 
 			# These transaction WERE processed.
 			if @authorize_response_kind == "Approved"
-				@payment_date[:zzF_Status] = "Approved"
 				@payment_date[:zzPP_Authorization_Code] = @authorization_code
 				@payment_date[:zzPP_Response_Message] = @authorize_response_message
-
-			elsif @authorize_response_kind == "Declined"
-				@payment_date[:zzF_Status] = "Declined"
-				@payment_date[:zzPP_Response_Error] = @authorize_response_message
-
-			elsif @authorize_response_kind == "Error"
-				@payment_date[:zzF_Status] = "Error"
-				@payment_date[:zzPP_Response_Error] = @authorize_response_message
-
-			elsif @authorize_response_kind == "HeldforReview"
-				@payment_date[:zzF_Status] = "HeldForReview"
+			else
 				@payment_date[:zzPP_Response_Error] = @authorize_response_message
 			end
 
 		elsif @result == "ERROR"
 
-			@payment_date[:zzF_Status] = "Error"
+			@payment_date[:zzF_Status] = @authorize_response_kind
 			@payment_date[:zzPP_Transaction] = @transaction_id
 			@payment_date[:zzPP_Response] = @authorize_response
 			@payment_date[:zzPP_Response_Code] = @authorize_response_code

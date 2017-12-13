@@ -94,28 +94,18 @@ def save_transaction_attempt
 
 	# Record the transaction results for each processed payment.
 	if @result == "OK"
+		@transaction_attempt[:zzF_Status] = @authorize_response_kind
 
 		if @authorize_response_kind == "Approved"
-			@transaction_attempt[:zzF_Status] = "Approved"
 			@transaction_attempt[:zzPP_Authorization_Code] = @authorization_code
 			@transaction_attempt[:zzPP_Response_Message] = @authorize_response_message
-
-		elsif @authorize_response_kind == "Declined"
-			@transaction_attempt[:zzF_Status] = "Declined"
-			@transaction_attempt[:zzPP_Response_Error] = @authorize_response_message
-
-		elsif @authorize_response_kind == "Error"
-			@transaction_attempt[:zzF_Status] = "Error"
-			@transaction_attempt[:zzPP_Response_Error] = @authorize_response_message
-
-		elsif @authorize_response_kind == "HeldforReview"
-			@transaction_attempt[:zzF_Status] = "HeldForReview"
+		else
 			@transaction_attempt[:zzPP_Response_Error] = @authorize_response_message
 		end
 
 	elsif @result == "ERROR"
 
-		@transaction_attempt[:zzF_Status] = "Error"
+		@transaction_attempt[:zzF_Status] = @authorize_response_kind
 		@transaction_attempt[:zzPP_Transaction] = @transaction_id
 		@transaction_attempt[:zzPP_Response] = @authorize_response
 		@transaction_attempt[:zzPP_Response_Code] = @authorize_response_code
