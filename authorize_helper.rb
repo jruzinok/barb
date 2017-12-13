@@ -91,13 +91,28 @@ def transaction_error
 	@result = "ERROR"
 	@authorize_response_code = @authorize_response.messages.messages[0].code
 	@authorize_response_message = @authorize_response.messages.messages[0].text
-	@return_json_package = JSON.generate ["result"=>@result,"status_code"=>@status_code,"status_message"=>@status_message][0]
 end
 
 def transaction_failure
 	@result = "FAILURE"
-	@authorize_response_kind = "TransactionFailure"
 	@status_code = 98
 	@status_message = "[ERROR] A transactional FAILURE occurred."
-	@return_json_package = JSON.generate ["result"=>@result,"status_code"=>@status_code,"status_message"=>@status_message][0]
+	copy_status_variables_to_response_variables
+	@return_json_package = JSON.generate ["result"=>@result,"status_code"=>@status_code,"status_message"=>@status_message,"authorize_response_code"=>@authorize_response_message,"authorize_response_message"=>@authorize_response_message][0]
+end
+
+def copy_status_variables_to_response_variables
+	# Because a response was NOT received, this ensures that the records are marked accordingly.
+	@authorize_response_code = @status_code
+	@authorize_response_message = @status_message
+end
+
+def transaction_payment_ok
+	@authorize_response_code = @authorize_response.messages.messages[0].code
+	@authorize_response_message = @authorize_response.messages.messages[0].text
+end
+
+def transaction_payment_error
+	@authorize_response_code = @authorize_response.transactionResponse.errors.errors[0].errorCode
+	@authorize_response_message = @@authorize_response.transactionResponse.errors.errors[0].errorText
 end
