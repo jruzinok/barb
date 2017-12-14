@@ -88,6 +88,41 @@ def build_array_of_payment_tokens
 	end
 end
 
+def process_payment_logic
+
+	# This is used to determine the GL Code for Current Student Payment Dates.
+	@today = Time.new
+
+	if check_required_process_payment_params
+		prepare_process_payment_variables
+		set_gl_codes
+		process_or_skip
+
+		if @result == "OK"
+			@status_code = 200
+			@status_message = "[OK] PaymentProcessed"
+			@return_json_package = JSON.generate ["result"=>@result,"status_code"=>@status_code,"status_message"=>@status_message,"authorize_response_kind"=>@authorize_response_kind,"transaction_id"=>@transaction_id,"authorization_code"=>@authorization_code][0]
+		elsif @result == "ERROR"
+			@status_code = 191
+			@status_message = "[ERROR] PaymentNotProcessed"
+			@return_json_package = JSON.generate ["result"=>@result,"status_code"=>@status_code,"status_message"=>@status_message,"authorize_response_kind"=>@authorize_response_kind,"transaction_id"=>@transaction_id,"authorize_response_code"=>@authorize_response_code,"authorize_response_message"=>@authorize_response_message][0]
+		end
+
+	else
+		@result = "ERROR"
+		@status_code = 190
+		@status_message = "[ERROR] Missing required JSON variables."
+		@return_json_package = JSON.generate ["result"=>@result,"status_code"=>@status_code,"status_message"=>@status_message][0]
+	end
+
+	log_result_to_console
+	set_response
+end
+
+
+
+
+
 def check_required_ct_params
 	if @json[:filemaker_id] && @json[:merchant] && @json[:name_first] && @json[:name_last] && @json[:program]
 		true
@@ -106,6 +141,14 @@ end
 
 def check_required_list_params
 	if @json[:customer_token]
+		true
+	else
+		false
+	end
+end
+
+def check_required_process_payment_params
+	if @json[:merchant] && @json[:customer_token] && @json[:payment_token] && @json[:amount] && @json[:date] && @json[:program] && @json[:database] # The :program and :database are used to determine the GL Codes.
 		true
 	else
 		false
@@ -135,4 +178,14 @@ def prepare_payment_variables
 	@city = @json[:address_city]
 	@state = @json[:address_state]
 	@zip = @json[:address_zip]
+end
+
+def prepare_process_payment_variables
+	@merchant = @json[:merchant]
+	@customer_token = @json[:customer_token]
+	@payment_token = @json[:payment_token]
+	@amount = @json[:amount]
+	@date = @json[:date]
+	@program = @json[:program]
+	@database = @json[:database]
 end

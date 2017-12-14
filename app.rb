@@ -100,6 +100,18 @@ class PaymentProcessor < Sinatra::Application
 		@return_json_package
 	end
 
+	# This process doesn't rely on FileMaker.
+	post '/process-payment' do
+		@process = "Process Payment"
+		@processType = "Payment"
+		@json = JSON.parse(request.body.read).symbolize_keys unless params[:path]
+
+		process_payment_logic
+
+		# Return the response back to the requesting application.
+		@return_json_package
+	end
+
 	get '/create-customer-token/:database/:directory_id' do
 		@process = "Create Customer Token"
 		@processType = "Token"
