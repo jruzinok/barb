@@ -115,5 +115,5 @@ end
 
 def transaction_payment_error
 	@authorize_response_code = @authorize_response.transactionResponse.errors.errors[0].errorCode
-	@authorize_response_message = @@authorize_response.transactionResponse.errors.errors[0].errorText
+	@authorize_response_message = @authorize_response.transactionResponse.errors.errors[0].errorText
 end
