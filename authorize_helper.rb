@@ -114,6 +114,13 @@ def transaction_payment_ok
 end
 
 def transaction_payment_error
-	@authorize_response_code = @authorize_response.transactionResponse.errors.errors[0].errorCode
-	@authorize_response_message = @authorize_response.transactionResponse.errors.errors[0].errorText
+	if @authorize_response.transactionResponse.errors != nil
+		@authorize_response_code = @authorize_response.transactionResponse.errors.errors[0].errorCode
+		@authorize_response_message = @authorize_response.transactionResponse.errors.errors[0].errorText
+	else
+		@result = "ERROR"
+		@authorize_response_kind = "TransactionError"
+		@authorize_response_code = "010101"
+		@authorize_response_message = "No response from Authorize"
+	end
 end
