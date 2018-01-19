@@ -155,6 +155,7 @@ def validate_customer_token
 
 		if transaction_ok
 			# This is the expected result when a webapp requests to create a PT.
+			@customer_token = @authorize_response.customerProfileId
 			@has_customer_token = true
 			@status_code = 200
 			@status_message = "[OK] CustomerTokenExists"

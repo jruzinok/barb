@@ -92,6 +92,8 @@ def transaction_error
 	@result = "ERROR"
 	@authorize_response_code = @authorize_response.messages.messages[0].code
 	@authorize_response_message = @authorize_response.messages.messages[0].text
+
+	clean_authorize_response_message
 end
 
 def transaction_failure
@@ -111,16 +113,24 @@ end
 def transaction_payment_ok
 	@authorize_response_code = @authorize_response.messages.messages[0].code
 	@authorize_response_message = @authorize_response.messages.messages[0].text
+
+	clean_authorize_response_message
 end
 
 def transaction_payment_error
 	if @authorize_response.transactionResponse != nil
 		@authorize_response_code = @authorize_response.transactionResponse.errors.errors[0].errorCode
 		@authorize_response_message = @authorize_response.transactionResponse.errors.errors[0].errorText
+
+		clean_authorize_response_message
 	else
 		@result = "ERROR"
 		@authorize_response_kind = "TransactionError"
 		@authorize_response_code = "010101"
 		@authorize_response_message = "No response from Authorize"
 	end
+end
+
+def clean_authorize_response_message
+	@authorize_response_message.sub! "(TESTMODE) ", ""
 end
