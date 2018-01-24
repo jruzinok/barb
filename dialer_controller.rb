@@ -11,14 +11,15 @@ def process_create_dialer_payment_method_request
 			save_scheduled_dailer_payment_date
 			create_payment_processor_log
 		end
-	end
 
+	log_result_to_console
 end
 
 # To ONLY create tokens.
 def process_create_dialer_payment_method_request_v2
 	parse_create_dialer_payment_method_post
 	create_dialer_tokens
+	log_result_to_console
 end
 
 def process_create_dialer_payment_date_request
@@ -32,9 +33,11 @@ def process_create_dialer_payment_date_request
 		create_payment_processor_log
 	end
 
+	log_result_to_console
 end
 
 def parse_create_dialer_payment_method_post
+	@merchant = params[:merchant]
 	@lead_id = params[:lead_id]
 	@guest_id = params[:guest_id]
 	@payment_method_id = params[:payment_method_id]
@@ -68,10 +71,12 @@ def log_post_variables_to_console
 	puts "----------------------------------------"
 	puts "[POST VALUES]"
 	puts "----------------------------------------"
+	puts "[DATABASE] #{@database}"
 	puts "[LEAD] #{@lead_id}"
 	puts "[GUEST] #{@guest_id}"
 	puts "[PAYMENTMETHOD] #{@payment_method_id}"
 	puts "[REQUESTTYPE] #{@request_type}" #Charge or Schedule
+	puts "[MERCHANT] #{@merchant}"
 
 	# Grab the values from the POST object.
 	puts "[DATE] #{@date}"
