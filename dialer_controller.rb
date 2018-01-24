@@ -11,6 +11,7 @@ def process_create_dialer_payment_method_request
 			save_scheduled_dailer_payment_date
 			create_payment_processor_log
 		end
+	end
 
 	log_result_to_console
 end
