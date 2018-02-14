@@ -49,21 +49,25 @@ class DATAEventAttendee < Rfm::Base
 end
 
 class DIALERPaymentDate < Rfm::Base
+	config :host => "192.168.0.17"
 	config :database => 'DialerLeads'
 	config :layout => 'WEB_PAYMENT'
 end
 
 class DIALERLead < Rfm::Base
+	config :host => "192.168.0.17"
 	config :database => 'DialerLeads'
 	config :layout => 'WEB_DIALERLEAD'
 end
 
 class DIALERGuest < Rfm::Base
+	config :host => "192.168.0.17"
 	config :database => 'DialerLeads'
 	config :layout => 'WEB_DIALERGUEST'
 end
 
 class DIALERPaymentMethod < Rfm::Base
+	config :host => "192.168.0.17"
 	config :database => 'DialerLeads'
 	config :layout => 'WEB_PAYMENTMETHOD'
 end
