@@ -48,6 +48,7 @@ def parse_create_dialer_payment_method_post
 	# GL Codes
 	@program = params[:program] # BC/CS/PTD
 	@event_abbr = params[:event_abbr] # ATL/DC/FL... [BC ONLY]
+	@event_year = params[:event_year] # BC ONLY e.g. 2018
 
 	# This is used to flag Payment Method records.
 	@flag_deposit = params[:flag_deposit]
