@@ -176,12 +176,14 @@ def retrieve_payment_token
 		request = GetCustomerPaymentProfileRequest.new
 		request.customerProfileId = @customer_token
 		request.customerPaymentProfileId = @payment_token
+		request.includeIssuerInfo = true
 
 		@authorize_response = transaction.get_customer_payment_profile(request)
 
 		if transaction_ok
 			@payment_token_retrieved = true
 			@masked_card_number = @authorize_response.paymentProfile.payment.creditCard.cardNumber
+			@card_issuer_number = @authorize_response.paymentProfile.payment.creditCard.issuerNumber
 		elsif @result == "ERROR"
 			@payment_token_retrieved = false
 			@status_code = 240

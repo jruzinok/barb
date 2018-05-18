@@ -20,8 +20,11 @@ def validate_multiple_tokens
 		@step1 = load_payment_method
 		@step2 = capture_related_directory_id
 		@step3 = find_directory
+		@step3b = check_directory_and_payment_method_merchants
 		@step4 = validate_tokens
 		@step5 = log_token_validation_result_to_console
+		@step5b = retrieve_payment_token
+		@step5c = update_payment_method_issuer_number
 		@step6 = save_payment_method_token_validation_result
 		@step7 = clear_response
 	end
@@ -47,6 +50,13 @@ end
 
 def capture_related_directory_id
 	@directory_id = @payment_method["_kF_Directory"]
+end
+
+# This is dependant on the retrieve_payment_token method.
+def update_payment_method_issuer_number
+	if @result == "OK"
+		@payment_method[:CreditCard_Issuer_Number] = @card_issuer_number
+	end
 end
 
 def save_payment_method_token_validation_result

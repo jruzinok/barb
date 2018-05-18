@@ -88,8 +88,6 @@ def load_payment_method
 	check_payment_token
 end
 
-# @save_payment_method = "Create"
-
 def save_payment_method
 	if @save_payment_method == "Create"
 		create_payment_method
@@ -120,6 +118,7 @@ def update_payment_method
 	if @result == "OK"
 		@payment_method[:Token_Payment_ID] = @payment_token
 		@payment_method[:zzF_Merchant] = @merchant
+		@payment_method[:CreditCard_Issuer_Number] = @card_issuer_number
 		@payment_method[:zzF_Status] = "Active"
 		@payment_method[:zzF_Type] = "Token"
 	else
