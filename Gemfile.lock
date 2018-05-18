@@ -1,30 +1,31 @@
 GEM
   remote: http://rubygems.org/
   specs:
-    activesupport (4.2.6)
-      i18n (~> 0.7)
-      json (~> 1.7, >= 1.7.7)
+    activesupport (5.2.0)
+      concurrent-ruby (~> 1.0, >= 1.0.2)
+      i18n (>= 0.7, < 2)
       minitest (~> 5.1)
-      thread_safe (~> 0.3, >= 0.3.4)
       tzinfo (~> 1.1)
-    authorizenet (1.9.3)
-      activesupport (= 4.2.6)
+    authorizenet (1.9.4)
+      activesupport (>= 4.2.6)
       nokogiri (~> 1.6, >= 1.6.4)
       roxml (= 3.3.1)
     backports (3.6.8)
     coderay (1.1.1)
+    concurrent-ruby (1.0.5)
     daemons (1.2.3)
     diff-lcs (1.2.5)
     eventmachine (1.2.0.1)
     ginjo-rfm (3.0.11)
-    i18n (0.8.5)
+    i18n (1.0.1)
+      concurrent-ruby (~> 1.0)
     json (1.8.6)
     method_source (0.8.2)
-    mini_portile2 (2.0.0)
-    minitest (5.10.2)
+    mini_portile2 (2.3.0)
+    minitest (5.11.3)
     multi_json (1.11.2)
-    nokogiri (1.6.7.2)
-      mini_portile2 (~> 2.0.0.rc2)
+    nokogiri (1.8.2)
+      mini_portile2 (~> 2.3.0)
     pry (0.10.3)
       coderay (~> 1.1.0)
       method_source (~> 0.8.1)
@@ -65,14 +66,14 @@ GEM
       rack (~> 1.0)
     thread_safe (0.3.6)
     tilt (2.0.2)
-    tzinfo (1.2.3)
+    tzinfo (1.2.5)
       thread_safe (~> 0.1)
 
 PLATFORMS
   ruby
 
 DEPENDENCIES
-  authorizenet (~> 1.9.3)
+  authorizenet (~> 1.9.4)
   ginjo-rfm (~> 3.0, >= 3.0.11)
   json
   pry
@@ -88,4 +89,4 @@ RUBY VERSION
    ruby 2.4.2p198
 
 BUNDLED WITH
-   1.15.4
+   1.16.0
