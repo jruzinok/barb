@@ -1,5 +1,5 @@
 source "http://rubygems.org"
-ruby '2.4.2'
+ruby '2.5.1'
 
 gem "sinatra"
 gem "rack"
@@ -7,7 +7,7 @@ gem "rack-cors"
 
 gem "rspec"    , '~> 2.1'
 gem "rake"     , '~> 0.8', '>= 0.8.7'
-gem "authorizenet"  , '~> 1.9.3'
+gem "authorizenet"  , '~> 1.9.5'
 gem 'ginjo-rfm', '~> 3.0', '>= 3.0.11'
 
 # Only included to support auto-reload durring development.
